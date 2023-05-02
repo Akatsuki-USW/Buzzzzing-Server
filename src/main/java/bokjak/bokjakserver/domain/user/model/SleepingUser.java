@@ -6,7 +6,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "user_black_user")
+@Table(name = "sleeping_user")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SleepingUser {
