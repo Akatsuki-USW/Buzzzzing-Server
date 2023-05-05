@@ -1,11 +1,11 @@
 package bokjak.bokjakserver.domain.spot.model;
 
 
-import bokjak.bokjakserver.domain.bookmark.model.Bookmark;
+import bokjak.bokjakserver.domain.bookmark.model.SpotBookmark;
+import bokjak.bokjakserver.domain.category.model.SpotCategory;
 import bokjak.bokjakserver.domain.comment.model.Comment;
 import bokjak.bokjakserver.domain.location.model.Location;
 import bokjak.bokjakserver.domain.user.model.User;
-import bokjak.bokjakserver.domain.user.model.UserBlackUser;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,18 +26,27 @@ public class Spot {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id", nullable = false)
     private Location location;
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "spot_category_id", nullable = false)
+    private SpotCategory spotCategory;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
+    @Column(length = 50)
+    private String title;
+    @Column(length = 50)
+    private String spot_name;
+    private String address;
+    private String roadNameAddress;
     @Column(length = 1500)
     private String content;
     @Column(length = 500)
-    private String image_url;
+    private String thumbnailImageUrl;
 
     @OneToMany(mappedBy = "spot", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Bookmark> bookmarkList;
+    private List<SpotBookmark> spotBookmarkList;
     @OneToMany(mappedBy = "spot", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> commentList;
+    @OneToMany(mappedBy = "spot", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SpotImage> spotImageList;
 }

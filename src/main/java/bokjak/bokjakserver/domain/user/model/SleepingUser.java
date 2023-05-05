@@ -1,31 +1,34 @@
 package bokjak.bokjakserver.domain.user.model;
 
+import bokjak.bokjakserver.common.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "sleeping_user")
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SleepingUser {
+public class SleepingUser extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sleeping_user_id")
     private Long id;
 
-    private Long userId;
+    private Long originalId;
     @Enumerated(EnumType.STRING)
     private Role role;
-    private String email;
     @Enumerated(EnumType.STRING)
-    private Socialtype socialtype;
-    private String socail_uuid;
-    private String refresh_token;
+    private UserStatus userStatus;
+    private String email;
+    private String socialUuid;
+    @Enumerated(EnumType.STRING)
+    private SocialType socialType;
+    private String profileImageUrl;
+    private String refreshToken;
     private String nickname;
-    private LocalDateTime lastVisitedAt;
-    private LocalDateTime quitedAt;
-
+    private LocalDateTime lastLoginDate;
 }

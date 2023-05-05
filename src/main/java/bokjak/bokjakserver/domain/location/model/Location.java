@@ -1,7 +1,10 @@
 package bokjak.bokjakserver.domain.location.model;
 
-import bokjak.bokjakserver.domain.category.model.Category;
+import bokjak.bokjakserver.common.model.BaseEntity;
+import bokjak.bokjakserver.domain.bookmark.model.LocationBookmark;
+import bokjak.bokjakserver.domain.category.model.LocationCategory;
 import bokjak.bokjakserver.domain.congestion.model.Congestion;
+import bokjak.bokjakserver.domain.spot.model.Spot;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,7 +15,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Location {
+public class Location extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,12 +23,15 @@ public class Location {
     private Long id;
 
     private Long apiId;
-    private String name;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
-
+    @JoinColumn(name = "location_category_id", nullable = false)
+    private LocationCategory locationCategory;
+    private String name;
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Congestion> congestionList;
+
+    @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Spot> spotList;
+    @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LocationBookmark> locationBookmarkList;
 }

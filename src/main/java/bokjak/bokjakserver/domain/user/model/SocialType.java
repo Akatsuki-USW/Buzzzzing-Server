@@ -1,5 +1,5 @@
 package bokjak.bokjakserver.domain.user.model;
 
-public enum Socialtype {
+public enum SocialType {
     KAKAO
 }

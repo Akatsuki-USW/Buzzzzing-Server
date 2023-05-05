@@ -21,14 +21,11 @@ public class Comment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "spot_id", nullable = false)
     private Spot spot;
-
-    @Column(length = 1500)
+    @Column(length = 300)
     private String content;
-
-    @Column(length = 500)
-    private String image_url;
+    private Long sequence;
+    private Long depth;
 }
