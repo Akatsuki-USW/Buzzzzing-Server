@@ -51,12 +51,12 @@ public class User extends BaseEntity {
     private List<LocationBookmark> locationBookmarkList;
 
     //회원(1) - 차단을 원하는 유저(다)
-    @OneToMany(mappedBy = "hiderUserId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserHideUser> hiderUserList;
+    @OneToMany(mappedBy = "blockerUserId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserBlockUser> blockerUserList;
 
     //회원(1) - 차단당한 유저(다)
-    @OneToMany(mappedBy = "hidedUserId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserHideUser> hidedUserList;
+    @OneToMany(mappedBy = "blockedUserId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserBlockUser> blockedUserList;
 
     //회원(1) - 신고한 유저(다)
     @OneToMany(mappedBy = "reporterUserId", cascade = CascadeType.ALL, orphanRemoval = true)
