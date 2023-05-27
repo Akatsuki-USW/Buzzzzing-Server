@@ -7,7 +7,7 @@ import bokjak.bokjakserver.domain.user.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -23,7 +23,7 @@ public class Ban extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "banned_user_id", nullable = false)
+    @JoinColumn(name = "banned_user_id")
     private User user;
     @OneToOne(mappedBy = "banId")       //n+1 잘 생각해봐야할 듯
     private Report report;
@@ -31,6 +31,11 @@ public class Ban extends BaseEntity {
     private String title;
     @Column(length = 300)
     private String content;
-    private LocalDate banStartedAt;
-    private LocalDate banEndedAt;
+    private LocalDateTime banStartedAt;
+    private LocalDateTime banEndedAt;
+    private Boolean isBanned;
+
+    public void changeIsBanned(boolean isBanned) {
+        this.isBanned = isBanned;
+    }
 }

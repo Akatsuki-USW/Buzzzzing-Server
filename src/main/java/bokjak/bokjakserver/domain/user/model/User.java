@@ -11,6 +11,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -31,50 +32,60 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
     private String email;
-    private String socialUuid;
+    private String password;    //다시 알아보기
+    private String socialEmail;
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
     @Column(length = 500)
     private String profileImageUrl;
-    private String refreshToken;
     @Column(length = 20)
     private String nickname;
     private LocalDateTime lastLoginDate;
 
 
     //회원(1) - 게시글 북마크 (다)
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SpotBookmark> spotBookmarkList;
+    private List<SpotBookmark> spotBookmarkList = new ArrayList<>();
 
     //회원(1) - 장소 북마크(다)
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<LocationBookmark> locationBookmarkList;
+    private List<LocationBookmark> locationBookmarkList = new ArrayList<>();
 
     //회원(1) - 차단을 원하는 유저(다)
+    @Builder.Default
     @OneToMany(mappedBy = "blockerUserId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserBlockUser> blockerUserList;
+    private List<UserBlockUser> blockerUserList = new ArrayList<>();
 
     //회원(1) - 차단당한 유저(다)
+    @Builder.Default
     @OneToMany(mappedBy = "blockedUserId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserBlockUser> blockedUserList;
+    private List<UserBlockUser> blockedUserList = new ArrayList<>();
 
     //회원(1) - 신고한 유저(다)
+    @Builder.Default
     @OneToMany(mappedBy = "reporterUserId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Report> reporterUserList;
+    private List<Report> reporterUserList = new ArrayList<>();
 
     //회원(1) - 신고당한 유저(다)
+    @Builder.Default
     @OneToMany(mappedBy = "reportedUserId", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Report> reportedUserList;
+    private List<Report> reportedUserList = new ArrayList<>();
 
     //회원(1) - 정지 유저(다)
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Ban> banList;
+    private List<Ban> banList = new ArrayList<>();
 
     //회원(1) - 게시글(다)
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Spot> spotList;
+    private List<Spot> spotList = new ArrayList<>();
 
     //회원(1) - 댓글(다)
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> commentList;
+    private List<Comment> commentList = new ArrayList<>();
+
 }
