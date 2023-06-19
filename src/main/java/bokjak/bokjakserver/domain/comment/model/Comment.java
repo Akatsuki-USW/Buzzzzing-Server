@@ -7,9 +7,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
+@Getter
 @Builder
 @AllArgsConstructor
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Comment extends BaseEntity {
 

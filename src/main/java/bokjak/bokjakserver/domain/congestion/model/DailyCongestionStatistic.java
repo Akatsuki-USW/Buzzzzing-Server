@@ -1,29 +1,30 @@
 package bokjak.bokjakserver.domain.congestion.model;
 
-import bokjak.bokjakserver.common.model.BaseEntity;
 import bokjak.bokjakserver.domain.location.model.Location;
+import com.vladmihalcea.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Type;
 
-import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity
 @Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Congestion extends BaseEntity {
-
+public class DailyCongestionStatistic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "congestion_id")
+    @Column(name = "congestion_statistic_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id", nullable = false)
     private Location location;
 
-    @Enumerated(EnumType.STRING)
-    private CongestionLevel congestionLevel;   //range : 1 ~ 4 (여유, 보통, 약간 혼잡, 혼잡)
-    private LocalDate observedAt;
+    @Type(JsonType.class)
+    @Column(columnDefinition = "json")
+    private Map<String, Object> content = new HashMap<>();  // 시간별 혼잡도 (09시 ~ 24시)
 }
