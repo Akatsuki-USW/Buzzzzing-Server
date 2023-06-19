@@ -34,10 +34,9 @@ public class Location extends BaseEntity {
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Congestion> congestionList = new ArrayList<>();
 
-    // TODO : new ArrayList
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Spot> spotList;
+    private List<Spot> spotList = new ArrayList<>();
 
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<LocationBookmark> locationBookmarkList;
+    private List<LocationBookmark> locationBookmarkList = new ArrayList<>();
 }

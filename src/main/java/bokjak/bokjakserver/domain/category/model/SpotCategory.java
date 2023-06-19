@@ -4,6 +4,7 @@ import bokjak.bokjakserver.domain.spot.model.Spot;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,5 +22,5 @@ public class SpotCategory {
     private String name;
 
     @OneToMany(mappedBy = "spotCategory", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Spot> spotList;
+    private List<Spot> spotList = new ArrayList<>();
 }

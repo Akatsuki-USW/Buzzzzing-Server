@@ -9,6 +9,7 @@ import bokjak.bokjakserver.domain.user.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -52,11 +53,11 @@ public class Spot {
     private String thumbnailImageUrl;
 
     @OneToMany(mappedBy = "spot", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SpotBookmark> spotBookmarkList;
+    private List<SpotBookmark> spotBookmarkList = new ArrayList<>();
 
     @OneToMany(mappedBy = "spot", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> commentList;
+    private List<Comment> commentList = new ArrayList<>();
 
     @OneToMany(mappedBy = "spot", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SpotImage> spotImageList;
+    private List<SpotImage> spotImageList = new ArrayList<>();
 }

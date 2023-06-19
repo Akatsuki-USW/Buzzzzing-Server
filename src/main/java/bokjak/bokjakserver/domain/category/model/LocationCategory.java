@@ -4,6 +4,7 @@ import bokjak.bokjakserver.domain.location.model.Location;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -23,6 +24,6 @@ public class LocationCategory {
     private String iconImageUrl;
 
     @OneToMany(mappedBy = "locationCategory", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Location> locationList;
+    private List<Location> locationList = new ArrayList<>();
 
 }
