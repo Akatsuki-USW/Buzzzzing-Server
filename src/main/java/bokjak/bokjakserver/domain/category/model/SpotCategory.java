@@ -7,9 +7,9 @@ import lombok.*;
 import java.util.List;
 
 @Entity
+@Getter
 @Builder
 @AllArgsConstructor
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SpotCategory {
 

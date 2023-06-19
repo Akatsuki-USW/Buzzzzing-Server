@@ -26,27 +26,37 @@ public class Spot {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id", nullable = false)
     private Location location;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "spot_category_id", nullable = false)
     private SpotCategory spotCategory;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
     @Column(length = 50)
     private String title;
+
     @Column(length = 50)
     private String spot_name;
+
     private String address;
+
     private String roadNameAddress;
+
     @Column(length = 1500)
     private String content;
+
     @Column(length = 500)
     private String thumbnailImageUrl;
 
     @OneToMany(mappedBy = "spot", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SpotBookmark> spotBookmarkList;
+
     @OneToMany(mappedBy = "spot", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> commentList;
+
     @OneToMany(mappedBy = "spot", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SpotImage> spotImageList;
 }

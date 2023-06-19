@@ -7,10 +7,9 @@ import lombok.*;
 import java.util.List;
 
 @Entity
-@Table
+@Getter
 @Builder
 @AllArgsConstructor
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LocationCategory {
 
@@ -20,6 +19,7 @@ public class LocationCategory {
     private Long id;
 
     private String name;
+
     private String iconImageUrl;
 
     @OneToMany(mappedBy = "locationCategory", cascade = CascadeType.ALL, orphanRemoval = true)
