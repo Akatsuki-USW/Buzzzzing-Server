@@ -53,14 +53,14 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LocationBookmark> locationBookmarkList = new ArrayList<>();
 
-    //회원(1) - 차단을 원하는 유저(다)
+    //회원(1) - 다른 유저에게 차단당한 유저(다)
     @Builder.Default
-    @OneToMany(mappedBy = "blockerUserId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "blockerUser", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserBlockUser> blockerUserList = new ArrayList<>();
 
-    //회원(1) - 차단당한 유저(다)
+    //회원(1) - 차단한 유저(다)
     @Builder.Default
-    @OneToMany(mappedBy = "blockedUserId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "blockedUser", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserBlockUser> blockedUserList = new ArrayList<>();
 
     //회원(1) - 신고한 유저(다)
@@ -87,5 +87,37 @@ public class User extends BaseEntity {
     @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> commentList = new ArrayList<>();
+
+    public void deletedUser() {
+        this.userStatus = UserStatus.DELETED;
+        this.email = null;
+        this.password = null;
+        this.nickname = null;
+        this.socialEmail = null;
+        this.socialType = null;
+        this.profileImageUrl = null;
+    }
+
+    public void updateUserStatus(UserStatus userStatus) {
+        this.userStatus = userStatus;
+    }
+
+    public void addBlockerUser(UserBlockUser userBlockUser) {
+        if (blockerUserList == null) blockerUserList = new ArrayList<>();
+        blockerUserList.add(userBlockUser);
+
+    }
+    public void addBlockedUser(UserBlockUser userBlockUser) {
+        if (blockedUserList == null) blockedUserList = new ArrayList<>();
+        blockedUserList.add(userBlockUser);
+    }
+
+    public void removeBlockerUser(UserBlockUser userBlockUser) {
+        blockerUserList.remove(userBlockUser);
+    }
+
+    public void removeBlockedUser(UserBlockUser userBlockUser) {
+        blockedUserList.remove(userBlockUser);
+    }
 
 }
