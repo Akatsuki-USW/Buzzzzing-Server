@@ -14,7 +14,7 @@ import static bokjak.bokjakserver.common.dto.ApiResponse.success;
 import static bokjak.bokjakserver.domain.user.dto.AuthDto.*;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 @Tag(name = "Auth API", description = "Oauth2 관련 API")
 @Slf4j
