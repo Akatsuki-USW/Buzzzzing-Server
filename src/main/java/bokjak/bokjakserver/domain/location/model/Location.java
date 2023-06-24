@@ -8,6 +8,7 @@ import bokjak.bokjakserver.domain.spot.model.Spot;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -22,16 +23,20 @@ public class Location extends BaseEntity {
     @Column(name = "location_id")
     private Long id;
 
-    private Long apiId;
+    private int apiId;  // 혼잡도 API(SK, 서울시)상의 장소 PK값
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_category_id", nullable = false)
     private LocationCategory locationCategory;
+
     private String name;
-    @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Congestion> congestionList;
 
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Spot> spotList;
+    private List<Congestion> congestionList = new ArrayList<>();
+
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<LocationBookmark> locationBookmarkList;
+    private List<Spot> spotList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<LocationBookmark> locationBookmarkList = new ArrayList<>();
 }

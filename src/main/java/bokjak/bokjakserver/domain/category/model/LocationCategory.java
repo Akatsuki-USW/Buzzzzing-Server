@@ -4,13 +4,13 @@ import bokjak.bokjakserver.domain.location.model.Location;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table
+@Getter
 @Builder
 @AllArgsConstructor
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LocationCategory {
 
@@ -20,9 +20,10 @@ public class LocationCategory {
     private Long id;
 
     private String name;
+
     private String iconImageUrl;
 
     @OneToMany(mappedBy = "locationCategory", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Location> locationList;
+    private List<Location> locationList = new ArrayList<>();
 
 }
