@@ -42,6 +42,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	testImplementation 'org.springframework.security:spring-security-test'
 
+
+
 	//jjwt 추가
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
 	implementation 'io.jsonwebtoken:jjwt-impl:0.11.2'
@@ -61,6 +63,12 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
+
+// gradlew 빌드시 에러 발생방지
+jar {
+	enabled = false
+}
+
 // queryDSL 설정부
 def querydslDir = "$buildDir/generated/querydsl"
 querydsl {
@@ -73,3 +81,4 @@ sourceSets {
 compileQuerydsl{
 	options.annotationProcessorPath = configurations.querydsl
 }
+

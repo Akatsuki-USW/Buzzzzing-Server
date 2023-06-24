@@ -13,9 +13,12 @@ public enum StatusCode {
     NOT_FOUND_USER(404, 2000, "not found user error."),
     NICKNAME_DUPLICATION(409, 2010, "duplicated nickname error."),
     BANNED_USER(400,2020,"banned user error"),
-    PERMANENTLY_BANNED_USER(400, 2030, "permanently banned user error."),
+    BLACKLIST_BANNED_USER(403, 2030, "blacklist user error."),
     SOCIAL_TYPE_ERROR(400,2040,"invalid social type error."),
-
+    REVOKE_USER(403,2050,"revoke user error"),
+    NICKNAME_VALIDATE_ERROR(400,2060,"invalid nickname error"),
+    BLOCK_ERROR(400,2070,"not found blockId error"),
+    IS_BLOCKED_ERROR(400,2080,"isblocked error"),
     /**
      * Auth
      */
@@ -32,6 +35,7 @@ public enum StatusCode {
     NEED_TO_SIGNUP(404, 1040, "need to signup, X-ACCESS-TOKEN is issued."),
     ENCRYPTION_FAILURE(400,1050,"encryption failure"),
     DECRYPTION_FAILURE(400,1060,"decryption failure"),
+    REVOKE_ERROR(404,1070,"revoke error"),
     IS_NOT_REFRESH(400, 1070, "this token is not refresh token."),
     EXPIRED_REFRESH(400,1080,"expired refresh token");
 

@@ -2,6 +2,7 @@ package bokjak.bokjakserver.util;
 
 import bokjak.bokjakserver.common.exception.StatusCode;
 import bokjak.bokjakserver.domain.user.exeption.AuthException;
+import bokjak.bokjakserver.domain.user.exeption.UserException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -9,6 +10,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Base64;
 
@@ -27,6 +29,25 @@ public class CustomEncryptUtil {
             secretKeySpec = new SecretKeySpec(key, "AES");
         } catch (Exception ignored) {
         }
+    }
+
+    public String hash(String socialEmail) {
+        try{
+            MessageDigest sha = MessageDigest.getInstance("SHA-256");
+            sha.update(socialEmail.getBytes());
+
+            return bytesToHex(sha.digest());
+        } catch (Exception ignored) {
+            throw new UserException(StatusCode.ENCRYPTION_FAILURE);
+        }
+    }
+
+    private String bytesToHex(byte[] bytes) {
+        StringBuilder builder = new StringBuilder();
+        for (byte b : bytes) {
+            builder.append(String.format("%02x", b));
+        }
+        return builder.toString();
     }
 
     public String encrypt(String str) {
@@ -49,7 +70,6 @@ public class CustomEncryptUtil {
             throw new AuthException(StatusCode.DECRYPTION_FAILURE);
         }
     }
-
 
     private String encodeBase64(byte[] source) {
         return Base64.getEncoder().encodeToString(source);

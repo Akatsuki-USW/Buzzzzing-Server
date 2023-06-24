@@ -2,13 +2,13 @@ package bokjak.bokjakserver.domain.user.model;
 
 import bokjak.bokjakserver.common.model.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "user_block_user")
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserBlockUser extends BaseEntity {
 
@@ -18,10 +18,15 @@ public class UserBlockUser extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "blocker_user_id", nullable = false)
-    private User blockerUserId;
+    @JoinColumn(name = "blocker_user_id")
+    private User blockerUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "blocked_user_id", nullable = false)
-    private User blockedUserId;
+    @JoinColumn(name = "blocked_user_id")
+    private User blockedUser;
+
+    public void deleteBlock() {
+        this.blockedUser = null;
+        this.blockerUser = null;
+    }
 }

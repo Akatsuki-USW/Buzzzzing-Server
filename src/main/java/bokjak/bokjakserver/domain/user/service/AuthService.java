@@ -6,15 +6,17 @@ import bokjak.bokjakserver.config.jwt.JwtProvider;
 import bokjak.bokjakserver.config.jwt.RefreshToken;
 import bokjak.bokjakserver.config.jwt.RefreshTokenRepository;
 import bokjak.bokjakserver.config.security.PrincipalDetails;
-import bokjak.bokjakserver.config.security.SecurityUtils;
 import bokjak.bokjakserver.domain.ban.model.Ban;
 import bokjak.bokjakserver.domain.ban.repository.BanRepository;
 import bokjak.bokjakserver.domain.user.dto.AuthDto.*;
 import bokjak.bokjakserver.domain.user.exeption.AuthException;
 import bokjak.bokjakserver.domain.user.exeption.UserException;
+import bokjak.bokjakserver.domain.user.model.RevokeUser;
 import bokjak.bokjakserver.domain.user.model.User;
 import bokjak.bokjakserver.domain.user.model.UserStatus;
+import bokjak.bokjakserver.domain.user.repository.RevokeUserRepository;
 import bokjak.bokjakserver.domain.user.repository.UserRepository;
+import bokjak.bokjakserver.util.CustomEncryptUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -41,18 +43,21 @@ public class AuthService {
     private final UserRepository userRepository;
     private final KakaoService kakaoService;
     private final BanRepository banRepository;
-    
-    @Transactional
+    private final RevokeUserRepository revokeUserRepository;
+    private final CustomEncryptUtil customEncryptUtil;
+
+    @Transactional(noRollbackFor = {AuthException.class})
     public AuthMessage loginAccess(SocialLoginRequest socialLoginRequest) {
-        OAuthSocialEmailResponse response = fetchSocialEmail(socialLoginRequest);        //id@KAKAO반환
+        OAuthSocialEmailResponse response = fetchSocialEmail(socialLoginRequest);
         String socialEmail = response.socialEmail();
+
         Optional<User> findUser = userRepository.findBySocialEmail(socialEmail);
-        //탈퇴 유저면 1년 지났는지 체크하는 로직 추가해야함
+        checkRevokeUser(socialEmail);
         AuthMessage loginMessage;
         if(findUser.isPresent()) {
             User user = findUser.get();
-            checkBanUser(user);
             checkUserStatus(user);
+
             JwtDto jwtDto = login(LoginRequest.toLoginRequest(user));
             loginMessage = new AuthMessage(
                     jwtDto,
@@ -61,7 +66,7 @@ public class AuthService {
         } else {
             String signToken = jwtProvider.createSignToken(socialEmail);
             SignToken signTokenResponse = new SignToken(signToken);
-            log.info("signtokenResponse={}", signTokenResponse.signToken());
+            log.info("signTokenResponse={}", signTokenResponse.signToken());
             throw new AuthException(StatusCode.NEED_TO_SIGNUP, signTokenResponse);
         }
         return loginMessage;
@@ -98,7 +103,6 @@ public class AuthService {
         );
     }
 
-
     private void checkDuplicationNickName(String nickname) {
         if (userRepository.existsByNickname(nickname)) {
             throw new UserException(StatusCode.NICKNAME_DUPLICATION);
@@ -110,21 +114,36 @@ public class AuthService {
         Optional<Ban> banedUser = banRepository.findByUserAndIsBannedIsTrue(user);
         if (banedUser.isEmpty()) return;
         boolean isBanExpired = LocalDateTime.now().isAfter(banedUser.get().getBanEndedAt());
-        if (isBanExpired) banedUser.get().changeIsBanned(false);     //시간나면 바꾸기..
-        else throw new UserException(StatusCode.BANNED_USER);
+        if (isBanExpired) {
+            banedUser.get().changeIsBanned(false);
+            user.updateUserStatus(UserStatus.NORMAL);
+        }
     }
 
-    public static void checkUserStatus(User user) {
+    @Transactional
+    public void checkRevokeUser(String socialEmail) {
+        Optional<RevokeUser> checkUser = revokeUserRepository.findBySocialEmail(customEncryptUtil.hash(socialEmail));
+        if (checkUser.isEmpty()) return;
+        RevokeUser revokeUser = checkUser.get();
+        boolean isRevokedExpired = LocalDateTime.now().isAfter(revokeUser.getRevokedAt().plusMonths(1));
+        if (isRevokedExpired) {
+            revokeUser.deleteRevokeUser();
+        }
+        else throw new UserException(StatusCode.REVOKE_USER);
+    }
+
+    @Transactional
+    public void checkUserStatus(User user) {
         UserStatus userStatus = user.getUserStatus();
-        //NORMAL,BANNED,PERMANENTLY_BANED,DELETED
+        //NORMAL,BANNED,BLACKLIST,DELETED
         switch (userStatus) {
             case NORMAL:
                 break;
-            case PERMANENTLY_BANED:
-                throw new UserException(StatusCode.PERMANENTLY_BANNED_USER);
-                /**
-                 * 나머지는 todo....
-                 */
+            case BANNED:
+                checkBanUser(user);
+                break;
+            case BLACKLIST:
+                throw new UserException(StatusCode.BLACKLIST_BANNED_USER);
         }
     }
 
@@ -137,7 +156,6 @@ public class AuthService {
         }
     }
 
-    @Transactional
     public JwtDto reissue(ReissueRequest reissueRequest) {
         return jwtProvider.reissue(reissueRequest.refreshToken());
     }

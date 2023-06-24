@@ -13,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDateTime;
+
 @Slf4j
 public class AuthDto {
 
@@ -63,6 +65,7 @@ public class AuthDto {
                     .nickname(nickname)
                     .role(Role.ROLE_USER)
                     .userStatus(UserStatus.NORMAL)
+                    .lastLoginDate(LocalDateTime.now())
                     .profileImageUrl(profileImageUrl).build();
         }
     }
@@ -76,6 +79,8 @@ public class AuthDto {
     public record SignAuthMessage(JwtDto detaildata, String detailMessage){}
 
     public record SignToken(String signToken) {}
+
+    public record RevokeKakaoResponse(String id) {}
 
     public record OAuthSocialEmailResponse(String socialEmail){
 
