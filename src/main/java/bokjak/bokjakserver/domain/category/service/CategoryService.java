@@ -1,5 +1,7 @@
 package bokjak.bokjakserver.domain.category.service;
 
+import bokjak.bokjakserver.common.dummy.DummyLocationCategory;
+import bokjak.bokjakserver.common.dummy.DummySpotCategory;
 import bokjak.bokjakserver.domain.category.dto.CategoryDto.*;
 import bokjak.bokjakserver.domain.category.model.LocationCategory;
 import bokjak.bokjakserver.domain.category.model.SpotCategory;
@@ -30,18 +32,18 @@ public class CategoryService {
 
     // Dummy 생성 및 테스트용 메서드
     @Transactional
-    public void createLocationCategory(String name, String iconImageUrl) {
+    public void createDummyLocationCategory(DummyLocationCategory dummyLocationCategory) {
         LocationCategory category = LocationCategory.builder()
-                .name(name)
-                .iconImageUrl(iconImageUrl)
+                .name(dummyLocationCategory.getName())
+                .iconImageUrl(dummyLocationCategory.getIconImageUrl())
                 .build();
         locationCategoryRepository.save(category);
     }
 
     @Transactional
-    public void createSpotCategory(String name) {
+    public void createDummySpotCategory(DummySpotCategory dummySpotCategory) {
         SpotCategory category = SpotCategory.builder()
-                .name(name)
+                .name(dummySpotCategory.getName())
                 .build();
         spotCategoryRepository.save(category);
     }
