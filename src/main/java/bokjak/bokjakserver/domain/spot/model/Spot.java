@@ -40,7 +40,7 @@ public class Spot {
     private String title;
 
     @Column(length = 50)
-    private String spot_name;
+    private String spotName;
 
     private String address;
 

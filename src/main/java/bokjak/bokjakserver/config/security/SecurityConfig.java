@@ -59,7 +59,7 @@ public class SecurityConfig {
                 .httpBasic().disable()
                 .authorizeHttpRequests()
 
-                .requestMatchers("/auth/login/admin", "/auth/reissue","/auth/login", "/auth/signup","/users/check/nickname/**").permitAll()
+                .requestMatchers("/auth/login/admin", "/auth/reissue","/auth/login", "/auth/signup","/users/check/nickname/**", "/categories").permitAll()
                 .anyRequest().authenticated();
 
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

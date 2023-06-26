@@ -9,6 +9,7 @@ build/
 
 *.properties
 *.yml
+/src/main/generated/
 
 ### STS ###
 .apt_generated
