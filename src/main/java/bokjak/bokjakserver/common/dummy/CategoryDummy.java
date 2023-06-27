@@ -8,6 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import static bokjak.bokjakserver.common.dummy.DummyLocationCategory.*;
+import static bokjak.bokjakserver.common.dummy.DummySpotCategory.*;
+
 @Slf4j
 @Component("categoryDummy")
 @RequiredArgsConstructor
@@ -23,22 +26,21 @@ public class CategoryDummy {
             return;
         }
 
-        // TODO: 추후 S3 이미지 오브젝트 넣고 url 업데이트
         // 로케이션 카테고리
-        categoryService.createLocationCategory("지하철", "");
-        categoryService.createLocationCategory("놀이공원", "");
-        categoryService.createLocationCategory("백화점", "");
-        categoryService.createLocationCategory("기타", "");
-        categoryService.createLocationCategory("공원", "");
-        categoryService.createLocationCategory("마트", "");
-        categoryService.createLocationCategory("휴양지", "");
-        categoryService.createLocationCategory("시장", "");
-        categoryService.createLocationCategory("종합", "");
+        categoryService.createDummyLocationCategory(SUBWAY);
+        categoryService.createDummyLocationCategory(AMUSE);
+        categoryService.createDummyLocationCategory(DEPART);
+        categoryService.createDummyLocationCategory(ETC);
+        categoryService.createDummyLocationCategory(PARK);
+        categoryService.createDummyLocationCategory(MART);
+        categoryService.createDummyLocationCategory(VACATION);
+        categoryService.createDummyLocationCategory(MARKET);
+        categoryService.createDummyLocationCategory(ALL);
 
         // 스팟 카테고리
-        categoryService.createSpotCategory("cafe");
-        categoryService.createSpotCategory("play");
-        categoryService.createSpotCategory("restaurant");
+        categoryService.createDummySpotCategory(CAFE);
+        categoryService.createDummySpotCategory(PLAY);
+        categoryService.createDummySpotCategory(RESTAURANT);
 
         log.info("[1] 카테고리 더미 생성 완료");
     }

@@ -37,7 +37,12 @@ public enum StatusCode {
     DECRYPTION_FAILURE(400,1060,"decryption failure"),
     REVOKE_ERROR(404,1070,"revoke error"),
     IS_NOT_REFRESH(400, 1070, "this token is not refresh token."),
-    EXPIRED_REFRESH(400,1080,"expired refresh token");
+    EXPIRED_REFRESH(400,1080,"expired refresh token"),
+
+    /**
+     * Location
+     */
+    CHOICE_NOT_EXIST(404, 5010, "not found choice.");
 
     private final int HttpCode;
     private final int statusCode;

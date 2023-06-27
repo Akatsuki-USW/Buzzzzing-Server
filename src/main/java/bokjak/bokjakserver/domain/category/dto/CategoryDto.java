@@ -5,6 +5,7 @@ import bokjak.bokjakserver.domain.category.model.SpotCategory;
 import lombok.Builder;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class CategoryDto {
@@ -42,8 +43,8 @@ public class CategoryDto {
     public record AllCategoryResponse(
             List<LocationCategoryResponse> locationCategories,
             List<SpotCategoryResponse> spotCategories,
-            List<Map<String, String>> locationRelaxFilter,
-            List<Map<String, String>> congestionDateFilter
+            List<EnumValue> congestionLevelChoices,
+            List<EnumDayValue> congestionHistoricalDateChoices
     ) {
 
         public static AllCategoryResponse of(List<LocationCategoryResponse> locationCategories,
@@ -52,9 +53,24 @@ public class CategoryDto {
             return AllCategoryResponse.builder()
                     .locationCategories(locationCategories)
                     .spotCategories(spotCategories)
-                    .locationRelaxFilter(CheckBoxFilter.locationRelaxFilter)
-                    .congestionDateFilter(CheckBoxFilter.congestionDateFilter)
+                    .congestionLevelChoices(toEnumValues(CongestionLevelChoice.class))
+                    .congestionHistoricalDateChoices(toEnumDayValues(CongestionHistoricalDateChoice.class))
                     .build();
         }
+    }
+
+    // enum -> DTO
+    private static List<EnumValue> toEnumValues(Class<? extends EnumModel> enumModel) {
+        return Arrays
+                .stream(enumModel.getEnumConstants())
+                .map(EnumValue::new)
+                .collect(Collectors.toList());
+    }
+
+    private static List<EnumDayValue> toEnumDayValues(Class<? extends EnumModel> enumModel) {
+        return Arrays
+                .stream(enumModel.getEnumConstants())
+                .map(EnumDayValue::new)
+                .collect(Collectors.toList());
     }
 }
