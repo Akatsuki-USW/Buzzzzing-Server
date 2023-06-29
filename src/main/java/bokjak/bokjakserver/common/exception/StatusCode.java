@@ -8,6 +8,21 @@ import lombok.RequiredArgsConstructor;
 public enum StatusCode {
 
     /**
+     * Common
+     */
+    INTERNAL_SERVER_ERROR(500,  -1, "internal server error."),
+    COMMON_BAD_REQUEST(400, 9000, ""),
+    INVALID_INPUT_VALUE(400, 9010, "invalid input value."),
+    METHOD_NOT_ALLOWED(405, 9020, "method not allowed."),
+    HTTP_CLIENT_ERROR(400, 9030, "http client error."),
+
+
+    AWS_S3_UPLOAD_FAIL(400, 9040, "AWS S3 upload fail."),
+    AWS_S3_DELETE_FAIL(400, 9050, "AWS S3 delete fail."),
+    AWS_S3_FILE_SIZE_EXCEEDED(400, 9060, "exceeded file size."),
+    AWS_S3_FILE_TYPE_NOT_PROVIDED(400, 9070, "file type not provided."),
+
+    /**
      * User
      */
     NOT_FOUND_USER(404, 2000, "not found user error."),
