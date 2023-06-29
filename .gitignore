@@ -10,6 +10,7 @@ build/
 *.properties
 *.yml
 /src/main/generated/
+memo.md
 
 ### STS ###
 .apt_generated
