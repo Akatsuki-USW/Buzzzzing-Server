@@ -1,9 +1,9 @@
 package bokjak.bokjakserver.util.s3.controller;
 
 import bokjak.bokjakserver.common.dto.ApiResponse;
-import bokjak.bokjakserver.util.s3.dto.AwsS3Dto;
 import bokjak.bokjakserver.util.s3.dto.AwsS3Dto.DeleteFileResponse;
 import bokjak.bokjakserver.util.s3.dto.AwsS3Dto.FileListDto;
+import bokjak.bokjakserver.util.s3.dto.AwsS3Dto.UpdateFileRequest;
 import bokjak.bokjakserver.util.s3.dto.AwsS3Dto.UploadFileRequest;
 import bokjak.bokjakserver.util.s3.service.AwsS3Service;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class AwsS3Controller {
     }
 
     @PostMapping("/change")
-    public ApiResponse<FileListDto> updateFiles(@ModelAttribute AwsS3Dto.UpdateFileRequest updateFileRequest) {
+    public ApiResponse<FileListDto> updateFiles(@ModelAttribute UpdateFileRequest updateFileRequest) {
         return success(awsS3Service.updateFiles(updateFileRequest));
     }
 

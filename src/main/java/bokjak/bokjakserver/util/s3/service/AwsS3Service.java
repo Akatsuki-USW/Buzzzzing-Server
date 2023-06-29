@@ -25,7 +25,9 @@ import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 import static bokjak.bokjakserver.config.security.SecurityUtils.getCurrentUserSocialEmail;
 
@@ -33,32 +35,33 @@ import static bokjak.bokjakserver.config.security.SecurityUtils.getCurrentUserSo
 @Service
 @RequiredArgsConstructor
 public class AwsS3Service {
-    private static final String FILE_EXTENSION_SEPARATOR = ".";
     private final AmazonS3Client amazonS3Client;
     @Value("${cloud.aws.s3.bucket}")
     private String bucketName;
 
-    // 복수 파일 업로드
+    private static final String FILE_EXTENSION_SEPARATOR = ".";
+    private static final String URL_SEPARATOR = "/";
+    private static final String S3_OBJECT_NAME_PATTERN = "{0}_{1}.{2}";
+
     public FileListDto uploadFiles(final UploadFileRequest uploadFileRequest) {
-        String currentUserSocialEmail = getCurrentUserSocialEmail();    // 유저 식별정보
+        String currentUserSocialEmail = getCurrentUserSocialEmail();
         List<MultipartFile> files = uploadFileRequest.files();
 
         if (CollectionUtils.isEmpty(files))     // 파일 존재 여부 검사
             throw new AwsS3Exception(StatusCode.INVALID_INPUT_VALUE);
 
-        List<FileDto> uploadedFiles = uploadFileRequest.files().stream()    // 업로드
+        List<FileDto> uploadedFiles = uploadFileRequest.files().stream()
                 .map(file -> uploadSingleFile(file, uploadFileRequest.type(), currentUserSocialEmail))
                 .toList();
         return new FileListDto(uploadedFiles);
     }
 
-    // 단일 파일 업로드
     public FileDto uploadSingleFile(final MultipartFile multipartFile, final String stringParam, final String owner) {
-        validateFileExist(multipartFile);   // 파일 유효성 검사
+        validateFileExist(multipartFile);
 
         String fileName = buildFileName(Objects.requireNonNull(multipartFile.getOriginalFilename()), owner);
 
-        ObjectMetadata objectMetadata = new ObjectMetadata();   // 생성할 S3 Object 메타 데이터 설정
+        ObjectMetadata objectMetadata = new ObjectMetadata();   // 생성할 S3 Object의 메타 데이터 설정
         objectMetadata.setContentType(multipartFile.getContentType());
         objectMetadata.setContentLength(multipartFile.getSize());
         S3SaveDir saveDir = S3SaveDir.toEnum(stringParam);  // 경로명 변수
@@ -68,70 +71,64 @@ public class AwsS3Service {
             amazonS3Client.putObject(new PutObjectRequest(bucketPath, fileName, inputStream, objectMetadata)    // 업로드
                     .withCannedAcl(CannedAccessControlList.PublicRead));    // ACL public read로 설정
         } catch (IOException e) {
-            log.warn(e.getMessage());
             throw new RuntimeException(e);
         } catch (AmazonServiceException e) {
+            log.warn("S3 파일 업로드 실패 = {}", e.getMessage());
             throw new AwsS3Exception(StatusCode.AWS_S3_UPLOAD_FAIL);
         }
 
-        String fileUrl = amazonS3Client.getUrl(bucketPath, fileName).toString();    // 생성된 파일 URL
+        String fileUrl = amazonS3Client.getUrl(bucketPath, fileName).toString();
         return new FileDto(multipartFile.getOriginalFilename(), fileUrl);
     }
 
-    // 파일 존재 여부 검사
     private void validateFileExist(MultipartFile multipartFile) {
         if (multipartFile.isEmpty())
             throw new AwsS3Exception(StatusCode.AWS_S3_UPLOAD_FAIL);
     }
 
-    // 파일 확장자 추출
-    private String getFileExtension(String originalFileName) {
+    private String getFileExtension(String originalFileName) {// 파일 확장자 추출
         int fileExtensionIndex = originalFileName.lastIndexOf(FILE_EXTENSION_SEPARATOR);
         return originalFileName.substring(fileExtensionIndex + 1);
     }
 
-    // 파일명 생성
     private String buildFileName(String originalFileName, String owner) {
-        return MessageFormat.format("{0}_{1}.{2}", owner, UUID.randomUUID(), getFileExtension(originalFileName));
+        return MessageFormat.format(S3_OBJECT_NAME_PATTERN, owner, UUID.randomUUID(), getFileExtension(originalFileName));
     }
 
-    // 업데이트
     public FileListDto updateFiles(final UpdateFileRequest updateFileRequest) {
         String type = updateFileRequest.type();
         String currentUserSocialEmail = getCurrentUserSocialEmail();
 
         List<String> urls = updateFileRequest.urlsToDelete();
-        if (CollectionUtils.isEmpty(urls)) {    // url 존재 여부 검사
+        if (CollectionUtils.isEmpty(urls)) {
             throw new AwsS3Exception(StatusCode.AWS_S3_DELETE_FAIL);
         }
 
-        updateFileRequest.urlsToDelete()    // 기존 파일 삭제
+        updateFileRequest.urlsToDelete()
                 .forEach(file -> deleteSingleFile(type, file));
 
-        List<FileDto> uploadedFiles = updateFileRequest.newFiles().stream() // 업로드
+        List<FileDto> uploadedFiles = updateFileRequest.newFiles().stream()
                 .map(file -> uploadSingleFile(file, type, currentUserSocialEmail))
                 .toList();
         return new FileListDto(uploadedFiles);
     }
 
-    // 단일 파일 삭제
     public void deleteSingleFile(final String type, final String url) {
-        String filename = getFileName(url); // 파일 경로명 구하기
+        String filename = getFileName(url);
         S3SaveDir saveDir = S3SaveDir.toEnum(type);
         String bucketPath = bucketName + saveDir.path;
 
         try {
-            amazonS3Client.deleteObject(new DeleteObjectRequest(bucketPath, filename)); // 삭제
+            amazonS3Client.deleteObject(new DeleteObjectRequest(bucketPath, filename));
         } catch (AmazonServiceException e) {
             log.warn("S3 파일 삭제 실패 = {}", e.getMessage());
             throw new AwsS3Exception(StatusCode.AWS_S3_DELETE_FAIL);
         }
     }
 
-    // url로부터 파일 이름 추출
     private String getFileName(String url) {
-        String[] parsedUrl = url.split("/");
-        String last = parsedUrl[parsedUrl.length - 1];  // 파일명
-        return URLDecoder.decode(last, StandardCharsets.UTF_8);
+        String[] parsedUrl = url.split(URL_SEPARATOR);
+        String fileName = parsedUrl[parsedUrl.length - 1];
+        return URLDecoder.decode(fileName, StandardCharsets.UTF_8);
     }
 }
