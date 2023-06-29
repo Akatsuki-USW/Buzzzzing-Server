@@ -69,7 +69,7 @@ public class AwsS3Service {
                     .withCannedAcl(CannedAccessControlList.PublicRead));    // ACL public read로 설정
         } catch (IOException e) {
             log.warn(e.getMessage());
-            throw new RuntimeException(e);  // TODO Internal error에 대한 Handler가 없어 보임
+            throw new RuntimeException(e);
         } catch (AmazonServiceException e) {
             throw new AwsS3Exception(StatusCode.AWS_S3_UPLOAD_FAIL);
         }

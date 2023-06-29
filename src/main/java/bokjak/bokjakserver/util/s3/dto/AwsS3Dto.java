@@ -1,6 +1,5 @@
 package bokjak.bokjakserver.util.s3.dto;
 
-import bokjak.bokjakserver.common.constant.GlobalConstants;
 import bokjak.bokjakserver.common.constant.MessageConstants;
 import org.springframework.web.multipart.MultipartFile;
 

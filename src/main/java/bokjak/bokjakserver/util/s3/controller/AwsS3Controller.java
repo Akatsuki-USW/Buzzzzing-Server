@@ -1,6 +1,5 @@
 package bokjak.bokjakserver.util.s3.controller;
 
-import bokjak.bokjakserver.common.constant.MessageConstants;
 import bokjak.bokjakserver.common.dto.ApiResponse;
 import bokjak.bokjakserver.util.s3.dto.AwsS3Dto;
 import bokjak.bokjakserver.util.s3.dto.AwsS3Dto.DeleteFileResponse;
@@ -8,7 +7,6 @@ import bokjak.bokjakserver.util.s3.dto.AwsS3Dto.FileListDto;
 import bokjak.bokjakserver.util.s3.dto.AwsS3Dto.UploadFileRequest;
 import bokjak.bokjakserver.util.s3.service.AwsS3Service;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import static bokjak.bokjakserver.common.dto.ApiResponse.success;
