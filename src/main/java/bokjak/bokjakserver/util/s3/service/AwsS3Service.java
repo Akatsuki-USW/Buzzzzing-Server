@@ -45,10 +45,6 @@ public class AwsS3Service {
 
     public FileListDto uploadFiles(final UploadFileRequest uploadFileRequest) {
         String currentUserSocialEmail = getCurrentUserSocialEmail();
-        List<MultipartFile> files = uploadFileRequest.files();
-
-        if (CollectionUtils.isEmpty(files))     // 파일 존재 여부 검사
-            throw new AwsS3Exception(StatusCode.INVALID_INPUT_VALUE);
 
         List<FileDto> uploadedFiles = uploadFileRequest.files().stream()
                 .map(file -> uploadSingleFile(file, uploadFileRequest.type(), currentUserSocialEmail))
@@ -83,7 +79,7 @@ public class AwsS3Service {
 
     private void validateFileExist(MultipartFile multipartFile) {
         if (multipartFile.isEmpty())
-            throw new AwsS3Exception(StatusCode.AWS_S3_UPLOAD_FAIL);
+            throw new AwsS3Exception(StatusCode.INVALID_INPUT_VALUE);
     }
 
     private String getFileExtension(String originalFileName) {// 파일 확장자 추출
@@ -98,11 +94,6 @@ public class AwsS3Service {
     public FileListDto updateFiles(final UpdateFileRequest updateFileRequest) {
         String type = updateFileRequest.type();
         String currentUserSocialEmail = getCurrentUserSocialEmail();
-
-        List<String> urls = updateFileRequest.urlsToDelete();
-        if (CollectionUtils.isEmpty(urls)) {
-            throw new AwsS3Exception(StatusCode.AWS_S3_DELETE_FAIL);
-        }
 
         updateFileRequest.urlsToDelete()
                 .forEach(file -> deleteSingleFile(type, file));
