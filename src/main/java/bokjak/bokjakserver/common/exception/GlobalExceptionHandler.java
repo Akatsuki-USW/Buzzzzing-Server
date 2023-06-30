@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -27,6 +28,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BuzException.class)
     public ResponseEntity<?> handle(BuzException ex) {
+        System.out.println(ex);
         log.warn("{}({}) - {}", ex.getClass().getSimpleName(), ex.statusCode.getStatusCode(), ex.getMessage());
         return ResponseEntity
                 .status(ex.statusCode.getHttpCode())
@@ -35,6 +37,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AuthException.class)
     public ResponseEntity<?> handle(AuthException ex) {
+        System.out.println(ex);
         log.warn("{}({}) - {}", ex.getClass().getSimpleName(), ex.statusCode.getStatusCode(), ex.getMessage());
         return ResponseEntity
                 .status(ex.statusCode.getHttpCode())
@@ -101,14 +104,21 @@ public class GlobalExceptionHandler {
         return error(INVALID_INPUT_VALUE.getStatusCode(), reason.toString());
     }
 
+    @ExceptionHandler(ServletRequestBindingException.class)// @RequestParam 누락
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ApiResponse<?> handleServletRequestBindingException(ServletRequestBindingException ex) {
+        log.warn("{} - {}", ex.getClass().getName(), ex.getMessage());
+        return error(HTTP_CLIENT_ERROR.getStatusCode(), ex.getMessage());
+    }
 
     /**
      * Internal Server Error 5xx
      * : 예외처리가 제대로 되지 않았거나 코드 자체의 문제인 경우일 확률 높음
+     * 무조건 코드를 고치거나 해당 예외처리 핸들러를 추가해줘야 함!
      */
-    @ExceptionHandler(RuntimeException.class)
+    @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<?> handleInternalError(final RuntimeException ex) {
+    public ResponseEntity<?> handleInternalError(final Exception ex) {
         log.error("Uncaught {} - {}", ex.getClass().getSimpleName(), ex.getMessage());
         ex.printStackTrace();
         return ResponseEntity
