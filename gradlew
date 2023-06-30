@@ -78,7 +78,7 @@ do
       /*)   app_path=$link ;; #(
       *)    app_path=$APP_HOME$link ;;
     esac
-donepl
+done
 
 APP_HOME=$( cd "${APP_HOME:-./}" && pwd -P ) || exit
 
