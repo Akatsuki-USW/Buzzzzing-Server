@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum CongestionLevel {
-    RELAX(1), NORMAL(2), BUZZ(3), VERY_BUZZ(4);
+    RELAX(1), NORMAL(2), BUZZING(3);
 
     private final int value;
 }
