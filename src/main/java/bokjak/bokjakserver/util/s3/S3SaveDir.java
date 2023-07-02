@@ -18,7 +18,7 @@ public enum S3SaveDir {
             case "spot" -> SPOT;
             case "etc" -> ETC;
 
-            default -> throw new AwsS3Exception(StatusCode.AWS_S3_FILE_TYPE_NOT_PROVIDED);
+            default -> throw new AwsS3Exception(StatusCode.AWS_S3_FILE_TYPE_INVALID);
         };
     }
 }

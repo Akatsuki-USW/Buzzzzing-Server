@@ -20,8 +20,7 @@ public enum StatusCode {
     AWS_S3_UPLOAD_FAIL(400, 9040, "AWS S3 upload fail."),
     AWS_S3_DELETE_FAIL(400, 9050, "AWS S3 delete fail."),
     AWS_S3_FILE_SIZE_EXCEEDED(400, 9060, "exceeded file size."),
-    AWS_S3_FILE_TYPE_NOT_PROVIDED(400, 9070, "file type not provided."),
-
+    AWS_S3_FILE_TYPE_INVALID(400, 9070, "invalid file type."),
     /**
      * User
      */
@@ -55,7 +54,7 @@ public enum StatusCode {
     EXPIRED_REFRESH(400,1080,"expired refresh token"),
 
     /**
-     * Location
+     * Location & Congestion
      */
     CHOICE_NOT_EXIST(404, 5010, "not found choice.");
 
