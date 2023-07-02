@@ -48,7 +48,7 @@ public class SleepingUserService {
             log.info("추가된 휴면유저가 없습니다.");
         } else {
             for (User user : notLoginUser) {
-                changeSleepingUser(user);
+                changeToSleepingUser(user);
             }
         }
     }
@@ -57,7 +57,7 @@ public class SleepingUserService {
     @Scheduled(cron = "0 0 10 * * *")
     public void sendMailToBeforeSleep() {
         log.info("sendMailToBeforeSleep 스케쥴러 시작");
-        LocalDateTime start = LocalDateTime.now().minusMonths(12);
+        LocalDateTime start = LocalDateTime.now().minusMonths(11).minusDays(1);
         LocalDateTime end = LocalDateTime.now().minusMonths(11);
         List<User> beforeSleepUsers = userRepository.findByLastLoginDateBetween(start, end);
 
@@ -74,7 +74,7 @@ public class SleepingUserService {
         }
     }
 
-    private void changeSleepingUser(User user) {
+    private void changeToSleepingUser(User user) {
         SleepingUser sleepingUser = SleepingUser.builder()
                 .originalId(user.getId())
                 .role(user.getRole())
