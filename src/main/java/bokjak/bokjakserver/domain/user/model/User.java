@@ -63,14 +63,14 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "blockedUser", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserBlockUser> blockedUserList = new ArrayList<>();
 
-    //회원(1) - 신고한 유저(다)
+    //회원(1) - 다른 유저에게 신고당한 유저(다)
     @Builder.Default
-    @OneToMany(mappedBy = "reporterUserId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "reporterUser", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Report> reporterUserList = new ArrayList<>();
 
-    //회원(1) - 신고당한 유저(다)
+    //회원(1) - 신고한 유저(다)
     @Builder.Default
-    @OneToMany(mappedBy = "reportedUserId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "reportedUser", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Report> reportedUserList = new ArrayList<>();
 
     //회원(1) - 정지 유저(다)
@@ -112,6 +112,10 @@ public class User extends BaseEntity {
         blockedUserList.add(userBlockUser);
     }
 
+    public void addReportedUser(Report report) {
+        if (reportedUserList == null) reportedUserList = new ArrayList<>();
+        reportedUserList.add(report);
+    }
     public void removeBlockerUser(UserBlockUser userBlockUser) {
         blockerUserList.remove(userBlockUser);
     }
@@ -120,4 +124,24 @@ public class User extends BaseEntity {
         blockedUserList.remove(userBlockUser);
     }
 
+    public void changeSleepingUser() {
+        this.userStatus = UserStatus.SLEEP;
+        this.email = null;
+        this.password = null;
+        this.socialEmail = null;
+        this.socialType = null;
+        this.lastLoginDate = null;
+    }
+
+    public void changeWakeUpUser(SleepingUser sleepingUser) {
+        this.userStatus = sleepingUser.getUserStatus();
+        this.email = sleepingUser.getEmail();
+        this.password = sleepingUser.getPassword();
+        this.socialEmail = sleepingUser.getSocialEmail();
+        this.socialType = sleepingUser.getSocialType();
+    }
+
+    public void updateLastLoginDate() {
+        this.lastLoginDate = LocalDateTime.now();
+    }
 }
