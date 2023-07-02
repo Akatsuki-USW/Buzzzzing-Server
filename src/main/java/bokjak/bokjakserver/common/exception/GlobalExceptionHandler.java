@@ -28,7 +28,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BuzException.class)
     public ResponseEntity<?> handle(BuzException ex) {
-        System.out.println(ex);
         log.warn("{}({}) - {}", ex.getClass().getSimpleName(), ex.statusCode.getStatusCode(), ex.getMessage());
         return ResponseEntity
                 .status(ex.statusCode.getHttpCode())
@@ -37,7 +36,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AuthException.class)
     public ResponseEntity<?> handle(AuthException ex) {
-        System.out.println(ex);
         log.warn("{}({}) - {}", ex.getClass().getSimpleName(), ex.statusCode.getStatusCode(), ex.getMessage());
         return ResponseEntity
                 .status(ex.statusCode.getHttpCode())
