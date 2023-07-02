@@ -26,5 +26,6 @@ public class WeeklyCongestionStatistic extends BaseEntity {
     @JoinColumn(name = "location_id", nullable = false)
     private Location location;
 
+    @Enumerated(EnumType.STRING)
     private CongestionLevel congestionLevel;    // 일주일 혼잡도 평균
 }

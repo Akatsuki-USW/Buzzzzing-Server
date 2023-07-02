@@ -1,14 +1,7 @@
-buildscript {
-	ext {
-		queryDslVersion = "5.0.0"
-	}
-}
-
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.0.6'
 	id 'io.spring.dependency-management' version '1.1.0'
-	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 }
 
 group = 'bokjak'
@@ -20,7 +13,6 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
-	querydsl.extendsFrom compileClasspath
 }
 
 repositories {
@@ -42,27 +34,30 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	testImplementation 'org.springframework.security:spring-security-test'
 
-
-
 	//jjwt 추가
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
 	implementation 'io.jsonwebtoken:jjwt-impl:0.11.2'
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.2'
 
 	// queryDSL
-	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta"
-	annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}:jakarta"
+	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
 	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
 	// JSON 컬럼 호환성
 	implementation 'com.vladmihalcea:hibernate-types-60:2.20.0'
 
+
 	// mail 추가
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
 	//thymeleaf 추가
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+	// S3
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
 }
 
 tasks.named('test') {
@@ -75,16 +70,4 @@ jar {
 	enabled = false
 }
 
-// queryDSL 설정부
-def querydslDir = "$buildDir/generated/querydsl"
-querydsl {
-	jpa = true
-	querydslSourcesDir = querydslDir
-}
-sourceSets {
-	main.java.srcDir querydslDir
-}
-compileQuerydsl{
-	options.annotationProcessorPath = configurations.querydsl
-}
-
+// queryDSL 설정부 필요 없음. https://www.inflearn.com/questions/828947/build%EA%B4%80%EB%A0%A8-%EC%A7%88%EB%AC%B8%EB%93%9C%EB%A6%BD%EB%8B%88%EB%8B%A4

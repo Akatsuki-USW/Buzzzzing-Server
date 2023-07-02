@@ -20,8 +20,8 @@ import java.util.Map;
 @Slf4j
 public class KakaoService {
 
-    @Value("${kakao.AdminKey}") //달라고 말해야함 //todo
-    private String AdminKey;
+//    @Value("${kakao.AdminKey}") //달라고 말해야함 //todo
+//    private String AdminKey;
 
     private final RestTemplate restTemplate;
     private final SocialService socialService;
@@ -45,7 +45,7 @@ public class KakaoService {
         params.add("target_id", socialUuid);
         log.info("socialUuid = {}", socialUuid);
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "KakaoAK " + AdminKey);
+//        headers.set("Authorization", "KakaoAK " + AdminKey);
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(params, headers);
