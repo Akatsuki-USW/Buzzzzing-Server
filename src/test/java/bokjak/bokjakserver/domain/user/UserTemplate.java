@@ -12,15 +12,15 @@ public class UserTemplate {
 
     private static Long id = 10000L;
     private static final String EMAIL = "test@naver.com";
-    private static final String PASSWORD1 = "test1@naver.com";
-    private static final String PASSWORD2 = "test2@naver.com";
-    private static final String NICKNAME1 = "test";
-    private static final String NICKNAME2 = "test2";
-    private static final String SOCIALEMAIL1 = "test1@KAKAO";
-    private static final String SOCIALEMAIL2 = "test2@KAKAO";
-    private static final String PROFILEIMAGEURL = "2031239.com";
-    private static final UserStatus USERSTATUS = UserStatus.NORMAL;
-    private static final SocialType SOCIALTYPE = SocialType.KAKAO;
+    private static final String DUMMY_PASSWORD_A = "test1@naver.com";
+    private static final String DUMMY_PASSWORD_B = "test2@naver.com";
+    private static final String DUMMY_NICKNAME_A = "test";
+    private static final String DUMMY_NICKNAME_B = "test2";
+    private static final String DUMMY_SOCIAL_EMAIL_A = "test1@KAKAO";
+    private static final String DUMMY_SOCIAL_EMAIL_B = "test2@KAKAO";
+    private static final String PROFILE_IMAGE_URL = "2031239.com";
+    private static final UserStatus USER_STATUS = UserStatus.NORMAL;
+    private static final SocialType SOCIAL_TYPE = SocialType.KAKAO;
     private static final Role ROLE = Role.ROLE_USER;
 
 
@@ -43,11 +43,11 @@ public class UserTemplate {
         return user;
     }
 
-    public static User makeUser1() {
-        return makeTestUser(EMAIL,PASSWORD1,NICKNAME1,SOCIALEMAIL1,PROFILEIMAGEURL,USERSTATUS,SOCIALTYPE,ROLE);
+    public static User makeDummyUserA() {
+        return makeTestUser(EMAIL,DUMMY_PASSWORD_A,DUMMY_NICKNAME_A,DUMMY_SOCIAL_EMAIL_A,PROFILE_IMAGE_URL,USER_STATUS,SOCIAL_TYPE,ROLE);
     }
-    public static User makeUser2() {
-        return makeTestUser(EMAIL,PASSWORD2,NICKNAME2,SOCIALEMAIL2,PROFILEIMAGEURL,USERSTATUS,SOCIALTYPE,ROLE);
+    public static User makeDummyUserB() {
+        return makeTestUser(EMAIL,DUMMY_PASSWORD_B,DUMMY_NICKNAME_B,DUMMY_SOCIAL_EMAIL_B,PROFILE_IMAGE_URL,USER_STATUS,SOCIAL_TYPE,ROLE);
     }
 
 }
