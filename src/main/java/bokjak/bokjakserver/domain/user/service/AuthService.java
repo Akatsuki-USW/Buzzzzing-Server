@@ -54,9 +54,9 @@ public class AuthService {
         OAuthSocialEmailResponse response = fetchSocialEmail(socialLoginRequest);
         String socialEmail = response.socialEmail();
 
-        checkSleepingUser(socialEmail);
+        checkIsSleepingUser(socialEmail);
         Optional<User> findUser = userRepository.findBySocialEmail(socialEmail);
-        checkRevokeUser(socialEmail);
+        checkIsRevokeUser(socialEmail);
         AuthMessage loginMessage;
         if(findUser.isPresent()) {
             User user = findUser.get();
@@ -114,7 +114,7 @@ public class AuthService {
     }
 
     @Transactional
-    public void checkSleepingUser(String socialEmail) {
+    public void checkIsSleepingUser(String socialEmail) {
         Optional<SleepingUser> sleepingUser = sleepingUserRepository.findBySocialEmail(socialEmail);
         if (sleepingUser.isEmpty()) return;
         User user = userRepository.findById(sleepingUser.get().getOriginalId()).orElseThrow(() -> new UserException(StatusCode.NOT_FOUND_USER));
@@ -135,7 +135,7 @@ public class AuthService {
     }
 
     @Transactional
-    public void checkRevokeUser(String socialEmail) {
+    public void checkIsRevokeUser(String socialEmail) {
         Optional<RevokeUser> checkUser = revokeUserRepository.findBySocialEmail(customEncryptUtil.hash(socialEmail));
         if (checkUser.isEmpty()) return;
         RevokeUser revokeUser = checkUser.get();

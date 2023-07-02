@@ -20,15 +20,15 @@ public class Report extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reporter_user_id", nullable = false)
-    private User reporterUserId;
+    private User reporterUser;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reported_user_id", nullable = false)
-    private User reportedUserId;
+    private User reportedUser;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ban_id", nullable = true)
     private Ban banId;
     @Enumerated(EnumType.STRING)
-    private ReportedTarget reportedTarget;
+    private ReportTarget reportTarget;
     private Long targetId;
     @Column(length = 300)
     private String content;
