@@ -48,8 +48,16 @@ dependencies {
 	// JSON 컬럼 호환성
 	implementation 'com.vladmihalcea:hibernate-types-60:2.20.0'
 
+
+	// mail 추가
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+	//thymeleaf 추가
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
 	// S3
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
 }
 
 tasks.named('test') {

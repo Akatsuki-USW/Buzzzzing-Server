@@ -3,6 +3,7 @@ package bokjak.bokjakserver.domain.user.repository;
 import bokjak.bokjakserver.domain.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,4 +13,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findBySocialEmail(String socialEmail);
     boolean existsByEmail(String email);
     boolean existsByNickname(String nickname);
+
+    List<User> findByLastLoginDateBetween(LocalDateTime startTime, LocalDateTime endTime);
+
+    List<User> findByLastLoginDateBefore(LocalDateTime beforeTime);
 }
