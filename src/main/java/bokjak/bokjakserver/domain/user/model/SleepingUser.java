@@ -24,11 +24,14 @@ public class SleepingUser extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private UserStatus userStatus;
     private String email;
-    private String socialUuid;
+    private String socialEmail;
+    private String password;
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
     private String profileImageUrl;
-    private String refreshToken;
     private String nickname;
     private LocalDateTime lastLoginDate;
+
+
+
 }

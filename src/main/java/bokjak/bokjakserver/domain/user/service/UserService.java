@@ -4,21 +4,20 @@ import bokjak.bokjakserver.common.exception.StatusCode;
 import bokjak.bokjakserver.config.jwt.RefreshTokenRepository;
 import bokjak.bokjakserver.domain.user.dto.AuthDto.AuthMessage;
 import bokjak.bokjakserver.domain.user.exeption.UserException;
-import bokjak.bokjakserver.domain.user.model.RevokeUser;
-import bokjak.bokjakserver.domain.user.model.SocialType;
-import bokjak.bokjakserver.domain.user.model.User;
-import bokjak.bokjakserver.domain.user.model.UserBlockUser;
+import bokjak.bokjakserver.domain.user.model.*;
 import bokjak.bokjakserver.domain.user.repository.RevokeUserRepository;
 import bokjak.bokjakserver.domain.user.repository.UserBlockUserRepository;
 import bokjak.bokjakserver.domain.user.repository.UserRepository;
 import bokjak.bokjakserver.util.CustomEncryptUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import static bokjak.bokjakserver.config.security.SecurityUtils.getCurrentUserSocialEmail;
@@ -66,7 +65,7 @@ public class UserService {
         User currentUser = getCurrentUser();
         User blockedUser = userRepository.findById(hideRequest.blockUserId()).orElseThrow(() -> new UserException(StatusCode.NOT_FOUND_USER));
 
-        boolean exists = userBlockUserRepository.existsByBlockerUserAndAndBlockedUser(currentUser, blockedUser);
+        boolean exists = userBlockUserRepository.existsByBlockerUserAndBlockedUser(currentUser, blockedUser);
         if (exists) throw new UserException(StatusCode.IS_BLOCKED_ERROR);
 
         UserBlockUser userBlockUser = UserBlockUser.builder()
@@ -105,6 +104,5 @@ public class UserService {
         }
         return new AuthMessage(result, "Revoke result: " + result);
     }
-
 
 }

@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface UserBlockUserRepository extends JpaRepository<UserBlockUser, Long> {
-    boolean existsByBlockerUserAndAndBlockedUser(User blockerUser, User blockedUser);
+    boolean existsByBlockerUserAndBlockedUser(User blockerUser, User blockedUser);
 
 }

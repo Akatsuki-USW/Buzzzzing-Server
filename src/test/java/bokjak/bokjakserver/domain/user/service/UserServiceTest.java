@@ -54,7 +54,7 @@ class UserServiceTest {
     RefreshTokenRepository refreshTokenRepository;
 
 
-    static User user = UserTemplate.makeUser1();
+    static User user = UserTemplate.makeDummyUserA();
 
     @BeforeEach
     void setUp() {
@@ -68,7 +68,7 @@ class UserServiceTest {
     @DisplayName("유저정보조회 - 성공")
     public void getUserInfo() throws Exception {
         //given
-        User testUser1 = UserTemplate.makeUser1();
+        User testUser1 = UserTemplate.makeDummyUserA();
         given(userRepository.findBySocialEmail(any())).willReturn(Optional.ofNullable(testUser1));
         //when
         UserInfoResponse userInfo = userService.getUserInfo();
@@ -128,11 +128,11 @@ class UserServiceTest {
     @DisplayName("회원 차단 - 실패")
     public void block_fail() throws Exception {
         //given
-        User testUser1 = UserTemplate.makeUser1();
-        User testUser2 = UserTemplate.makeUser2();
+        User testUser1 = UserTemplate.makeDummyUserA();
+        User testUser2 = UserTemplate.makeDummyUserB();
         given(userRepository.findBySocialEmail(any())).willReturn(Optional.ofNullable(testUser1));
         given(userRepository.findById(any())).willReturn(Optional.ofNullable(testUser2));
-        given(userBlockUserRepository.existsByBlockerUserAndAndBlockedUser(any(),any())).willReturn(true);
+        given(userBlockUserRepository.existsByBlockerUserAndBlockedUser(any(),any())).willReturn(true);
         //
 
         //when-then
@@ -145,11 +145,11 @@ class UserServiceTest {
     @DisplayName("회원 차단 - 성공")
     public void block_success() throws Exception {
         //given
-        User testUser1 = UserTemplate.makeUser1();
-        User testUser2 = UserTemplate.makeUser2();
+        User testUser1 = UserTemplate.makeDummyUserA();
+        User testUser2 = UserTemplate.makeDummyUserB();
         given(userRepository.findBySocialEmail(any())).willReturn(Optional.ofNullable(testUser1));
         given(userRepository.findById(any())).willReturn(Optional.ofNullable(testUser2));
-        given(userBlockUserRepository.existsByBlockerUserAndAndBlockedUser(any(),any())).willReturn(false);
+        given(userBlockUserRepository.existsByBlockerUserAndBlockedUser(any(),any())).willReturn(false);
         //when
         UserDto.HideResponse hideResponse = userService.hideUser(new UserDto.HideRequest(1L));
 
@@ -161,7 +161,7 @@ class UserServiceTest {
     @DisplayName("회원 탈퇴 - 성공")
     public void revokeUser() throws Exception {
         //given
-        User testUser1 = UserTemplate.makeUser1();
+        User testUser1 = UserTemplate.makeDummyUserA();
         given(userRepository.findBySocialEmail(any())).willReturn(Optional.ofNullable(testUser1));
         String[] split = testUser1.getSocialEmail().split("@");
         given(kakaoService.revokeKakao(split[0])).willReturn(true);
@@ -178,7 +178,7 @@ class UserServiceTest {
     @DisplayName("회원 탈퇴 - 실패")
     public void revokeError() throws Exception {
         //given
-        User testUser = UserTemplate.makeUser1();
+        User testUser = UserTemplate.makeDummyUserA();
         given(userRepository.findBySocialEmail(any())).willReturn(Optional.ofNullable(testUser));
         String[] split = testUser.getSocialEmail().split("@");
         given(kakaoService.revokeKakao(split[0])).willReturn(false);

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>휴면계정으로 전환 안내</title>
+
+</head>
+<body style="font-family: Arial, sans-serif;
+            line-height: 1.5;
+            color: #333333;
+            margin: 0;
+            padding: 0;">
+<div class="container" style="max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;">
+    <h1 style="color: #0066cc;">휴면계정으로 전환 안내</h1>
+    <p style="margin-bottom: 20px;">안녕하세요, 복작복작입니다.</p>
+    <p style="margin-bottom: 20px;">귀하의 계정이 휴면 상태로 전환될 예정입니다. 휴면 상태로 전환되면 일정 기간 동안 계정에 로그인하지 않으면 일부 기능이 제한될 수 있습니다.</p>
+    <p style="margin-bottom: 20px;">휴면계정 변환예정 닉네임 : <strong><span th:text="${nickname}">닉네임</span></strong></p>
+    <p style="margin-bottom: 20px;">계정을 활성 상태로 유지하려면 다음 단계를 따라 주십시오:</p>
+    <ol>
+        <li>아래의 "활성화" 버튼을 클릭하여 계정에 로그인합니다.</li>
+        <li>계정에 로그인한 후, 활동을 통해 계정을 활성화시킵니다.</li>
+    </ol>
+    <p style="margin-bottom: 20px;">활성화 버튼을 클릭하여 계정을 활성화하세요:</p>
+    <p style="margin-bottom: 20px;"><a href="" class="button" style="display: inline-block;
+            padding: 10px 20px;
+            background-color: #0066cc;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 4px;">활성화</a></p>
+    <p style="margin-bottom: 20px;">계정을 활성 상태로 유지하기 위해 로그인해야 하는 일정 기간은 수신일로부터 한달입니다.</p>
+    <p style="margin-bottom: 20px;">계정을 계속 사용하지 않을 경우 휴면 상태로 유지될 수 있으며, 휴면 계정에 대한 추가 조치를 취할 수 있습니다.</p>
+    <p style="margin-bottom: 20px;">추가 도움이 필요한 경우, 문의하실 사항이 있으면 저희에게 연락해 주세요.</p>
+    <p style="margin-bottom: 20px;">감사합니다.<br>복작복작 팀 드림</p>
+</div>
+</body>
+</html>

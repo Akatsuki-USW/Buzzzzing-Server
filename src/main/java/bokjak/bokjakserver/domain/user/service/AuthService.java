@@ -12,9 +12,11 @@ import bokjak.bokjakserver.domain.user.dto.AuthDto.*;
 import bokjak.bokjakserver.domain.user.exeption.AuthException;
 import bokjak.bokjakserver.domain.user.exeption.UserException;
 import bokjak.bokjakserver.domain.user.model.RevokeUser;
+import bokjak.bokjakserver.domain.user.model.SleepingUser;
 import bokjak.bokjakserver.domain.user.model.User;
 import bokjak.bokjakserver.domain.user.model.UserStatus;
 import bokjak.bokjakserver.domain.user.repository.RevokeUserRepository;
+import bokjak.bokjakserver.domain.user.repository.SleepingUserRepository;
 import bokjak.bokjakserver.domain.user.repository.UserRepository;
 import bokjak.bokjakserver.util.CustomEncryptUtil;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +45,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final KakaoService kakaoService;
     private final BanRepository banRepository;
+    private final SleepingUserRepository sleepingUserRepository;
     private final RevokeUserRepository revokeUserRepository;
     private final CustomEncryptUtil customEncryptUtil;
 
@@ -51,12 +54,14 @@ public class AuthService {
         OAuthSocialEmailResponse response = fetchSocialEmail(socialLoginRequest);
         String socialEmail = response.socialEmail();
 
+        checkIsSleepingUser(socialEmail);
         Optional<User> findUser = userRepository.findBySocialEmail(socialEmail);
-        checkRevokeUser(socialEmail);
+        checkIsRevokeUser(socialEmail);
         AuthMessage loginMessage;
         if(findUser.isPresent()) {
             User user = findUser.get();
             checkUserStatus(user);
+            user.updateLastLoginDate();
 
             JwtDto jwtDto = login(LoginRequest.toLoginRequest(user));
             loginMessage = new AuthMessage(
@@ -90,7 +95,6 @@ public class AuthService {
         String socialEmail = signKey.socialEmail();
         String socialType = signKey.socialType();
         String nickname = signUpRequest.nickname();
-        String profileImageUrl = signUpRequest.profileImageUrl();
 
         checkDuplicationNickName(nickname);
         User user = signUpRequest.toUser(socialEmail, socialType, passwordEncoder);
@@ -110,6 +114,16 @@ public class AuthService {
     }
 
     @Transactional
+    public void checkIsSleepingUser(String socialEmail) {
+        Optional<SleepingUser> sleepingUser = sleepingUserRepository.findBySocialEmail(socialEmail);
+        if (sleepingUser.isEmpty()) return;
+        User user = userRepository.findById(sleepingUser.get().getOriginalId()).orElseThrow(() -> new UserException(StatusCode.NOT_FOUND_USER));
+        user.changeWakeUpUser(sleepingUser.get());
+
+        sleepingUserRepository.delete(sleepingUser.get());
+    }
+
+    @Transactional
     public void checkBanUser(User user) {
         Optional<Ban> banedUser = banRepository.findByUserAndIsBannedIsTrue(user);
         if (banedUser.isEmpty()) return;
@@ -121,7 +135,7 @@ public class AuthService {
     }
 
     @Transactional
-    public void checkRevokeUser(String socialEmail) {
+    public void checkIsRevokeUser(String socialEmail) {
         Optional<RevokeUser> checkUser = revokeUserRepository.findBySocialEmail(customEncryptUtil.hash(socialEmail));
         if (checkUser.isEmpty()) return;
         RevokeUser revokeUser = checkUser.get();
@@ -135,7 +149,7 @@ public class AuthService {
     @Transactional
     public void checkUserStatus(User user) {
         UserStatus userStatus = user.getUserStatus();
-        //NORMAL,BANNED,BLACKLIST,DELETED
+
         switch (userStatus) {
             case NORMAL:
                 break;
@@ -143,6 +157,7 @@ public class AuthService {
                 checkBanUser(user);
                 break;
             case BLACKLIST:
+                checkBanUser(user);
                 throw new UserException(StatusCode.BLACKLIST_BANNED_USER);
         }
     }

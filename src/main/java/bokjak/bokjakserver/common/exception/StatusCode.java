@@ -20,14 +20,13 @@ public enum StatusCode {
     AWS_S3_UPLOAD_FAIL(400, 9040, "AWS S3 upload fail."),
     AWS_S3_DELETE_FAIL(400, 9050, "AWS S3 delete fail."),
     AWS_S3_FILE_SIZE_EXCEEDED(400, 9060, "exceeded file size."),
-    AWS_S3_FILE_TYPE_NOT_PROVIDED(400, 9070, "file type not provided."),
-
+    AWS_S3_FILE_TYPE_INVALID(400, 9070, "invalid file type."),
     /**
      * User
      */
     NOT_FOUND_USER(404, 2000, "not found user error."),
     NICKNAME_DUPLICATION(409, 2010, "duplicated nickname error."),
-    BANNED_USER(400,2020,"banned user error"),
+    BANNED_USER(403,2020,"banned user error"),
     BLACKLIST_BANNED_USER(403, 2030, "blacklist user error."),
     SOCIAL_TYPE_ERROR(400,2040,"invalid social type error."),
     REVOKE_USER(403,2050,"revoke user error"),
@@ -55,10 +54,17 @@ public enum StatusCode {
     EXPIRED_REFRESH(400,1080,"expired refresh token"),
 
     /**
-     * Location
+     * Location & Congestion
      */
-    CHOICE_NOT_EXIST(404, 5010, "not found choice.");
+    CHOICE_NOT_EXIST(404, 5010, "not found choice."),
 
+    /**
+     * report
+     */
+
+    NOT_FOUND_REPORTED_USER(404, 3000,"not found reported user error."),
+    REPORT_DUPLICATION(400, 3010, "duplicate report."),
+    NOT_FOUND_REPORT_TARGET(404,3020,"report target not found.");
     private final int HttpCode;
     private final int statusCode;
     private final String message;
