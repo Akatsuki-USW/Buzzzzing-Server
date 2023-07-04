@@ -43,6 +43,7 @@ public class AuthService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final UserService userService;
     private final KakaoService kakaoService;
     private final BanRepository banRepository;
     private final SleepingUserRepository sleepingUserRepository;
@@ -108,9 +109,7 @@ public class AuthService {
     }
 
     private void checkDuplicationNickName(String nickname) {
-        if (userRepository.existsByNickname(nickname)) {
-            throw new UserException(StatusCode.NICKNAME_DUPLICATION);
-        }
+        userService.validateDuplicateNickname(nickname);
     }
 
     @Transactional

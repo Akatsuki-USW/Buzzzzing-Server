@@ -50,8 +50,9 @@ public class UserService {
         return new NicknameResponse(true);
     }
 
-    private void validateDuplicateNickname(String nickname) {
-        String pattern = "^(?=.*[a-z0-9가-힣])[a-z0-9가-힣]{2,16}$";
+    public void validateDuplicateNickname(String nickname) {
+//        String pattern = "^(?=.*[a-z0-9가-힣])[a-z0-9가-힣]{2,16}$";
+        String pattern = "^[0-9a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣]{2,16}$";
         if (!Pattern.matches(pattern, nickname)) {
             throw new UserException(StatusCode.NICKNAME_VALIDATE_ERROR);
         }
