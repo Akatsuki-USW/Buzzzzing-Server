@@ -6,6 +6,7 @@ import bokjak.bokjakserver.domain.user.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +32,7 @@ public class AuthController {
 
     @Operation(summary = "회원가입")
     @PostMapping("/signup")
-    public ApiResponse<JwtDto> signup(@RequestBody SignUpRequest signUpRequest) {
+    public ApiResponse<JwtDto> signup(@Valid @RequestBody SignUpRequest signUpRequest) {
         SignAuthMessage signAuthMessage = authService.signUp(signUpRequest);
         return success(signAuthMessage.detaildata());
     }

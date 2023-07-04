@@ -8,6 +8,7 @@ import bokjak.bokjakserver.domain.user.model.SocialType;
 import bokjak.bokjakserver.domain.user.model.User;
 import bokjak.bokjakserver.domain.user.model.UserStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Email;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -44,6 +45,7 @@ public class AuthDto {
     public record SignUpRequest(
             String signToken,
             String nickname,
+            @Email
             String email,
             String profileImageUrl
     ) {
@@ -67,6 +69,18 @@ public class AuthDto {
                     .userStatus(UserStatus.NORMAL)
                     .lastLoginDate(LocalDateTime.now())
                     .profileImageUrl(profileImageUrl).build();
+        }
+        public User toDummy(String email, String nickname, String socialEmail) {
+            return User.builder()
+                    .email(email)
+                    .profileImageUrl("www.test.com")
+                    .nickname(nickname)
+                    .socialEmail(socialEmail)
+                    .userStatus(UserStatus.NORMAL)
+                    .socialType(SocialType.KAKAO)
+                    .role(Role.ROLE_USER)
+                    .lastLoginDate(LocalDateTime.now())
+                    .build();
         }
     }
 
