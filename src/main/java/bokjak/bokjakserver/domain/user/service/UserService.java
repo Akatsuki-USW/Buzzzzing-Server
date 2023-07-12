@@ -62,6 +62,15 @@ public class UserService {
     }
 
     @Transactional
+    public UserInfoResponse updateUserInfo(UpdateUserInfoRequest updateUserInfoRequest) {
+        User currentUser = getCurrentUser();
+        validateDuplicateNickname(updateUserInfoRequest.nickname());
+        currentUser.updateUserInfo(updateUserInfoRequest);
+
+        return UserInfoResponse.of(currentUser);
+    }
+
+    @Transactional
     public HideResponse hideUser(HideRequest hideRequest) {
         User currentUser = getCurrentUser();
         User blockedUser = userRepository.findById(hideRequest.blockUserId()).orElseThrow(() -> new UserException(StatusCode.NOT_FOUND_USER));

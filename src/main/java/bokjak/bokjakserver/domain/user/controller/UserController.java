@@ -4,10 +4,7 @@ package bokjak.bokjakserver.domain.user.controller;
 import bokjak.bokjakserver.common.dto.ApiResponse;
 import bokjak.bokjakserver.domain.user.dto.AuthDto.AuthMessage;
 import bokjak.bokjakserver.domain.user.dto.UserDto;
-import bokjak.bokjakserver.domain.user.dto.UserDto.HideRequest;
-import bokjak.bokjakserver.domain.user.dto.UserDto.HideResponse;
-import bokjak.bokjakserver.domain.user.dto.UserDto.NicknameResponse;
-import bokjak.bokjakserver.domain.user.dto.UserDto.UserInfoResponse;
+import bokjak.bokjakserver.domain.user.dto.UserDto.*;
 import bokjak.bokjakserver.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +31,11 @@ public class UserController {
     @PostMapping("/hide")
     public ApiResponse<HideResponse> hideUser(@RequestBody HideRequest hideRequest) {
         return success(userService.hideUser(hideRequest));
+    }
+
+    @PostMapping("/me/profile")
+    public ApiResponse<UserInfoResponse> updateUserInfo(@RequestBody UpdateUserInfoRequest updateUserInfoRequest) {
+        return success(userService.updateUserInfo(updateUserInfoRequest));
     }
 
     @PostMapping("/revoke")
