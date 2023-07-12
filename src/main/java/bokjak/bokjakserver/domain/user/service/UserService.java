@@ -64,7 +64,10 @@ public class UserService {
     @Transactional
     public UserInfoResponse updateUserInfo(UpdateUserInfoRequest updateUserInfoRequest) {
         User currentUser = getCurrentUser();
-        validateDuplicateNickname(updateUserInfoRequest.nickname());
+        if (!currentUser.getNickname().equals(updateUserInfoRequest.nickname())) {
+            validateDuplicateNickname(updateUserInfoRequest.nickname());
+        }
+
         currentUser.updateUserInfo(updateUserInfoRequest);
 
         return UserInfoResponse.of(currentUser);
