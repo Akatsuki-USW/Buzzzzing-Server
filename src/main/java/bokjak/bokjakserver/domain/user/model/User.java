@@ -5,8 +5,11 @@ import bokjak.bokjakserver.domain.ban.model.Ban;
 import bokjak.bokjakserver.domain.bookmark.model.LocationBookmark;
 import bokjak.bokjakserver.domain.bookmark.model.SpotBookmark;
 import bokjak.bokjakserver.domain.comment.model.Comment;
+import bokjak.bokjakserver.domain.notification.model.Notification;
 import bokjak.bokjakserver.domain.report.model.Report;
 import bokjak.bokjakserver.domain.spot.model.Spot;
+import bokjak.bokjakserver.domain.user.dto.UserDto;
+import bokjak.bokjakserver.domain.user.dto.UserDto.UpdateUserInfoRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -88,6 +91,10 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> commentList = new ArrayList<>();
 
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notification> notificationList = new ArrayList<>();
+
     public void deletedUser() {
         this.userStatus = UserStatus.DELETED;
         this.email = null;
@@ -143,5 +150,11 @@ public class User extends BaseEntity {
 
     public void updateLastLoginDate() {
         this.lastLoginDate = LocalDateTime.now();
+    }
+
+    public void updateUserInfo(UpdateUserInfoRequest updateUserInfoRequest) {
+        this.email = updateUserInfoRequest.email();
+        this.nickname = updateUserInfoRequest.nickname();
+        this.profileImageUrl = updateUserInfoRequest.profileImageUrl();
     }
 }
