@@ -2,13 +2,13 @@ package bokjak.bokjakserver.domain.category.dto;
 
 import bokjak.bokjakserver.domain.category.model.LocationCategory;
 import bokjak.bokjakserver.domain.category.model.SpotCategory;
-import bokjak.bokjakserver.util.enums.EnumDayValue;
+import bokjak.bokjakserver.util.enums.EnumQueryValue;
 import bokjak.bokjakserver.util.enums.EnumValue;
 import lombok.Builder;
 
 import java.util.*;
 
-import static bokjak.bokjakserver.util.enums.EnumDayValue.toEnumDayValues;
+import static bokjak.bokjakserver.util.enums.EnumQueryValue.toEnumQueryValues;
 import static bokjak.bokjakserver.util.enums.EnumValue.toEnumValues;
 
 
@@ -48,7 +48,7 @@ public class CategoryDto {
             List<LocationCategoryResponse> locationCategories,
             List<SpotCategoryResponse> spotCategories,
             List<EnumValue<String>> congestionLevelChoices,
-            List<EnumDayValue> congestionHistoricalDateChoices
+            List<EnumQueryValue<String>> congestionHistoricalDateChoices
     ) {
 
         public static AllCategoryResponse of(List<LocationCategoryResponse> locationCategories,
@@ -58,7 +58,7 @@ public class CategoryDto {
                     .locationCategories(locationCategories)
                     .spotCategories(spotCategories)
                     .congestionLevelChoices(toEnumValues(CongestionLevelChoice.class))
-                    .congestionHistoricalDateChoices(toEnumDayValues(CongestionHistoricalDateChoice.class))
+                    .congestionHistoricalDateChoices(toEnumQueryValues(CongestionHistoricalDateChoice.class))
                     .build();
         }
     }
