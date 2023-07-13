@@ -5,7 +5,7 @@ import bokjak.bokjakserver.domain.location.model.Location;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -23,7 +23,7 @@ public class Congestion extends BaseEntity {
     @JoinColumn(name = "location_id", nullable = false)
     private Location location;
 
-    @Enumerated(EnumType.STRING)
-    private CongestionLevel congestionLevel;   //range : 1 ~ 4 (여유, 보통, 약간 혼잡, 혼잡)
-    private LocalDate observedAt;
+    @Column(length = 1, nullable = false)
+    private int congestionLevel;   //range : 1 ~ 3 (여유, 보통, 혼잡)
+    private LocalDateTime observedAt;
 }

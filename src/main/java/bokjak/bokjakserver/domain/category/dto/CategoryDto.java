@@ -2,10 +2,14 @@ package bokjak.bokjakserver.domain.category.dto;
 
 import bokjak.bokjakserver.domain.category.model.LocationCategory;
 import bokjak.bokjakserver.domain.category.model.SpotCategory;
+import bokjak.bokjakserver.util.enums.EnumDayValue;
+import bokjak.bokjakserver.util.enums.EnumValue;
 import lombok.Builder;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static bokjak.bokjakserver.util.enums.EnumDayValue.toEnumDayValues;
+import static bokjak.bokjakserver.util.enums.EnumValue.toEnumValues;
 
 
 public class CategoryDto {
@@ -43,7 +47,7 @@ public class CategoryDto {
     public record AllCategoryResponse(
             List<LocationCategoryResponse> locationCategories,
             List<SpotCategoryResponse> spotCategories,
-            List<EnumValue> congestionLevelChoices,
+            List<EnumValue<String>> congestionLevelChoices,
             List<EnumDayValue> congestionHistoricalDateChoices
     ) {
 
@@ -59,18 +63,4 @@ public class CategoryDto {
         }
     }
 
-    // enum -> DTO
-    private static List<EnumValue> toEnumValues(Class<? extends EnumModel> enumModel) {
-        return Arrays
-                .stream(enumModel.getEnumConstants())
-                .map(EnumValue::new)
-                .collect(Collectors.toList());
-    }
-
-    private static List<EnumDayValue> toEnumDayValues(Class<? extends EnumModel> enumModel) {
-        return Arrays
-                .stream(enumModel.getEnumConstants())
-                .map(EnumDayValue::new)
-                .collect(Collectors.toList());
-    }
 }

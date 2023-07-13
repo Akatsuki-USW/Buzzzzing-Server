@@ -24,6 +24,7 @@ public class LocationCategory {
     private String iconImageUrl;
 
     @OneToMany(mappedBy = "locationCategory", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Location> locationList = new ArrayList<>();
 
 }

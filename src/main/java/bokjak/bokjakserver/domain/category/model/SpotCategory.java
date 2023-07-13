@@ -22,5 +22,6 @@ public class SpotCategory {
     private String name;
 
     @OneToMany(mappedBy = "spotCategory", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Spot> spotList = new ArrayList<>();
 }

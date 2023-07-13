@@ -106,7 +106,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public ApiResponse<?> handleServletRequestBindingException(ServletRequestBindingException ex) {
         log.warn("{} - {}", ex.getClass().getName(), ex.getMessage());
-        return error(HTTP_CLIENT_ERROR.getStatusCode(), ex.getMessage());
+        return error(INVALID_REQUEST_PARAM.getStatusCode(), ex.getMessage());
     }
 
     /**
