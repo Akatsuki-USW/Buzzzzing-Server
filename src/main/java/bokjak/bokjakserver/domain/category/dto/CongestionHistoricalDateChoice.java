@@ -3,6 +3,7 @@ package bokjak.bokjakserver.domain.category.dto;
 import bokjak.bokjakserver.common.constant.GlobalConstants;
 import bokjak.bokjakserver.common.exception.StatusCode;
 import bokjak.bokjakserver.domain.category.exception.CategoryException;
+import bokjak.bokjakserver.util.enums.EnumModel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -11,7 +12,7 @@ import java.util.Calendar;
 
 @Getter
 @AllArgsConstructor
-public enum CongestionHistoricalDateChoice implements EnumModel {
+public enum CongestionHistoricalDateChoice implements EnumModel<String> {
     TODAY("Last week, today"), MON("Last Mon"), TUE("Last Tue"), WED("Last Wed"),
     THU("Last Thu"), FRI("Last Fri"), SAT("Last Sat"), SUN("Last Sun");
 
@@ -49,10 +50,10 @@ public enum CongestionHistoricalDateChoice implements EnumModel {
             case SAT -> calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
             case SUN -> calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
 
-            default -> throw new IllegalArgumentException("Unexpected value");  // Internal Error 이여야 함
+            default -> throw new IllegalArgumentException(StatusCode.INTERNAL_SERVER_ERROR.getMessage());  // Internal Error 이여야 함
         }
 
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat formatter = new SimpleDateFormat(GlobalConstants.DATE_FORMAT);
         return formatter.format(calendar.getTime());
     }
 
