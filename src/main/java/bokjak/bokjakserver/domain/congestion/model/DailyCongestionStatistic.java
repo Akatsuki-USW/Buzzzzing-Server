@@ -19,13 +19,14 @@ import java.util.Map;
 public class DailyCongestionStatistic extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "congestion_statistic_id")
+    @Column(name = "daily_congestion_statistic_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id", nullable = false)
     private Location location;
 
+    // TODO refactor: Map<String, Integer> -> 클래스
     @Type(JsonType.class)
     @Column(columnDefinition = "json")
     @Builder.Default

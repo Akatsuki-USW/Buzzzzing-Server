@@ -4,7 +4,6 @@ import bokjak.bokjakserver.domain.congestion.dto.CongestionDto.CongestionPredict
 import bokjak.bokjakserver.domain.congestion.model.Congestion;
 import bokjak.bokjakserver.domain.congestion.model.CongestionLevel;
 import bokjak.bokjakserver.domain.location.model.Location;
-import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -45,37 +44,6 @@ public class LocationDto {
     }
 
     @Builder
-    public record LocationCard(
-            Long id,
-            String name,
-            Long categoryId,
-            String categoryName,
-            String categoryIconUrl,
-            int congestionLevel,
-            LocalDateTime observedAt,
-            int bookMarkCount
-    ) {
-        @QueryProjection
-        public LocationCard {
-        }
-
-        public static LocationCard of(
-                Location location,
-                Congestion congestion
-        ) {
-            return LocationCard.builder()
-                    .id(location.getId())
-                    .name(location.getName())
-                    .categoryId(location.getLocationCategory().getId())
-                    .categoryName(location.getLocationCategory().getName())
-                    .observedAt(congestion.getObservedAt())
-                    .congestionLevel(congestion.getCongestionLevel())
-                    .bookMarkCount(location.getLocationBookmarkList().size())
-                    .build();
-        }
-    }
-
-    @Builder
     public record LocationDetailResponse(
             Long id,
             String name,
@@ -91,7 +59,7 @@ public class LocationDto {
             Integer mayRelaxUntil,
             Integer mayBuzzAt,
             Integer mayBuzzUntil
-            ) {
+    ) {
         public static LocationDetailResponse of(
                 Location location,
                 Congestion congestion,

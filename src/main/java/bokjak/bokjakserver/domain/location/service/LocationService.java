@@ -123,6 +123,7 @@ public class LocationService {
                 .findTop1ByLocationIdAndCreatedAtBetweenOrderByCreatedAtDesc(locationId, start, end)
                 .orElseThrow(() -> new CongestionException(StatusCode.NOT_FOUND_DAILY_CONGESTION_STAT));
 
+
         return DailyCongestionStatisticResponse.of(dailyCongestionStatistic);
     }
 

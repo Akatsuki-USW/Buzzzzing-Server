@@ -6,25 +6,41 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class CongestionDto {
     @Builder
     public record DailyCongestionStatisticResponse(
-    Long id,
-    ArrayList<Map<String, Integer>> content
+            Long id,
+            List<DailyCongestionRecord> content
     ) {
         public static DailyCongestionStatisticResponse of(
                 DailyCongestionStatistic dailyCongestionStatistic
         ) {
+            List<DailyCongestionRecord> records = dailyCongestionStatistic.getContent().get(GlobalConstants.CONTENT_DATA)
+                    .stream().map(DailyCongestionRecord::of).toList();
+
             return DailyCongestionStatisticResponse.builder()
                     .id(dailyCongestionStatistic.getId())
-                    .content(dailyCongestionStatistic.getContent().get(GlobalConstants.CONTENT_DATA))
+                    .content(records)
                     .build();
         }
+    }
 
+    @Builder
+    public record DailyCongestionRecord(
+            int time,
+            int congestionLevel
+    ) {
+        public static DailyCongestionRecord of(
+                Map<String, Integer> raw
+        ) {
+            return DailyCongestionRecord.builder()
+                    .time(raw.get(GlobalConstants.CONTENT_HOUR))
+                    .congestionLevel(raw.get(GlobalConstants.CONTENT_CONGESTION_LEVEL))
+                    .build();
+        }
     }
 
     @Data

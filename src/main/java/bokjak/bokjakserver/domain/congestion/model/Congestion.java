@@ -24,6 +24,6 @@ public class Congestion extends BaseEntity {
     private Location location;
 
     @Column(length = 1, nullable = false)
-    private int congestionLevel;   //range : 1 ~ 3 (여유, 보통, 약간 혼잡, 혼잡)
+    private int congestionLevel;   //range : 1 ~ 3 (여유, 보통, 혼잡)
     private LocalDateTime observedAt;
 }
