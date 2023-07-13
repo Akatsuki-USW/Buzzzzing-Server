@@ -1,11 +1,13 @@
 package bokjak.bokjakserver.domain.congestion.model;
 
+import bokjak.bokjakserver.common.model.BaseEntity;
 import bokjak.bokjakserver.domain.location.model.Location;
 import com.vladmihalcea.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Type;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,7 +16,7 @@ import java.util.Map;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class DailyCongestionStatistic {
+public class DailyCongestionStatistic extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "congestion_statistic_id")
@@ -26,5 +28,6 @@ public class DailyCongestionStatistic {
 
     @Type(JsonType.class)
     @Column(columnDefinition = "json")
-    private Map<String, Object> content = new HashMap<>();  // 시간별 혼잡도 (09시 ~ 24시)
+    @Builder.Default
+    private Map<String, ArrayList<Map<String, Integer>>> content = new HashMap<>();  // 시간별 혼잡도 (09시 ~ 24시)
 }

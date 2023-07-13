@@ -53,11 +53,14 @@ public class Spot {
     private String thumbnailImageUrl;
 
     @OneToMany(mappedBy = "spot", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<SpotBookmark> spotBookmarkList = new ArrayList<>();
 
     @OneToMany(mappedBy = "spot", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Comment> commentList = new ArrayList<>();
 
     @OneToMany(mappedBy = "spot", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<SpotImage> spotImageList = new ArrayList<>();
 }
