@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum DummySpotCategory {
-    CAFE("cafe"), PLAY("play"), RESTAURANT("restaurant");
+    CAFE("카페"), PLAY("놀거리"), RESTAURANT("맛집");
 
     private final String name;
 }
