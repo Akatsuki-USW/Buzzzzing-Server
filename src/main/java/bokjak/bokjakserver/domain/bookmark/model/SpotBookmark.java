@@ -4,6 +4,7 @@ import bokjak.bokjakserver.common.model.BaseEntity;
 import bokjak.bokjakserver.domain.spot.model.Spot;
 import bokjak.bokjakserver.domain.user.model.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Entity
@@ -19,10 +20,12 @@ public class SpotBookmark extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "spot_id", nullable = false)
+    @NotNull
+    @JoinColumn(name = "spot_id")
     private Spot spot;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @NotNull
+    @JoinColumn(name = "user_id")
     private User user;
 }

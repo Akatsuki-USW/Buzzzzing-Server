@@ -3,6 +3,7 @@ package bokjak.bokjakserver.domain.congestion.model;
 import bokjak.bokjakserver.domain.location.model.Location;
 import com.vladmihalcea.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.Type;
 import org.springframework.data.annotation.CreatedDate;
@@ -24,7 +25,8 @@ public class DailyCongestionStatistic {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "location_id", nullable = false)
+    @NotNull
+    @JoinColumn(name = "location_id")
     private Location location;
 
     @CreatedDate

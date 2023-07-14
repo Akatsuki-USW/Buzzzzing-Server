@@ -2,6 +2,7 @@ package bokjak.bokjakserver.domain.congestion.model;
 
 import bokjak.bokjakserver.domain.location.model.Location;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 
@@ -20,10 +21,11 @@ public class WeeklyCongestionStatistic {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "location_id", nullable = false)
+    @NotNull
+    @JoinColumn(name = "location_id")
     private Location location;
 
-    @Column(nullable = false)
+    @NotNull
     private Float averageCongestionLevel;    // 일주일 혼잡도 평균
 
     @CreatedDate

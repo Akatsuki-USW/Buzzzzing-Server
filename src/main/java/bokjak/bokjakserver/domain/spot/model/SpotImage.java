@@ -1,7 +1,9 @@
 package bokjak.bokjakserver.domain.spot.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.validator.constraints.URL;
 
 @Entity
 @Getter
@@ -16,9 +18,11 @@ public class SpotImage {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "spot_id", nullable = false)
+    @NotNull
+    @JoinColumn(name = "spot_id")
     private Spot spot;
 
-    @Column(length = 500)
+    @NotNull
+    @URL
     private String imageUrl;
 }
