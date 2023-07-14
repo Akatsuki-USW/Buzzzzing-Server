@@ -7,7 +7,10 @@ import bokjak.bokjakserver.domain.comment.model.Comment;
 import bokjak.bokjakserver.domain.location.model.Location;
 import bokjak.bokjakserver.domain.user.model.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.validator.constraints.URL;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,31 +28,36 @@ public class Spot {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "location_id", nullable = false)
+    @NotNull
+    @JoinColumn(name = "location_id")
     private Location location;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "spot_category_id", nullable = false)
+    @NotNull
+    @JoinColumn(name = "spot_category_id")
     private SpotCategory spotCategory;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @NotNull
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(length = 50)
+    @NotNull
+    @Size(max = 50)
     private String title;
 
-    @Column(length = 50)
+    @Size(max = 50)
     private String spotName;
 
     private String address;
 
     private String roadNameAddress;
 
-    @Column(length = 1500)
+    @NotNull
+    @Size(max = 1500)
     private String content;
 
-    @Column(length = 500)
+    @URL
     private String thumbnailImageUrl;
 
     @OneToMany(mappedBy = "spot", cascade = CascadeType.ALL, orphanRemoval = true)

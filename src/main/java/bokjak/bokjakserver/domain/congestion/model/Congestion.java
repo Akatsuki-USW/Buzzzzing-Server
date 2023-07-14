@@ -3,6 +3,8 @@ package bokjak.bokjakserver.domain.congestion.model;
 import bokjak.bokjakserver.common.model.BaseEntity;
 import bokjak.bokjakserver.domain.location.model.Location;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -20,10 +22,13 @@ public class Congestion extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "location_id", nullable = false)
+    @NotNull
+    @JoinColumn(name = "location_id")
     private Location location;
 
-    @Column(length = 1, nullable = false)
+    @NotNull
+    @Max(3)
     private int congestionLevel;   //range : 1 ~ 3 (여유, 보통, 혼잡)
+
     private LocalDateTime observedAt;
 }

@@ -2,6 +2,8 @@ package bokjak.bokjakserver.domain.category.model;
 
 import bokjak.bokjakserver.domain.spot.model.Spot;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -19,6 +21,8 @@ public class SpotCategory {
     @Column(name = "spot_category_id")
     private Long id;
 
+    @NotNull
+    @Size(max = 45)
     private String name;
 
     @OneToMany(mappedBy = "spotCategory", cascade = CascadeType.ALL, orphanRemoval = true)

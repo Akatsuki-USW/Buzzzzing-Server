@@ -4,6 +4,8 @@ import bokjak.bokjakserver.common.model.BaseEntity;
 import bokjak.bokjakserver.domain.spot.model.Spot;
 import bokjak.bokjakserver.domain.user.model.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Entity
@@ -19,13 +21,21 @@ public class Comment extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @NotNull
+    @JoinColumn(name = "user_id")
     private User user;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "spot_id", nullable = false)
+    @NotNull
+    @JoinColumn(name = "spot_id")
     private Spot spot;
-    @Column(length = 300)
+
+    @NotNull
+    @Size(max = 300)
     private String content;
+
+    // 추후 대댓글 구현시 사용
     private Long sequence;
+
     private Long depth;
 }

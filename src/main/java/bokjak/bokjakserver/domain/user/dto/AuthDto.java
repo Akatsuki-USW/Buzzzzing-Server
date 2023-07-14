@@ -70,10 +70,10 @@ public class AuthDto {
                     .lastLoginDate(LocalDateTime.now())
                     .profileImageUrl(profileImageUrl).build();
         }
-        public User toDummy(String email, String nickname, String socialEmail) {
+        public User toDummy(String email, String nickname, String socialEmail, String profileImageUrl) {
             return User.builder()
                     .email(email)
-                    .profileImageUrl("www.test.com")
+                    .profileImageUrl(profileImageUrl)
                     .nickname(nickname)
                     .socialEmail(socialEmail)
                     .userStatus(UserStatus.NORMAL)
