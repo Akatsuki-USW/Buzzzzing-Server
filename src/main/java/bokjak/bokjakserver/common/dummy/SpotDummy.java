@@ -5,6 +5,8 @@ import bokjak.bokjakserver.domain.category.repository.SpotCategoryRepository;
 import bokjak.bokjakserver.domain.location.model.Location;
 import bokjak.bokjakserver.domain.location.repository.LocationRepository;
 import bokjak.bokjakserver.domain.spot.model.Spot;
+import bokjak.bokjakserver.domain.spot.model.SpotImage;
+import bokjak.bokjakserver.domain.spot.repository.SpotImageRepository;
 import bokjak.bokjakserver.domain.spot.repository.SpotRepository;
 import bokjak.bokjakserver.domain.user.model.User;
 import bokjak.bokjakserver.domain.user.repository.UserRepository;
@@ -28,6 +30,7 @@ public class SpotDummy {
     private final SpotCategoryRepository spotCategoryRepository;
     private final SpotRepository spotRepository;
     private final UserRepository userRepository;
+    private final SpotImageRepository spotImageRepository;
 
     @PostConstruct
     public void init() {
@@ -35,6 +38,7 @@ public class SpotDummy {
             log.info("[5] 스팟 데이터가 이미 존재");
         } else {
             createSpots();
+            createSpotImages();
             log.info("[5] 스팟 더미 생성 완료");
         }
     }
@@ -59,6 +63,25 @@ public class SpotDummy {
                         .spotName(location.getName() + i + "번째 스팟")
                         .title(location.getName() + " 근처 " + category.getName())
                         .content(strings.get((int) (Math.random() * 100) % 3))
+                        .build());
+            }
+        }
+    }
+
+    private void createSpotImages() {
+        List<Spot> allSpot = spotRepository.findAll();
+        ArrayList<String> urls = new ArrayList<>();
+        urls.add("https://buz-s3.s3.ap-southeast-2.amazonaws.com/etc/daniel.jpg");
+        urls.add("https://buz-s3.s3.ap-southeast-2.amazonaws.com/etc/hani_omg.png");
+        urls.add("https://buz-s3.s3.ap-southeast-2.amazonaws.com/etc/hyein.jpg");
+        urls.add("https://buz-s3.s3.ap-southeast-2.amazonaws.com/etc/hyerin.png");
+        urls.add("https://buz-s3.s3.ap-southeast-2.amazonaws.com/etc/minji.png");
+
+        for (Spot spot : allSpot) {// 스팟마다 0~5개 랜덤으로
+            for (int i = 0; i < (int) (Math.random() * 100) % 6; i++) {
+                spotImageRepository.save(SpotImage.builder()
+                        .spot(spot)
+                        .imageUrl(urls.get(i))
                         .build());
             }
         }
