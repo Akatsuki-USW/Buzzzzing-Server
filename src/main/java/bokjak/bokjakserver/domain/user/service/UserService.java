@@ -45,6 +45,10 @@ public class UserService {
         return new UserInfoResponse(user.getEmail(),user.getNickname(),user.getProfileImageUrl());
     }
 
+    public User getUser(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new UserException(StatusCode.NOT_FOUND_USER));
+    }
+
     public NicknameResponse isDuplicateNickname(String nickname) {
         validateDuplicateNickname(nickname);
         return new NicknameResponse(true);
