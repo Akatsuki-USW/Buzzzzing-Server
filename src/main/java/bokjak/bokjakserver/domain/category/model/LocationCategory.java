@@ -19,6 +19,7 @@ public class LocationCategory {
     @Column(name = "location_category_id")
     private Long id;
 
+    @Column(nullable = false)
     private String name;
 
     private String iconImageUrl;

@@ -31,6 +31,7 @@ public class Location extends BaseEntity {
     @JoinColumn(name = "location_category_id", nullable = false)
     private LocationCategory locationCategory;
 
+    @Column(nullable = false)
     private String name;
 
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)

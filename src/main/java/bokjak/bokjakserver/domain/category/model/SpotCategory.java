@@ -19,6 +19,7 @@ public class SpotCategory {
     @Column(name = "spot_category_id")
     private Long id;
 
+    @Column(nullable = false)
     private String name;
 
     @OneToMany(mappedBy = "spotCategory", cascade = CascadeType.ALL, orphanRemoval = true)
