@@ -70,6 +70,7 @@ public enum StatusCode {
     REPORT_DUPLICATION(400, 3010, "duplicate report."),
     NOT_FOUND_REPORT_TARGET(404,3020,"report target not found."),
     ALREADY_BAN_USER(400,3030,"already ban user."),
+    NOT_CORRECT_USER_AND_TARGET(404, 3040,"not correct writer and report target id"),
     OVER_CONTENT_LENGTH(400,3080,"limit of the number of words.");
 
     private final int HttpCode;
