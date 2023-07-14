@@ -2,6 +2,7 @@ package bokjak.bokjakserver.domain.location.controller;
 
 import bokjak.bokjakserver.common.dto.ApiResponse;
 import bokjak.bokjakserver.common.dto.PageResponse;
+import bokjak.bokjakserver.config.security.PrincipalDetails;
 import bokjak.bokjakserver.domain.congestion.dto.CongestionDto.DailyCongestionStatisticResponse;
 import bokjak.bokjakserver.domain.location.dto.LocationDto.BookmarkResponse;
 import bokjak.bokjakserver.domain.location.dto.LocationDto.LocationCardResponse;
@@ -12,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -49,7 +51,7 @@ public class LocationController {
 
     @GetMapping("/{locationId}")
     public ApiResponse<LocationDetailResponse> getLocation(@PathVariable Long locationId) {
-        LocationDetailResponse response = locationService.getLocation(locationId);
+        LocationDetailResponse response = locationService.getLocationDetail(locationId);
         return success(response);
     }
 
@@ -71,8 +73,8 @@ public class LocationController {
     }
 
     @PostMapping("{locationId}/bookmarks")
-    public ApiResponse<BookmarkResponse> bookmark(@PathVariable Long locationId) {
-        BookmarkResponse response = locationService.bookmark(locationId);
+    public ApiResponse<BookmarkResponse> bookmark(@PathVariable Long locationId, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        BookmarkResponse response = locationService.bookmark(locationId, principalDetails.getUserId());
         return success(response);
     }
 }
