@@ -164,4 +164,12 @@ public class User extends BaseEntity {
         this.nickname = updateUserInfoRequest.nickname();
         this.profileImageUrl = updateUserInfoRequest.profileImageUrl();
     }
+
+    public void addLocationBookmark(LocationBookmark locationBookmark) {
+        locationBookmarkList.add(locationBookmark);
+    }
+
+    public void removeLocationBookmark(LocationBookmark locationBookmark) {
+        locationBookmarkList.remove(locationBookmark);
+    }
 }
