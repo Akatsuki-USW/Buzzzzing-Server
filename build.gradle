@@ -65,9 +65,14 @@ tasks.named('test') {
 }
 
 
-// gradlew 빌드시 에러 발생방지
+// gradlew 빌드시 에러 발생방지, 빌드시 -plain.jar 생기는 설정 끄기 for Github Actions
 jar {
 	enabled = false
+}
+
+// jar 파일 이름 설정
+bootJar {
+	archiveFileName = "buzzing-server.jar"
 }
 
 // queryDSL 설정부 필요 없음. https://www.inflearn.com/questions/828947/build%EA%B4%80%EB%A0%A8-%EC%A7%88%EB%AC%B8%EB%93%9C%EB%A6%BD%EB%8B%88%EB%8B%A4
