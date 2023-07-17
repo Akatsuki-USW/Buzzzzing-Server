@@ -7,8 +7,8 @@ build/
 
 ## 커스텀
 
-*.properties
-*.yml
+# TODO application.yml -> application-secret.yml
+application.yml
 /src/main/generated/
 memo.md
 
