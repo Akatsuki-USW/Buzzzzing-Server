@@ -73,6 +73,7 @@ jobs:
           key: ${{ secrets.EC2_PEM_KEY }}
           envs: GITHUB_SHA
           script: |
+            docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}            
             docker pull ${{ secrets.DOCKER_USERNAME }}/buzzing-server:${GITHUB_SHA::7}
             docker tag ${{ secrets.DOCKER_USERNAME }}/buzzing-server:${GITHUB_SHA::7} buzzing-server
             docker rm -f $(docker ps -qa)
