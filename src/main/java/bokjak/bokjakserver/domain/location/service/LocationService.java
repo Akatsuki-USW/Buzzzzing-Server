@@ -97,11 +97,10 @@ public class LocationService {
     }
 
     // 상세 조회
-    public LocationDetailResponse getLocation(Long locationId) {
+    public LocationDetailResponse getLocationDetail(Long locationId) {
         User currentUser = userService.getCurrentUser();
 
-        Location location = locationRepository.findById(locationId)
-                .orElseThrow(() -> new LocationException(StatusCode.NOT_FOUND_LOCATION));
+        Location location = getLocation(locationId);
         Congestion congestion = congestionRepository.findTopByLocationIdOrderByObservedAtDesc(locationId)
                 .orElseThrow(() -> new CongestionException(StatusCode.NOT_FOUND_CONGESTION));
         boolean isBookmarked = currentUser.getLocationBookmarkList().stream()
@@ -129,26 +128,33 @@ public class LocationService {
 
     // 북마크 등록 OR 수정
     @Transactional
-    public BookmarkResponse bookmark(Long locationId) {
-        User currentUser = userService.getCurrentUser();
-        Location location = locationRepository.findById(locationId)
-                .orElseThrow(() -> new LocationException(StatusCode.NOT_FOUND_LOCATION));
+    public BookmarkResponse bookmark(Long locationId, Long userId) {
+        User user = userService.getUser(userId);    // no session lazy 예외 핸들용 TODO 고민해보기
+        Location location = getLocation(locationId);
 
-        Optional<LocationBookmark> bookmark = locationBookmarkRepository.findByUserAndLocation(currentUser, location);
+        Optional<LocationBookmark> bookmark = user.getLocationBookmarkList().stream()
+                .filter(it -> it.getLocation().equals(location))
+                .findFirst();
+
         boolean isBookmarked;
 
         if (bookmark.isEmpty()) {// 기존의 북마크 여부에 따라 등록, 취소 처리
-            locationBookmarkRepository.save(LocationBookmark.builder()
-                    .user(currentUser)
+            user.addLocationBookmark(LocationBookmark.builder()
+                    .user(user)
                     .location(location)
                     .build());
             isBookmarked = true;
         } else {
-            locationBookmarkRepository.delete(bookmark.get());
+            user.removeLocationBookmark(bookmark.get());
             isBookmarked = false;
         }
 
         return BookmarkResponse.of(locationId, isBookmarked);
+    }
+
+    public Location getLocation(Long locationId) {
+        return locationRepository.findById(locationId)
+                .orElseThrow(() -> new LocationException(StatusCode.NOT_FOUND_LOCATION));
     }
 
     /* private 함수 */
