@@ -4,6 +4,8 @@ public class GlobalConstants {
     /**
      * Common
      */
+    public static final String[] APPOINTED_URIS = {"/auth/login/admin", "/auth/reissue", "/auth/login", "/auth/signup", "/users/check/nickname/**", "/hello/**", "/categories/**", "/files"};
+
 
     /**
      * Category
