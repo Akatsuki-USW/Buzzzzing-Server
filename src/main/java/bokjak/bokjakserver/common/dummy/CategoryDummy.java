@@ -35,7 +35,6 @@ public class CategoryDummy {
         categoryService.createDummyLocationCategory(MART);
         categoryService.createDummyLocationCategory(VACATION);
         categoryService.createDummyLocationCategory(MARKET);
-        categoryService.createDummyLocationCategory(ALL);
 
         // 스팟 카테고리
         categoryService.createDummySpotCategory(CAFE);

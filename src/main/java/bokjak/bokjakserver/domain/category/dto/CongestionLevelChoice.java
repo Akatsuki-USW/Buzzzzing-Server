@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum CongestionLevelChoice implements EnumModel<String> {
-    BUZZING("인기순"), RELAX("여유순"), NORMAL("보통");
+    RELAX("여유순"), NORMAL("보통"), BUZZING("복쟉순");
 
     private final String value;
 
