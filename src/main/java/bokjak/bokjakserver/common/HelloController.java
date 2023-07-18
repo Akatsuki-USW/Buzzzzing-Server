@@ -17,6 +17,6 @@ public class HelloController {
 
     @GetMapping()
     public String sayHello() {
-        return " ✅ server listening on port " + port;
+        return "✅ server listening on port " + port;
     }
 }
