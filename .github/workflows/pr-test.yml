@@ -6,19 +6,16 @@
 
 name: Gradlew build Test on PR
 
-## trigger : 해당 브랜치를 base로 한 PR이 생성됐을 때
+## trigger : PR이 생성됐을 때
 on:
-  pull_request:
-    branches: [ "develop" ]
+  pull_request
 
 permissions:
   contents: read
 
 jobs:
   test:
-
     runs-on: ubuntu-latest
-
     steps:
       ## JDK 버전 : 17
       - uses: actions/checkout@v3
