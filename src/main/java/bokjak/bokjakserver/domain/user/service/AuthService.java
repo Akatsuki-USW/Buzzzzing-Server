@@ -63,6 +63,7 @@ public class AuthService {
             User user = findUser.get();
             checkUserStatus(user);
             user.updateLastLoginDate();
+            user.updateFcmToken(socialLoginRequest.fcmToken());
 
             JwtDto jwtDto = login(LoginRequest.toLoginRequest(user));
             loginMessage = new AuthMessage(
@@ -101,6 +102,7 @@ public class AuthService {
         User user = signUpRequest.toUser(socialEmail, socialType, passwordEncoder);
         userRepository.save(user);
 
+        user.updateFcmToken(signUpRequest.fcmToken());
         JwtDto jwtDto = login(LoginRequest.toLoginRequest(user));
         return new SignAuthMessage(
                 jwtDto,

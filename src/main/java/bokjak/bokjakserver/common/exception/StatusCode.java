@@ -65,7 +65,17 @@ public enum StatusCode {
 
     NOT_FOUND_REPORTED_USER(404, 3000,"not found reported user error."),
     REPORT_DUPLICATION(400, 3010, "duplicate report."),
-    NOT_FOUND_REPORT_TARGET(404,3020,"report target not found.");
+    NOT_FOUND_REPORT_TARGET(404,3020,"report target not found."),
+
+    /**
+     * Notification
+     */
+    GET_FCM_ACCESS_TOKEN_ERROR(400,4500,"fcm access token get failed"),
+    FCM_MESSAGE_JSON_PARSING_ERROR(400,4510,"fcm message json parsing failed"),
+    SEND_FCM_PUSH_ERROR(400,4520,"send fcm push message failed"),
+    NOT_FOUND_NOTIFICATION(404, 4530, "not found notification error");
+
+
     private final int HttpCode;
     private final int statusCode;
     private final String message;
