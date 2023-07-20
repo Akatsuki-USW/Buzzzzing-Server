@@ -11,6 +11,7 @@ build/
 application.yml
 /src/main/generated/
 memo.md
+/src/main/resources/buzzzzing-firebase-private-key.json
 
 ### STS ###
 .apt_generated

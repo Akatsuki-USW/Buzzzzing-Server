@@ -9,6 +9,7 @@ import bokjak.bokjakserver.domain.user.model.User;
 import bokjak.bokjakserver.domain.user.model.UserStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,10 +21,14 @@ import java.time.LocalDateTime;
 public class AuthDto {
 
     public record SocialLoginRequest(
+            @NotBlank
             @Schema(description = "소셜 타입", example = "KAKAO")
             String socialType,
+            @NotBlank
             @Schema(description = "Oauth2 Access 토큰", example = "ya29.a0Aa4xrXNXkiDBMm7MtSneVejzvup")
-            String oauthAccessToken
+            String oauthAccessToken,
+            @NotBlank
+            String fcmToken
     ){}
 
     public record LoginRequest(String socialEmail, String password) {
@@ -43,11 +48,15 @@ public class AuthDto {
         }
     }
     public record SignUpRequest(
+            @NotBlank
             String signToken,
+            @NotBlank
             String nickname,
             @Email
             String email,
-            String profileImageUrl
+            String profileImageUrl,
+            @NotBlank
+            String fcmToken
     ) {
         @Builder
         public SignUpRequest{}
@@ -68,6 +77,7 @@ public class AuthDto {
                     .role(Role.ROLE_USER)
                     .userStatus(UserStatus.NORMAL)
                     .lastLoginDate(LocalDateTime.now())
+                    .fcmToken(fcmToken)
                     .profileImageUrl(profileImageUrl).build();
         }
         public User toDummy(String email, String nickname, String socialEmail, String profileImageUrl) {
@@ -85,7 +95,9 @@ public class AuthDto {
     }
 
     public record SigningUser(String socialEmail, String socialUuid, String socialType) {}
-    public record ReissueRequest(String refreshToken) {}
+    public record ReissueRequest(
+            @NotBlank
+            String refreshToken) {}
 
 
     public record AuthMessage(Object detailData, String detailMessage) {}

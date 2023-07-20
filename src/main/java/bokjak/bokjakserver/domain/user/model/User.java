@@ -8,7 +8,6 @@ import bokjak.bokjakserver.domain.comment.model.Comment;
 import bokjak.bokjakserver.domain.notification.model.Notification;
 import bokjak.bokjakserver.domain.report.model.Report;
 import bokjak.bokjakserver.domain.spot.model.Spot;
-import bokjak.bokjakserver.domain.user.dto.UserDto;
 import bokjak.bokjakserver.domain.user.dto.UserDto.UpdateUserInfoRequest;
 import jakarta.persistence.*;
 import lombok.*;
@@ -44,6 +43,7 @@ public class User extends BaseEntity {
     @Column(length = 20)
     private String nickname;
     private LocalDateTime lastLoginDate;
+    private String fcmToken;
 
 
     //회원(1) - 게시글 북마크 (다)
@@ -129,6 +129,10 @@ public class User extends BaseEntity {
         reportedUsers.add(report);
     }
 
+    public void addNotification(Notification notification) {
+        if (notificationList == null) notificationList = new ArrayList<>();
+        notificationList.add(notification);
+    }
 
     public void removeBlockerUser(UserBlockUser userBlockUser) {
         blockerUserList.remove(userBlockUser);
@@ -159,6 +163,9 @@ public class User extends BaseEntity {
         this.lastLoginDate = LocalDateTime.now();
     }
 
+    public void updateFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
+    }
     public void updateUserInfo(UpdateUserInfoRequest updateUserInfoRequest) {
         this.email = updateUserInfoRequest.email();
         this.nickname = updateUserInfoRequest.nickname();
