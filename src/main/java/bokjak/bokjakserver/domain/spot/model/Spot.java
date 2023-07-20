@@ -57,9 +57,6 @@ public class Spot {
     @Size(max = 1500)
     private String content;
 
-    @URL
-    private String thumbnailImageUrl;
-
     @OneToMany(mappedBy = "spot", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<SpotBookmark> spotBookmarkList = new ArrayList<>();
