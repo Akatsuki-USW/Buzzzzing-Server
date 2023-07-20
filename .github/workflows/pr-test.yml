@@ -1,0 +1,51 @@
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
+# gradlew 빌드까지만 테스트
+
+name: Gradlew build Test on PR
+
+## trigger : PR이 생성됐을 때
+on:
+  pull_request
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      ## JDK 버전 : 17
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+
+      ## 빌드 시간 단축용 gradle 캐싱
+      - name: Gradle Caching
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      ## 1. yml 파일 생성
+      - name: Set up yml file
+        env:
+          YAML_SECRET: ${{ secrets.APPLICATION_YML }}
+          YAML_DIR: src/main/resources
+          YAML_FILE_NAME: application.yml
+        run: echo $YAML_SECRET | base64 --decode > $YAML_DIR/$YAML_FILE_NAME
+
+      ## 2. gradlew 권한 부여 및 빌드
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build with Gradle
+        run: ./gradlew bootJar

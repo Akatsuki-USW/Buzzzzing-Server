@@ -14,7 +14,6 @@ import java.util.Collection;
 public class PrincipalDetails implements UserDetails {
 
     private User user;
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
@@ -30,6 +29,10 @@ public class PrincipalDetails implements UserDetails {
     @Override
     public String getUsername() {
         return user.getSocialEmail();
+    }
+
+    public Long getUserId() {
+        return user.getId();
     }
 
     @Override

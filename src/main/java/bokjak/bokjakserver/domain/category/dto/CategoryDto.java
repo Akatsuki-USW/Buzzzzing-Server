@@ -2,10 +2,14 @@ package bokjak.bokjakserver.domain.category.dto;
 
 import bokjak.bokjakserver.domain.category.model.LocationCategory;
 import bokjak.bokjakserver.domain.category.model.SpotCategory;
+import bokjak.bokjakserver.util.enums.EnumQueryValue;
+import bokjak.bokjakserver.util.enums.EnumValue;
 import lombok.Builder;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static bokjak.bokjakserver.util.enums.EnumQueryValue.toEnumQueryValues;
+import static bokjak.bokjakserver.util.enums.EnumValue.toEnumValues;
 
 
 public class CategoryDto {
@@ -43,8 +47,8 @@ public class CategoryDto {
     public record AllCategoryResponse(
             List<LocationCategoryResponse> locationCategories,
             List<SpotCategoryResponse> spotCategories,
-            List<EnumValue> congestionLevelChoices,
-            List<EnumDayValue> congestionHistoricalDateChoices
+            List<EnumValue<String>> congestionLevelChoices,
+            List<EnumQueryValue<String>> congestionHistoricalDateChoices
     ) {
 
         public static AllCategoryResponse of(List<LocationCategoryResponse> locationCategories,
@@ -54,23 +58,9 @@ public class CategoryDto {
                     .locationCategories(locationCategories)
                     .spotCategories(spotCategories)
                     .congestionLevelChoices(toEnumValues(CongestionLevelChoice.class))
-                    .congestionHistoricalDateChoices(toEnumDayValues(CongestionHistoricalDateChoice.class))
+                    .congestionHistoricalDateChoices(toEnumQueryValues(CongestionHistoricalDateChoice.class))
                     .build();
         }
     }
 
-    // enum -> DTO
-    private static List<EnumValue> toEnumValues(Class<? extends EnumModel> enumModel) {
-        return Arrays
-                .stream(enumModel.getEnumConstants())
-                .map(EnumValue::new)
-                .collect(Collectors.toList());
-    }
-
-    private static List<EnumDayValue> toEnumDayValues(Class<? extends EnumModel> enumModel) {
-        return Arrays
-                .stream(enumModel.getEnumConstants())
-                .map(EnumDayValue::new)
-                .collect(Collectors.toList());
-    }
 }

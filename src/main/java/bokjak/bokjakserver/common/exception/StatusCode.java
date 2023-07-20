@@ -15,13 +15,12 @@ public enum StatusCode {
     INVALID_INPUT_VALUE(400, 9010, "invalid input value."),
     METHOD_NOT_ALLOWED(405, 9020, "method not allowed."),
     HTTP_CLIENT_ERROR(400, 9030, "http client error."),
-
+    INVALID_REQUEST_PARAM(400, 9100, "invalid request param."),
 
     AWS_S3_UPLOAD_FAIL(400, 9040, "AWS S3 upload fail."),
     AWS_S3_DELETE_FAIL(400, 9050, "AWS S3 delete fail."),
     AWS_S3_FILE_SIZE_EXCEEDED(400, 9060, "exceeded file size."),
-    AWS_S3_FILE_TYPE_NOT_PROVIDED(400, 9070, "file type not provided."),
-
+    AWS_S3_FILE_TYPE_INVALID(400, 9070, "invalid file type."),
     /**
      * User
      */
@@ -55,9 +54,13 @@ public enum StatusCode {
     EXPIRED_REFRESH(400,1080,"expired refresh token"),
 
     /**
-     * Location
+     * Location & Congestion
      */
     CHOICE_NOT_EXIST(404, 5010, "not found choice."),
+    NOT_FOUND_LOCATION(404, 5100, "not found location."),
+    NOT_FOUND_CONGESTION(404, 5110, "not found congestion."),
+    NOT_FOUND_DAILY_CONGESTION_STAT(404, 5120, "not found daily congestion statistics."),
+    NOT_FOUND_WEEKLY_CONGESTION_STAT(404, 5130, "not found weekly congestion statistics."),
 
     /**
      * report
@@ -66,6 +69,10 @@ public enum StatusCode {
     NOT_FOUND_REPORTED_USER(404, 3000,"not found reported user error."),
     REPORT_DUPLICATION(400, 3010, "duplicate report."),
     NOT_FOUND_REPORT_TARGET(404,3020,"report target not found."),
+    ALREADY_BAN_USER(400,3030,"already ban user."),
+    NOT_CORRECT_USER_AND_TARGET(404, 3040,"not correct writer and report target id"),
+    OVER_CONTENT_LENGTH(400,3080,"limit of the number of words."),
+
 
     /**
      * Notification

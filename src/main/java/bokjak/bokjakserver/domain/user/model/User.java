@@ -8,7 +8,6 @@ import bokjak.bokjakserver.domain.comment.model.Comment;
 import bokjak.bokjakserver.domain.notification.model.Notification;
 import bokjak.bokjakserver.domain.report.model.Report;
 import bokjak.bokjakserver.domain.spot.model.Spot;
-import bokjak.bokjakserver.domain.user.dto.UserDto;
 import bokjak.bokjakserver.domain.user.dto.UserDto.UpdateUserInfoRequest;
 import jakarta.persistence.*;
 import lombok.*;
@@ -67,15 +66,15 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "blockedUser", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserBlockUser> blockedUserList = new ArrayList<>();
 
-    //회원(1) - 다른 유저에게 신고당한 유저(다)
-    @Builder.Default
-    @OneToMany(mappedBy = "reporterUser", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Report> reporterUserList = new ArrayList<>();
-
     //회원(1) - 신고한 유저(다)
     @Builder.Default
+    @OneToMany(mappedBy = "reporter", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Report> reporters = new ArrayList<>();
+
+    //회원(1) - 다른 유저에게 신고당한 유저(다)
+    @Builder.Default
     @OneToMany(mappedBy = "reportedUser", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Report> reportedUserList = new ArrayList<>();
+    private List<Report> reportedUsers = new ArrayList<>();
 
     //회원(1) - 정지 유저(다)
     @Builder.Default
@@ -120,9 +119,14 @@ public class User extends BaseEntity {
         blockedUserList.add(userBlockUser);
     }
 
+    public void addReporterUser(Report report) {
+        if (reporters == null) reporters = new ArrayList<>();
+        reporters.add(report);
+    }
+
     public void addReportedUser(Report report) {
-        if (reportedUserList == null) reportedUserList = new ArrayList<>();
-        reportedUserList.add(report);
+        if (reportedUsers == null) reportedUsers = new ArrayList<>();
+        reportedUsers.add(report);
     }
 
     public void addNotification(Notification notification) {
@@ -166,5 +170,13 @@ public class User extends BaseEntity {
         this.email = updateUserInfoRequest.email();
         this.nickname = updateUserInfoRequest.nickname();
         this.profileImageUrl = updateUserInfoRequest.profileImageUrl();
+    }
+
+    public void addLocationBookmark(LocationBookmark locationBookmark) {
+        locationBookmarkList.add(locationBookmark);
+    }
+
+    public void removeLocationBookmark(LocationBookmark locationBookmark) {
+        locationBookmarkList.remove(locationBookmark);
     }
 }

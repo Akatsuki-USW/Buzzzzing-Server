@@ -22,7 +22,7 @@ public class CategoryDummy {
     @PostConstruct
     public void init(){
         if (locationCategoryRepository.count() > 0) {
-            log.info("[1] 카테고리가 이미 존재");
+            log.info("[2] 카테고리가 이미 존재");
             return;
         }
 
@@ -35,7 +35,6 @@ public class CategoryDummy {
         categoryService.createDummyLocationCategory(MART);
         categoryService.createDummyLocationCategory(VACATION);
         categoryService.createDummyLocationCategory(MARKET);
-        categoryService.createDummyLocationCategory(ALL);
 
         // 스팟 카테고리
         categoryService.createDummySpotCategory(CAFE);

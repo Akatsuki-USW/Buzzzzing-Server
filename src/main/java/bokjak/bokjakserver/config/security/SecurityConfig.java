@@ -1,5 +1,6 @@
 package bokjak.bokjakserver.config.security;
 
+import bokjak.bokjakserver.common.constant.GlobalConstants;
 import bokjak.bokjakserver.config.jwt.JwtAccessDeniedHandler;
 import bokjak.bokjakserver.config.jwt.JwtAuthenticationEntryPoint;
 import bokjak.bokjakserver.config.jwt.JwtAuthenticationFilter;
@@ -23,6 +24,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 import java.util.Arrays;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Configuration
@@ -58,8 +60,7 @@ public class SecurityConfig {
                 .formLogin().disable()
                 .httpBasic().disable()
                 .authorizeHttpRequests()
-
-                .requestMatchers("/auth/login/admin", "/auth/reissue","/auth/login", "/auth/signup","/users/check/nickname/**", "/categories/**", "/files").permitAll()
+                .requestMatchers(GlobalConstants.APPOINTED_URIS).permitAll()
                 .anyRequest().authenticated();
 
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
