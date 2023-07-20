@@ -7,6 +7,7 @@ import bokjak.bokjakserver.domain.spot.model.Spot;
 import bokjak.bokjakserver.domain.user.model.User;
 import lombok.Builder;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class NotificationDto {
@@ -68,7 +69,7 @@ public class NotificationDto {
             Long redirectTargetId,
             String title,
             String body,
-            String createdAt,
+            LocalDateTime createdAt,
             boolean isRead
     ) {
         @Builder
