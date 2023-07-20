@@ -3,8 +3,6 @@ package bokjak.bokjakserver.domain.spot.dto;
 import bokjak.bokjakserver.domain.spot.model.Spot;
 import lombok.Builder;
 
-import java.net.URL;
-
 public class SpotDto {
     /* Request */
 
@@ -19,7 +17,7 @@ public class SpotDto {
             Long spotCategoryId,
             Long userId,
             String userNickname,
-            String userProfileImageUrl    // TODO ?? 이거 DB에서 나올 때 뭘로 나오려나
+            String userProfileImageUrl
     ) {
         public static SpotCardResponse of(
                 Spot spot,
@@ -28,7 +26,8 @@ public class SpotDto {
             return SpotCardResponse.builder()
                     .id(spot.getId())
                     .title(spot.getTitle())
-                    .thumbnailImageUrl(spot.getThumbnailImageUrl())
+                    .thumbnailImageUrl(spot.getSpotImageList().isEmpty() ? null
+                            : spot.getSpotImageList().get(0).getImageUrl())
                     .isBookmarked(isBookmarked)
                     .spotCategoryId(spot.getSpotCategory().getId())
                     .userId(spot.getUser().getId())

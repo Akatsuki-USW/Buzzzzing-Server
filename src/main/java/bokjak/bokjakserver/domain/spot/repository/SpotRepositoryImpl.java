@@ -2,6 +2,7 @@ package bokjak.bokjakserver.domain.spot.repository;
 
 import bokjak.bokjakserver.domain.spot.model.Spot;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -15,9 +16,9 @@ import java.util.List;
 import static bokjak.bokjakserver.domain.bookmark.model.QSpotBookmark.spotBookmark;
 import static bokjak.bokjakserver.domain.category.model.QSpotCategory.spotCategory;
 import static bokjak.bokjakserver.domain.spot.model.QSpot.spot;
+import static bokjak.bokjakserver.domain.spot.model.QSpotImage.spotImage;
 import static bokjak.bokjakserver.domain.user.model.QUser.user;
 import static bokjak.bokjakserver.domain.user.model.QUserBlockUser.userBlockUser;
-import static com.querydsl.jpa.JPAExpressions.select;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -31,8 +32,6 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
             Long locationId,
             List<Long> categoryIds
     ) {
-        // EQ location id. cursur id. category Id. limit size
-
         JPAQuery<Spot> query = selectSpotByLocationPrefix(userId, locationId)
                 .where(gtCursorId(cursorId))
                 .where(inSpotCategoryId(categoryIds))
@@ -52,8 +51,9 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
                 .leftJoin(spot.user, user).fetchJoin()
                 .leftJoin(spot.spotCategory, spotCategory).fetchJoin()
                 .leftJoin(spot.spotBookmarkList, spotBookmark).fetchJoin()
+                .leftJoin(spot.spotImageList, spotImage)
                 .where(spot.location.id.eq(locationId))
-                .where(spot.user.id.notIn(select(userBlockUser.blockedUser.id)  // 차단한 유저 제외
+                .where(spot.user.id.notIn(JPAExpressions.select(userBlockUser.blockedUser.id)  // 차단한 유저 제외
                         .from(userBlockUser)
                         .where(userBlockUser.blockerUser.id.eq(userId))
                 ));

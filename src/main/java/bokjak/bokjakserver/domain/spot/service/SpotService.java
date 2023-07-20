@@ -1,9 +1,11 @@
 package bokjak.bokjakserver.domain.spot.service;
 
 import bokjak.bokjakserver.common.dto.PageResponse;
+import bokjak.bokjakserver.domain.bookmark.model.SpotBookmark;
 import bokjak.bokjakserver.domain.bookmark.repository.SpotBookmarkRepository;
 import bokjak.bokjakserver.domain.spot.dto.SpotDto.SpotCardResponse;
 import bokjak.bokjakserver.domain.spot.model.Spot;
+import bokjak.bokjakserver.domain.spot.model.SpotImage;
 import bokjak.bokjakserver.domain.spot.repository.SpotRepository;
 import bokjak.bokjakserver.domain.user.model.User;
 import bokjak.bokjakserver.domain.user.service.UserService;
