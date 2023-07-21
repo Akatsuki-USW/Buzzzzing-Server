@@ -4,6 +4,7 @@ import bokjak.bokjakserver.common.dto.ApiResponse;
 import bokjak.bokjakserver.common.dto.PageResponse;
 import bokjak.bokjakserver.config.security.PrincipalDetails;
 import bokjak.bokjakserver.domain.spot.dto.SpotDto;
+import bokjak.bokjakserver.domain.spot.dto.SpotDto.BookmarkResponse;
 import bokjak.bokjakserver.domain.spot.dto.SpotDto.SpotCardResponse;
 import bokjak.bokjakserver.domain.spot.dto.SpotDto.SpotDetailResponse;
 import bokjak.bokjakserver.domain.spot.service.SpotService;
@@ -44,6 +45,15 @@ public class SpotController {
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
         SpotDetailResponse response = spotService.getSpotDetail(principalDetails.getUserId(), spotId);
+        return success(response);
+    }
+
+    @PostMapping("/spots/{spotId}/bookmarks")
+    public ApiResponse<BookmarkResponse> bookmark(
+            @PathVariable Long spotId,
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ) {
+        BookmarkResponse response = spotService.bookmark(principalDetails.getUserId(), spotId);
         return success(response);
     }
 }

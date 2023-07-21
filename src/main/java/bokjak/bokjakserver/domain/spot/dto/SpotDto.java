@@ -88,4 +88,17 @@ public class SpotDto {
                     .build();
         }
     }
+
+    @Builder
+    public record BookmarkResponse(
+            Long spotId,
+            boolean isBookmarked
+    ) {
+        public static BookmarkResponse of(Long spotId, boolean isBookmarked) {
+            return BookmarkResponse.builder()
+                    .spotId(spotId)
+                    .isBookmarked(isBookmarked)
+                    .build();
+        }
+    }
 }

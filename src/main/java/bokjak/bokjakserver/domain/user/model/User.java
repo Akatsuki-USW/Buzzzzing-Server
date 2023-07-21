@@ -172,4 +172,12 @@ public class User extends BaseEntity {
     public void removeLocationBookmark(LocationBookmark locationBookmark) {
         locationBookmarkList.remove(locationBookmark);
     }
+
+    public void addSpotBookmark(SpotBookmark spotBookmark) {
+        spotBookmarkList.add(spotBookmark);
+    }
+
+    public void removeSpotBookmark(SpotBookmark spotBookmark) {
+        spotBookmarkList.remove(spotBookmark);
+    }
 }
