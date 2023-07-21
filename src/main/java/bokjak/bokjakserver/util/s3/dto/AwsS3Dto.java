@@ -1,5 +1,6 @@
 package bokjak.bokjakserver.util.s3.dto;
 
+import bokjak.bokjakserver.common.constant.ConstraintConstants;
 import bokjak.bokjakserver.common.constant.MessageConstants;
 import jakarta.validation.constraints.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -8,7 +9,7 @@ import java.util.List;
 
 public class AwsS3Dto {
     public record UploadFileRequest(
-            @NotBlank @Size(max = 25)
+            @NotBlank @Size(max = ConstraintConstants.S3_FILE_TYPE_MAX_LENGTH)
             String type,
             @NotEmpty
             List<MultipartFile> files
@@ -16,7 +17,7 @@ public class AwsS3Dto {
     }
 
     public record UpdateFileRequest(
-            @NotBlank @Size(max = 25)
+            @NotBlank @Size(max = ConstraintConstants.S3_FILE_TYPE_MAX_LENGTH)
             String type,
             @NotEmpty
             List<String> urlsToDelete,

@@ -26,15 +26,15 @@ public class Location extends BaseEntity {
     @Column(name = "location_id")
     private Long id;
 
+    @NotNull
+    private String name;
+
     private int apiId;  // 혼잡도 API(SK, 서울시)상의 장소 PK값
 
     @ManyToOne(fetch = FetchType.LAZY)
     @NotNull
     @JoinColumn(name = "location_category_id")
     private LocationCategory locationCategory;
-
-    @NotNull
-    private String name;
 
     @OneToMany(mappedBy = "location", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default

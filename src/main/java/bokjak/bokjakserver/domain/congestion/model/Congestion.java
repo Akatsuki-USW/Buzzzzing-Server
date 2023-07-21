@@ -1,5 +1,6 @@
 package bokjak.bokjakserver.domain.congestion.model;
 
+import bokjak.bokjakserver.common.constant.ConstraintConstants;
 import bokjak.bokjakserver.common.model.BaseEntity;
 import bokjak.bokjakserver.domain.location.model.Location;
 import jakarta.persistence.*;
@@ -27,7 +28,7 @@ public class Congestion extends BaseEntity {
     private Location location;
 
     @NotNull
-    @Max(3)
+    @Max(ConstraintConstants.CONGESTION_LEVEL_MAX_VALUE)
     private int congestionLevel;   //range : 1 ~ 3 (여유, 보통, 혼잡)
 
     private LocalDateTime observedAt;
