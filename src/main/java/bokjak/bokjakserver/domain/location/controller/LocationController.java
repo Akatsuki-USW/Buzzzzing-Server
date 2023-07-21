@@ -72,7 +72,7 @@ public class LocationController {
         return success(pageResponse);
     }
 
-    @PostMapping("{locationId}/bookmarks")
+    @PostMapping("/{locationId}/bookmarks")
     public ApiResponse<BookmarkResponse> bookmark(@PathVariable Long locationId, @AuthenticationPrincipal PrincipalDetails principalDetails) {
         BookmarkResponse response = locationService.bookmark(locationId, principalDetails.getUserId());
         return success(response);
