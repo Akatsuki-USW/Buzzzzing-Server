@@ -72,9 +72,10 @@ public class LocationRepositoryImpl implements LocationRepositoryCustom {
     }
 
     @Override
-    public Page<Location> getBookmarked(Pageable pageable, Long userId) {
+    public Page<Location> getBookmarked(Pageable pageable, Long cursorId, Long userId) {
         JPAQuery<Location> query = selectLocationsPrefix()
                 .where(locationBookmark.user.id.eq(userId))// 특정 user의 Bookmark와 JOIN
+                .where(gtCursorId(cursorId))
                 .limit(pageable.getPageSize());
 
         return PageableExecutionUtils.getPage(

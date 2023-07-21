@@ -89,9 +89,9 @@ public class LocationService {
     }
 
     // 내가 북마크한 로케이션 리스트 조회
-    public PageResponse<LocationCardResponse> getMyBookmarkedLocations(Pageable pageable) {
+    public PageResponse<LocationCardResponse> getMyBookmarkedLocations(Pageable pageable, Long cursorId) {
         User currentUser = userService.getCurrentUser();
-        Page<Location> resultPage = locationRepository.getBookmarked(pageable, currentUser.getId());
+        Page<Location> resultPage = locationRepository.getBookmarked(pageable, cursorId, currentUser.getId());
 
         return makeLocationCardPageResponse(currentUser, resultPage);
     }

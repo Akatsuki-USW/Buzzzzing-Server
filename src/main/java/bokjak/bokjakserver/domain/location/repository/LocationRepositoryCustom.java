@@ -21,6 +21,6 @@ public interface LocationRepositoryCustom {
 
     Page<Location> getTopOfWeeklyAverageCongestion(Pageable pageable, LocalDateTime start, LocalDateTime end);
 
-    Page<Location> getBookmarked(Pageable pageable, Long userId);
+    Page<Location> getBookmarked(Pageable pageable, Long cursorId, Long userId);
 
 }

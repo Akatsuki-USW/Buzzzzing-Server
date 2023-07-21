@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static bokjak.bokjakserver.common.constant.GlobalConstants.*;
+import static bokjak.bokjakserver.common.constant.GlobalConstants.TOP_LOCATIONS_SIZE;
 import static bokjak.bokjakserver.common.dto.ApiResponse.success;
 
 @Slf4j
@@ -66,9 +66,10 @@ public class LocationController {
 
     @GetMapping("/bookmarks/me")
     public ApiResponse<PageResponse<LocationCardResponse>> getMyBookmarkedLocations(
-            @PageableDefault(sort = "id", direction = Sort.Direction.DESC, size = TOP_LOCATIONS_SIZE) Pageable pageable
+            @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(required = false) Long cursorId
     ) {
-        PageResponse<LocationCardResponse> pageResponse = locationService.getMyBookmarkedLocations(pageable);
+        PageResponse<LocationCardResponse> pageResponse = locationService.getMyBookmarkedLocations(pageable, cursorId);
         return success(pageResponse);
     }
 
