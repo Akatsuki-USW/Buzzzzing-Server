@@ -1,11 +1,12 @@
 package bokjak.bokjakserver.domain.spot.service;
 
 import bokjak.bokjakserver.common.dto.PageResponse;
-import bokjak.bokjakserver.domain.bookmark.model.SpotBookmark;
+import bokjak.bokjakserver.common.exception.StatusCode;
 import bokjak.bokjakserver.domain.bookmark.repository.SpotBookmarkRepository;
 import bokjak.bokjakserver.domain.spot.dto.SpotDto.SpotCardResponse;
+import bokjak.bokjakserver.domain.spot.dto.SpotDto.SpotDetailResponse;
+import bokjak.bokjakserver.domain.spot.exception.SpotException;
 import bokjak.bokjakserver.domain.spot.model.Spot;
-import bokjak.bokjakserver.domain.spot.model.SpotImage;
 import bokjak.bokjakserver.domain.spot.repository.SpotRepository;
 import bokjak.bokjakserver.domain.user.model.User;
 import bokjak.bokjakserver.domain.user.service.UserService;
@@ -38,9 +39,9 @@ public class SpotService {
     ) {
         User user = userService.getUser(currentUserId);
         Page<Spot> resultPage = spotRepository.getSpots(user.getId(), pageable, cursorId, locationId, categoryIds);
-
         List<Long> bookmarkedSpotIdList = spotBookmarkRepository.findAllByUser(user).stream()
                 .map(it -> it.getSpot().getId()).toList();
+
         Page<SpotCardResponse> responsePage = resultPage
                 .map(it -> SpotCardResponse.of(it, bookmarkedSpotIdList.contains(it.getId())));
 
@@ -48,6 +49,17 @@ public class SpotService {
     }
 
     // 스팟 상세 조회
+    public SpotDetailResponse getSpotDetail(Long currentUserId, Long spotId) {
+        Spot spot = spotRepository.getSpot(spotId)
+                .orElseThrow(() -> new SpotException(StatusCode.NOT_FOUND_SPOT));
+
+        boolean isBookmarked = spot.getSpotBookmarkList().stream()
+                .anyMatch(it -> it.getUser().getId().equals(currentUserId));
+        boolean isAuthor = spot.getUser().getId().equals(currentUserId);
+
+        return SpotDetailResponse.of(spot, isBookmarked, isAuthor);
+    }
+
     // 내가 북마크한 스팟 리스트 조회
     // 내가 쓴 스팟 리스트 조회
     // 스팟 상세 조회

@@ -3,7 +3,9 @@ package bokjak.bokjakserver.domain.spot.controller;
 import bokjak.bokjakserver.common.dto.ApiResponse;
 import bokjak.bokjakserver.common.dto.PageResponse;
 import bokjak.bokjakserver.config.security.PrincipalDetails;
+import bokjak.bokjakserver.domain.spot.dto.SpotDto;
 import bokjak.bokjakserver.domain.spot.dto.SpotDto.SpotCardResponse;
+import bokjak.bokjakserver.domain.spot.dto.SpotDto.SpotDetailResponse;
 import bokjak.bokjakserver.domain.spot.service.SpotService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,9 +28,9 @@ public class SpotController {
 
     @GetMapping("/{locationId}/spots")
     public ApiResponse<PageResponse<SpotCardResponse>> getSpots(
-            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable,
-            @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PathVariable Long locationId,
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable,
             @RequestParam(required = false) Long cursorId,
             @RequestParam(required = false) List<Long> categoryIds
     ) {
@@ -36,4 +38,12 @@ public class SpotController {
         return success(pageResponse);
     }
 
+    @GetMapping("/spots/{spotId}")
+    public ApiResponse<SpotDetailResponse> getSpotDetail(
+            @PathVariable Long spotId,
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ) {
+        SpotDetailResponse response = spotService.getSpotDetail(principalDetails.getUserId(), spotId);
+        return success(response);
+    }
 }

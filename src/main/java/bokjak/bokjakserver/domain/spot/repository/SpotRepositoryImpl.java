@@ -12,9 +12,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 import static bokjak.bokjakserver.domain.bookmark.model.QSpotBookmark.spotBookmark;
 import static bokjak.bokjakserver.domain.category.model.QSpotCategory.spotCategory;
+import static bokjak.bokjakserver.domain.location.model.QLocation.location;
 import static bokjak.bokjakserver.domain.spot.model.QSpot.spot;
 import static bokjak.bokjakserver.domain.spot.model.QSpotImage.spotImage;
 import static bokjak.bokjakserver.domain.user.model.QUser.user;
@@ -32,7 +34,7 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
             Long locationId,
             List<Long> categoryIds
     ) {
-        JPAQuery<Spot> query = selectSpotByLocationPrefix(userId, locationId)
+        JPAQuery<Spot> query = selectSpotsByLocationPrefix(userId, locationId)
                 .where(gtCursorId(cursorId))
                 .where(inSpotCategoryId(categoryIds))
                 .limit(pageable.getPageSize());
@@ -44,12 +46,19 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
         );
     }
 
+    public Optional<Spot> getSpot(Long spotId) {
+        JPAQuery<Spot> query = selectSpotPrefix()
+                .where(spot.id.eq(spotId));
+
+        return Optional.ofNullable(query.fetchOne());
+    }
+
 
     /* JPA Query */
-    private JPAQuery<Spot> selectSpotByLocationPrefix(Long userId, Long locationId) {
+    private JPAQuery<Spot> selectSpotsByLocationPrefix(Long userId, Long locationId) {
         return queryFactory.selectFrom(spot)
-                .leftJoin(spot.user, user).fetchJoin()
-                .leftJoin(spot.spotCategory, spotCategory).fetchJoin()
+                .join(spot.user, user).fetchJoin()
+                .join(spot.spotCategory, spotCategory).fetchJoin()
                 .leftJoin(spot.spotBookmarkList, spotBookmark).fetchJoin()
                 .leftJoin(spot.spotImageList, spotImage)
                 .where(spot.location.id.eq(locationId))
@@ -57,6 +66,15 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
                         .from(userBlockUser)
                         .where(userBlockUser.blockerUser.id.eq(userId))
                 ));
+    }
+
+    private JPAQuery<Spot> selectSpotPrefix() {
+        return queryFactory.selectFrom(spot)
+                .join(spot.user, user).fetchJoin()
+                .join(spot.location, location).fetchJoin()
+                .join(spot.spotCategory, spotCategory).fetchJoin()
+                .leftJoin(spot.spotBookmarkList, spotBookmark).fetchJoin()
+                .leftJoin(spot.spotImageList, spotImage);
     }
 
     private BooleanExpression inSpotCategoryId(List<Long> categoryIdList) {

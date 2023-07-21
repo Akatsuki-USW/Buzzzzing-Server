@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface SpotRepositoryCustom {
     // 리스트 조회
@@ -15,7 +16,10 @@ public interface SpotRepositoryCustom {
             Long locationId,
             List<Long> categoryIds
     );
+
     // 상세 조회
+    Optional<Spot> getSpot(Long spotId);
+
     // 북마크
     // 내가 북마크한 스팟 조회
     // 내가 댓글 단 글 조회

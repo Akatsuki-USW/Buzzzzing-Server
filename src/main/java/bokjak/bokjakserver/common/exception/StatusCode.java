@@ -63,6 +63,12 @@ public enum StatusCode {
     NOT_FOUND_WEEKLY_CONGESTION_STAT(404, 5130, "not found weekly congestion statistics."),
 
     /**
+     * Spot & Comment
+     */
+    NOT_FOUND_SPOT(404, 5500, "not found spot."),
+
+
+    /**
      * report
      */
 
