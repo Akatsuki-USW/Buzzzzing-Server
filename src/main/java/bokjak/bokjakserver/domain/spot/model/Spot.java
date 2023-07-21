@@ -1,6 +1,7 @@
 package bokjak.bokjakserver.domain.spot.model;
 
 
+import bokjak.bokjakserver.common.model.BaseEntity;
 import bokjak.bokjakserver.domain.bookmark.model.SpotBookmark;
 import bokjak.bokjakserver.domain.category.model.SpotCategory;
 import bokjak.bokjakserver.domain.comment.model.Comment;
@@ -20,12 +21,24 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Spot {
+public class Spot extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "spot_id")
     private Long id;
+
+    @NotNull
+    @Size(max = 50)
+    private String title;
+
+    private String address;
+
+    private String roadNameAddress; // deprecated : 클라이언트측에서 도로명 입력 안 함
+
+    @NotNull
+    @Size(max = 1500)
+    private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @NotNull
@@ -41,21 +54,6 @@ public class Spot {
     @NotNull
     @JoinColumn(name = "user_id")
     private User user;
-
-    @NotNull
-    @Size(max = 50)
-    private String title;
-
-    @Size(max = 50)
-    private String spotName;
-
-    private String address;
-
-    private String roadNameAddress;
-
-    @NotNull
-    @Size(max = 1500)
-    private String content;
 
     @OneToMany(mappedBy = "spot", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default

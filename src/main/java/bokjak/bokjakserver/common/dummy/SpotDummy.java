@@ -65,7 +65,6 @@ public class SpotDummy {
                         .user(allUser.get(i))
                         .spotCategory(category) // 3가지 중 1 랜덤
                         .address(location.getName() + i + "근처")
-                        .spotName(location.getName() + i + "번째 스팟")
                         .title(location.getName() + " 근처 " + category.getName())
                         .content(strings.get((int) (Math.random() * 100) % 3))
                         .build());
