@@ -4,9 +4,11 @@ import bokjak.bokjakserver.common.dto.ApiResponse;
 import bokjak.bokjakserver.common.dto.PageResponse;
 import bokjak.bokjakserver.config.security.PrincipalDetails;
 import bokjak.bokjakserver.domain.congestion.dto.CongestionDto.DailyCongestionStatisticResponse;
+import bokjak.bokjakserver.domain.location.dto.LocationDto;
 import bokjak.bokjakserver.domain.location.dto.LocationDto.BookmarkResponse;
 import bokjak.bokjakserver.domain.location.dto.LocationDto.LocationCardResponse;
 import bokjak.bokjakserver.domain.location.dto.LocationDto.LocationDetailResponse;
+import bokjak.bokjakserver.domain.location.dto.LocationDto.LocationSimpleCardResponse;
 import bokjak.bokjakserver.domain.location.service.LocationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +31,7 @@ public class LocationController {
     private final LocationService locationService;
 
     @GetMapping
-    public ApiResponse<PageResponse<LocationCardResponse>> getLocations(
+    public ApiResponse<PageResponse<LocationCardResponse>> getLocationsBasedOnCongestion(
             @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable,
             @RequestParam(required = false) Long cursorId,
             @RequestParam(required = false) String keyword,
@@ -38,6 +40,15 @@ public class LocationController {
             @RequestParam(required = false) List<Long> categoryIds
     ) {
         PageResponse<LocationCardResponse> pageResponse = locationService.search(pageable, cursorId, keyword, categoryIds, congestionSort, cursorCongestionLevel);
+        return success(pageResponse);
+    }
+
+    @GetMapping("/simple")
+    public ApiResponse<PageResponse<LocationSimpleCardResponse>> getSimpleLocations(
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable,
+            @RequestParam(required = false) Long cursorId
+    ) {
+        PageResponse<LocationSimpleCardResponse> pageResponse = locationService.getLocations(pageable, cursorId);
         return success(pageResponse);
     }
 

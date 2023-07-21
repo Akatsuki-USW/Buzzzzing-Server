@@ -40,7 +40,7 @@ public class LocationRepositoryImpl implements LocationRepositoryCustom {
             SortOrder congestionLevelSortOrder,
             CongestionLevel cursorCongestionLevel
     ) {
-        JPAQuery<Location> query = selectLocationsPrefix()
+        JPAQuery<Location> query = selectLocationsBasedOnCongestionPrefix()
                 .where(containsKeyword(keyword))
                 .where(congestionLevelSortOrder == null || cursorCongestionLevel == null // 정렬 여부에 따라 페이징 방식 다르게처리
                         ? gtCursorId(cursorId)
@@ -57,8 +57,22 @@ public class LocationRepositoryImpl implements LocationRepositoryCustom {
     }
 
     @Override
+    public Page<Location> getLocations(Pageable pageable,Long cursorId) {
+        JPAQuery<Location> query = queryFactory.selectFrom(location)
+                .where(gtCursorId(cursorId))
+                .limit(pageable.getPageSize());
+
+        return PageableExecutionUtils.getPage(
+                query.fetch(),
+                pageable,
+                query::fetchCount
+        );
+    }
+
+
+    @Override
     public Page<Location> getTopOfWeeklyAverageCongestion(Pageable pageable, LocalDateTime start, LocalDateTime end) {
-        JPAQuery<Location> query = selectLocationsPrefix()
+        JPAQuery<Location> query = selectLocationsBasedOnCongestionPrefix()
                 .leftJoin(location.weeklyCongestionStatisticList, weeklyCongestionStatistic)
                 .where(weeklyCongestionStatistic.createdAt.between(start, end))
                 .orderBy(weeklyCongestionStatistic.averageCongestionLevel.asc())
@@ -73,7 +87,7 @@ public class LocationRepositoryImpl implements LocationRepositoryCustom {
 
     @Override
     public Page<Location> getBookmarked(Pageable pageable, Long cursorId, Long userId) {
-        JPAQuery<Location> query = selectLocationsPrefix()
+        JPAQuery<Location> query = selectLocationsBasedOnCongestionPrefix()
                 .where(locationBookmark.user.id.eq(userId))// 특정 user의 Bookmark와 JOIN
                 .where(gtCursorId(cursorId))
                 .limit(pageable.getPageSize());
@@ -86,7 +100,7 @@ public class LocationRepositoryImpl implements LocationRepositoryCustom {
     }
 
     /* JPAQuery */
-    public JPAQuery<Location> selectLocationsPrefix() {// 현재 혼잡도와 함께 로케이션 조회
+    public JPAQuery<Location> selectLocationsBasedOnCongestionPrefix() {// 현재 혼잡도와 함께 로케이션 조회
         QCongestion subQCongestion = new QCongestion("subQCongestion");
 
         return queryFactory.selectFrom(location)
