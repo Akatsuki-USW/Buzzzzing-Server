@@ -20,8 +20,8 @@ public interface SpotRepositoryCustom {
     // 상세 조회
     Optional<Spot> getSpot(Long spotId);
 
-    // 북마크
     // 내가 북마크한 스팟 조회
+    Page<Spot> getBookmarked(Pageable pageable, Long cursorId, Long userId);
     // 내가 댓글 단 글 조회
     // 생성
     // 수정

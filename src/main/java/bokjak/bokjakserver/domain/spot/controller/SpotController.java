@@ -3,7 +3,6 @@ package bokjak.bokjakserver.domain.spot.controller;
 import bokjak.bokjakserver.common.dto.ApiResponse;
 import bokjak.bokjakserver.common.dto.PageResponse;
 import bokjak.bokjakserver.config.security.PrincipalDetails;
-import bokjak.bokjakserver.domain.spot.dto.SpotDto;
 import bokjak.bokjakserver.domain.spot.dto.SpotDto.BookmarkResponse;
 import bokjak.bokjakserver.domain.spot.dto.SpotDto.SpotCardResponse;
 import bokjak.bokjakserver.domain.spot.dto.SpotDto.SpotDetailResponse;
@@ -36,6 +35,16 @@ public class SpotController {
             @RequestParam(required = false) List<Long> categoryIds
     ) {
         PageResponse<SpotCardResponse> pageResponse = spotService.getSpots(principalDetails.getUserId(), pageable, cursorId, locationId, categoryIds);
+        return success(pageResponse);
+    }
+
+    @GetMapping("/spots/bookmarks/me")
+    public ApiResponse<PageResponse<SpotCardResponse>> getMyBookmarkedSpots(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(required = false) Long cursorId
+    ) {
+        PageResponse<SpotCardResponse> pageResponse = spotService.getMyBookmarkedSpots(principalDetails.getUserId(), pageable, cursorId);
         return success(pageResponse);
     }
 

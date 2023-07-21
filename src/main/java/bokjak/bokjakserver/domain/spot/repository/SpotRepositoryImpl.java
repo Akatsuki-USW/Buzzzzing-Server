@@ -27,6 +27,7 @@ import static bokjak.bokjakserver.domain.user.model.QUserBlockUser.userBlockUser
 public class SpotRepositoryImpl implements SpotRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
+    @Override
     public Page<Spot> getSpots(
             Long userId,
             Pageable pageable,
@@ -34,9 +35,10 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
             Long locationId,
             List<Long> categoryIds
     ) {
-        JPAQuery<Spot> query = selectSpotsByLocationPrefix(userId, locationId)
-                .where(gtCursorId(cursorId))
+        JPAQuery<Spot> query = selectSpotsPrefix(userId)
+                .where(eqLocationId(locationId))// 특정 로케이션의
                 .where(inSpotCategoryId(categoryIds))
+                .where(gtCursorId(cursorId))
                 .limit(pageable.getPageSize());
 
         return PageableExecutionUtils.getPage(
@@ -46,6 +48,21 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
         );
     }
 
+    @Override
+    public Page<Spot> getBookmarked(Pageable pageable, Long cursorId, Long userId) {
+        JPAQuery<Spot> query = selectSpotsPrefix(userId)
+                .where(spotBookmark.user.id.eq(userId))// 현재 유저가 북마크한
+                .where(gtCursorId(cursorId))
+                .limit(pageable.getPageSize());
+
+        return PageableExecutionUtils.getPage(
+                query.fetch(),
+                pageable,
+                query::fetchCount
+        );
+    }
+
+    @Override
     public Optional<Spot> getSpot(Long spotId) {
         JPAQuery<Spot> query = selectSpotPrefix()
                 .where(spot.id.eq(spotId));
@@ -53,15 +70,12 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
         return Optional.ofNullable(query.fetchOne());
     }
 
-
     /* JPA Query */
-    private JPAQuery<Spot> selectSpotsByLocationPrefix(Long userId, Long locationId) {
+    private JPAQuery<Spot> selectSpotsPrefix(Long userId) {
         return queryFactory.selectFrom(spot)
                 .join(spot.user, user).fetchJoin()
-                .join(spot.spotCategory, spotCategory).fetchJoin()
                 .leftJoin(spot.spotBookmarkList, spotBookmark).fetchJoin()
                 .leftJoin(spot.spotImageList, spotImage)
-                .where(spot.location.id.eq(locationId))
                 .where(spot.user.id.notIn(JPAExpressions.select(userBlockUser.blockedUser.id)  // 차단한 유저 제외
                         .from(userBlockUser)
                         .where(userBlockUser.blockerUser.id.eq(userId))
@@ -86,7 +100,7 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
         else return spot.id.gt(cursorId);
     }
 
-    private BooleanExpression notInUserId(List<Long> blockedUserIdList) {
-        return blockedUserIdList != null ? spot.user.id.notIn(blockedUserIdList) : null;
+    private BooleanExpression eqLocationId(Long locationId) {
+        return locationId != null ? spot.location.id.eq(locationId) : null;
     }
 }

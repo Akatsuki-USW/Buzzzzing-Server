@@ -18,12 +18,11 @@ public class SpotDto {
             String title,
             String address,
             String thumbnailImageUrl,
-            boolean isBookmarked,
-            Long spotCategoryId,
             Long userId,
             String userNickname,
-            String userProfileImageUrl
-    ) {
+            String userProfileImageUrl,
+            boolean isBookmarked
+            ) {
         public static SpotCardResponse of(
                 Spot spot,
                 Boolean isBookmarked
@@ -34,11 +33,10 @@ public class SpotDto {
                     .address(spot.getAddress())
                     .thumbnailImageUrl(spot.getSpotImageList().isEmpty() ? null
                             : spot.getSpotImageList().get(0).getImageUrl())
-                    .isBookmarked(isBookmarked)
-                    .spotCategoryId(spot.getSpotCategory().getId())
                     .userId(spot.getUser().getId())
                     .userNickname(spot.getUser().getNickname())
                     .userProfileImageUrl(spot.getUser().getProfileImageUrl())
+                    .isBookmarked(isBookmarked)
                     .build();
         }
 

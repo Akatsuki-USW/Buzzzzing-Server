@@ -42,6 +42,19 @@ public class SpotService {
     ) {
         User user = userService.getUser(currentUserId);
         Page<Spot> resultPage = spotRepository.getSpots(user.getId(), pageable, cursorId, locationId, categoryIds);
+
+        return makeSpotCardResponsePageResponse(user, resultPage);
+    }
+
+    // 내가 북마크한 스팟 리스트 조회
+    public PageResponse<SpotCardResponse> getMyBookmarkedSpots(Long currentUserId, Pageable pageable, Long cursorId) {
+        User user = userService.getUser(currentUserId);
+        Page<Spot> resultPage = spotRepository.getBookmarked(pageable, cursorId, currentUserId);
+
+        return makeSpotCardResponsePageResponse(user, resultPage);
+    }
+
+    private PageResponse<SpotCardResponse> makeSpotCardResponsePageResponse(User user, Page<Spot> resultPage) {
         List<Long> bookmarkedSpotIdList = spotBookmarkRepository.findAllByUser(user).stream()
                 .map(it -> it.getSpot().getId()).toList();
 
@@ -63,7 +76,6 @@ public class SpotService {
         return SpotDetailResponse.of(spot, isBookmarked, isAuthor);
     }
 
-    // 내가 북마크한 스팟 리스트 조회
     // 내가 쓴 스팟 리스트 조회
     // 스팟 상세 조회
     // 스팟 북마크
