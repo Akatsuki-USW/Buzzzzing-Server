@@ -49,7 +49,7 @@ public class SpotService {
             List<Long> categoryIds
     ) {
         User user = userService.getUser(currentUserId);
-        Page<Spot> resultPage = spotRepository.getSpots(user.getId(), pageable, cursorId, locationId, categoryIds);
+        Page<Spot> resultPage = spotRepository.getSpotsExceptBlocked(user.getId(), pageable, cursorId, locationId, categoryIds);
 
         return makeSpotCardResponsePageResponse(user, resultPage);
     }
@@ -58,6 +58,14 @@ public class SpotService {
     public PageResponse<SpotCardResponse> getMyBookmarkedSpots(Long currentUserId, Pageable pageable, Long cursorId) {
         User user = userService.getUser(currentUserId);
         Page<Spot> resultPage = spotRepository.getBookmarked(pageable, cursorId, currentUserId);
+
+        return makeSpotCardResponsePageResponse(user, resultPage);
+    }
+
+    // 내가 쓴 스팟 리스트 조회
+    public PageResponse<SpotCardResponse> getMySpots(Long currentUserId, Pageable pageable, Long cursorId) {
+        User user = userService.getUser(currentUserId);
+        Page<Spot> resultPage = spotRepository.getMySpots(pageable, cursorId, currentUserId);
 
         return makeSpotCardResponsePageResponse(user, resultPage);
     }
@@ -84,7 +92,6 @@ public class SpotService {
         return SpotDetailResponse.of(spot, isBookmarked, isAuthor);
     }
 
-    // 내가 쓴 스팟 리스트 조회
     // 스팟 북마크
     @Transactional
     public BookmarkResponse bookmark(Long currentUserId, Long spotId) {

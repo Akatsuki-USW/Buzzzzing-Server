@@ -13,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,7 +31,7 @@ public class SpotController {
     public ApiResponse<PageResponse<SpotCardResponse>> getSpots(
             @PathVariable Long locationId,
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable,
+            @PageableDefault Pageable pageable,
             @RequestParam(required = false) Long cursorId,
             @RequestParam(required = false) List<Long> categoryIds
     ) {
@@ -43,10 +42,20 @@ public class SpotController {
     @GetMapping("/spots/bookmarks/me")
     public ApiResponse<PageResponse<SpotCardResponse>> getMyBookmarkedSpots(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+            @PageableDefault Pageable pageable,
             @RequestParam(required = false) Long cursorId
     ) {
         PageResponse<SpotCardResponse> pageResponse = spotService.getMyBookmarkedSpots(principalDetails.getUserId(), pageable, cursorId);
+        return success(pageResponse);
+    }
+
+    @GetMapping("/spots/me")
+    public ApiResponse<PageResponse<SpotCardResponse>> getMySpots(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PageableDefault Pageable pageable,
+            @RequestParam(required = false) Long cursorId
+    ) {
+        PageResponse<SpotCardResponse> pageResponse = spotService.getMySpots(principalDetails.getUserId(), pageable, cursorId);
         return success(pageResponse);
     }
 

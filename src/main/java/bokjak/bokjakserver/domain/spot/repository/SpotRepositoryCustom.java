@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface SpotRepositoryCustom {
     // 리스트 조회
-    Page<Spot> getSpots(
+    Page<Spot> getSpotsExceptBlocked(
             Long userId,
             Pageable pageable,
             Long cursorId,
@@ -22,6 +22,9 @@ public interface SpotRepositoryCustom {
 
     // 내가 북마크한 스팟 조회
     Page<Spot> getBookmarked(Pageable pageable, Long cursorId, Long userId);
+
+    // 내가 작성한 스팟 조회
+    Page<Spot> getMySpots(Pageable pageable, Long cursorId, Long userId);
     // 내가 댓글 단 글 조회
     // 생성
     // 수정
