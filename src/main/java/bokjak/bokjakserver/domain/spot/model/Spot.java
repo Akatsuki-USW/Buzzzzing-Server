@@ -1,6 +1,7 @@
 package bokjak.bokjakserver.domain.spot.model;
 
 
+import bokjak.bokjakserver.common.constant.GlobalConstants;
 import bokjak.bokjakserver.common.model.BaseEntity;
 import bokjak.bokjakserver.domain.bookmark.model.SpotBookmark;
 import bokjak.bokjakserver.domain.category.model.SpotCategory;
@@ -11,7 +12,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.hibernate.validator.constraints.URL;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,15 +29,16 @@ public class Spot extends BaseEntity {
     private Long id;
 
     @NotNull
-    @Size(max = 50)
+    @Size(max = GlobalConstants.SPOT_TITLE_MAX_LENGTH)
     private String title;
 
+    @Size(max = GlobalConstants.SPOT_ADDRESS_MAX_LENGTH)
     private String address;
 
     private String roadNameAddress; // deprecated : 클라이언트측에서 도로명 입력 안 함
 
     @NotNull
-    @Size(max = 1500)
+    @Size(max = GlobalConstants.SPOT_CONTENT_MAX_LENGTH)
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)

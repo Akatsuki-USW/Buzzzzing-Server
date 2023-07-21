@@ -22,4 +22,13 @@ public class GlobalConstants {
     public static final String CONTENT_CONGESTION_LEVEL = "congestionLevel";
     public static final int CONGESTION_STATISTIC_START_TIME = 9;
     public static final int CONGESTION_PREDICTION_WEEK = 1;
+
+    /**
+     * Spot
+     */
+    public static final int SPOT_TITLE_MAX_LENGTH = 50;
+    public static final int SPOT_ADDRESS_MAX_LENGTH = 500;
+    public static final int SPOT_CONTENT_MAX_LENGTH = 1500;
+    public static final int SPOT_IMAGE_MAX_SIZE = 2;
+
 }
