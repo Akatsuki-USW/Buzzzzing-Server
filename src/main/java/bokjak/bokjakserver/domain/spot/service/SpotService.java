@@ -4,11 +4,16 @@ import bokjak.bokjakserver.common.dto.PageResponse;
 import bokjak.bokjakserver.common.exception.StatusCode;
 import bokjak.bokjakserver.domain.bookmark.model.SpotBookmark;
 import bokjak.bokjakserver.domain.bookmark.repository.SpotBookmarkRepository;
-import bokjak.bokjakserver.domain.spot.dto.SpotDto.BookmarkResponse;
-import bokjak.bokjakserver.domain.spot.dto.SpotDto.SpotCardResponse;
-import bokjak.bokjakserver.domain.spot.dto.SpotDto.SpotDetailResponse;
+import bokjak.bokjakserver.domain.category.exception.CategoryException;
+import bokjak.bokjakserver.domain.category.model.SpotCategory;
+import bokjak.bokjakserver.domain.category.repository.SpotCategoryRepository;
+import bokjak.bokjakserver.domain.location.exception.LocationException;
+import bokjak.bokjakserver.domain.location.model.Location;
+import bokjak.bokjakserver.domain.location.repository.LocationRepository;
+import bokjak.bokjakserver.domain.spot.dto.SpotDto.*;
 import bokjak.bokjakserver.domain.spot.exception.SpotException;
 import bokjak.bokjakserver.domain.spot.model.Spot;
+import bokjak.bokjakserver.domain.spot.model.SpotImage;
 import bokjak.bokjakserver.domain.spot.repository.SpotRepository;
 import bokjak.bokjakserver.domain.user.model.User;
 import bokjak.bokjakserver.domain.user.service.UserService;
@@ -31,6 +36,9 @@ public class SpotService {
     private final UserService userService;
     private final SpotRepository spotRepository;
     private final SpotBookmarkRepository spotBookmarkRepository;
+    private final LocationRepository locationRepository;
+    private final SpotCategoryRepository spotCategoryRepository;
+
 
     // 스팟 리스트 조회
     public PageResponse<SpotCardResponse> getSpots(
@@ -77,7 +85,6 @@ public class SpotService {
     }
 
     // 내가 쓴 스팟 리스트 조회
-    // 스팟 상세 조회
     // 스팟 북마크
     @Transactional
     public BookmarkResponse bookmark(Long currentUserId, Long spotId) {
@@ -104,7 +111,22 @@ public class SpotService {
 
         return BookmarkResponse.of(spotId, isBookmarked);
     }
-    // 스팟 생성   TODO user status check 로직 추가 (AuthService)
+
+    // 스팟 생성
+    @Transactional
+    public SpotIdResponse createSpot(Long currentUserId, Long locationId, Long spotCategoryId, CreateSpotRequest createSpotRequest) {
+        User user = userService.getUser(currentUserId);
+        Location location = locationRepository.findById(locationId)
+                .orElseThrow(() -> new LocationException(StatusCode.NOT_FOUND_LOCATION));
+        SpotCategory spotCategory = spotCategoryRepository.findById(spotCategoryId)
+                .orElseThrow(() -> new CategoryException(StatusCode.NOT_FOUND_SPOT_CATEGORY));
+
+        Spot spot = spotRepository.save(createSpotRequest.toEntity(user, location, spotCategory));
+
+        createSpotRequest.imageUrls().forEach(imageUrl -> spot.addSpotImage(SpotImage.of(spot, imageUrl)));
+
+        return SpotIdResponse.of(spot);
+    }
     // 스팟 수정
     // 스팟 삭제
 }

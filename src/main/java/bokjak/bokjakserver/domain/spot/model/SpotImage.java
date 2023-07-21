@@ -25,4 +25,8 @@ public class SpotImage {
     @NotNull
     @URL
     private String imageUrl;
+
+    public static SpotImage of(Spot spot, String imageUrl) {
+        return SpotImage.builder().spot(spot).imageUrl(imageUrl).build();
+    }
 }

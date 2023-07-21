@@ -1,7 +1,7 @@
 package bokjak.bokjakserver.domain.spot.model;
 
 
-import bokjak.bokjakserver.common.constant.GlobalConstants;
+import bokjak.bokjakserver.common.constant.ConstraintConstants;
 import bokjak.bokjakserver.common.model.BaseEntity;
 import bokjak.bokjakserver.domain.bookmark.model.SpotBookmark;
 import bokjak.bokjakserver.domain.category.model.SpotCategory;
@@ -29,16 +29,16 @@ public class Spot extends BaseEntity {
     private Long id;
 
     @NotNull
-    @Size(max = GlobalConstants.SPOT_TITLE_MAX_LENGTH)
+    @Size(max = ConstraintConstants.SPOT_TITLE_MAX_LENGTH)
     private String title;
 
-    @Size(max = GlobalConstants.SPOT_ADDRESS_MAX_LENGTH)
+    @Size(max = ConstraintConstants.SPOT_ADDRESS_MAX_LENGTH)
     private String address;
 
     private String roadNameAddress; // deprecated : 클라이언트측에서 도로명 입력 안 함
 
     @NotNull
-    @Size(max = GlobalConstants.SPOT_CONTENT_MAX_LENGTH)
+    @Size(max = ConstraintConstants.SPOT_CONTENT_MAX_LENGTH)
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -67,4 +67,13 @@ public class Spot extends BaseEntity {
     @OneToMany(mappedBy = "spot", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<SpotImage> spotImageList = new ArrayList<>();
+
+    /* 연관관계 메서드 */
+    public void addSpotImage(SpotImage spotImage) {
+        spotImageList.add(spotImage);
+    }
+
+    public void addSpotImages(List<SpotImage> spotImages) {
+        spotImageList.addAll(spotImages);
+    }
 }

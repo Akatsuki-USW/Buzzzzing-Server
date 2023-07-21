@@ -3,16 +3,17 @@ package bokjak.bokjakserver.domain.spot.controller;
 import bokjak.bokjakserver.common.dto.ApiResponse;
 import bokjak.bokjakserver.common.dto.PageResponse;
 import bokjak.bokjakserver.config.security.PrincipalDetails;
-import bokjak.bokjakserver.domain.spot.dto.SpotDto.BookmarkResponse;
-import bokjak.bokjakserver.domain.spot.dto.SpotDto.SpotCardResponse;
-import bokjak.bokjakserver.domain.spot.dto.SpotDto.SpotDetailResponse;
+import bokjak.bokjakserver.domain.spot.dto.SpotDto.*;
 import bokjak.bokjakserver.domain.spot.service.SpotService;
+import bokjak.bokjakserver.domain.user.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +26,7 @@ import static bokjak.bokjakserver.common.dto.ApiResponse.success;
 @RequiredArgsConstructor
 public class SpotController {
     private final SpotService spotService;
+    private final AuthService authService;
 
     @GetMapping("/{locationId}/spots")
     public ApiResponse<PageResponse<SpotCardResponse>> getSpots(
@@ -63,6 +65,18 @@ public class SpotController {
             @AuthenticationPrincipal PrincipalDetails principalDetails
     ) {
         BookmarkResponse response = spotService.bookmark(principalDetails.getUserId(), spotId);
+        return success(response);
+    }
+
+    @PostMapping("/{locationId}/category/{spotCategoryId}/spots")
+    public ApiResponse<SpotIdResponse> createSpot(
+            @PathVariable Long locationId,
+            @PathVariable Long spotCategoryId,
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @Valid @RequestBody CreateSpotRequest createSpotRequest
+    ) {
+        authService.checkIsBannedUser(principalDetails.getUser());
+        SpotIdResponse response = spotService.createSpot(principalDetails.getUserId(), locationId, spotCategoryId, createSpotRequest);
         return success(response);
     }
 }

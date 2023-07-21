@@ -1,17 +1,47 @@
 package bokjak.bokjakserver.domain.spot.dto;
 
+import bokjak.bokjakserver.domain.category.model.SpotCategory;
+import bokjak.bokjakserver.domain.location.model.Location;
 import bokjak.bokjakserver.domain.spot.model.Spot;
 import bokjak.bokjakserver.domain.spot.model.SpotImage;
+import bokjak.bokjakserver.domain.user.model.User;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static bokjak.bokjakserver.common.constant.ConstraintConstants.*;
+
 public class SpotDto {
+
     /* Request */
+    @Builder
+    public record CreateSpotRequest(
+            @NotBlank @Size(max = SPOT_TITLE_MAX_LENGTH)
+            String title,
+            @NotNull @Size(max = SPOT_ADDRESS_MAX_LENGTH)
+            String address,
+            @NotBlank @Size(max = SPOT_CONTENT_MAX_LENGTH)
+            String content,
+            @NotNull @Size(max = SPOT_IMAGE_MAX_SIZE)
+            List<String> imageUrls
+    ) {
+        public Spot toEntity(User user, Location location, SpotCategory spotCategory) {
+            return Spot.builder()
+                    .title(title)
+                    .address(address)
+                    .content(content)
+                    .user(user)
+                    .location(location)
+                    .spotCategory(spotCategory)
+                    .build();
+        }
+    }
 
     /* Response */
-
     @Builder
     public record SpotCardResponse(
             Long id,
@@ -22,7 +52,7 @@ public class SpotDto {
             String userNickname,
             String userProfileImageUrl,
             boolean isBookmarked
-            ) {
+    ) {
         public static SpotCardResponse of(
                 Spot spot,
                 Boolean isBookmarked
@@ -96,6 +126,17 @@ public class SpotDto {
             return BookmarkResponse.builder()
                     .spotId(spotId)
                     .isBookmarked(isBookmarked)
+                    .build();
+        }
+    }
+
+    @Builder
+    public record SpotIdResponse(
+            Long spotId
+    ) {
+        public static SpotIdResponse of(Spot spot) {
+            return SpotIdResponse.builder()
+                    .spotId(spot.getId())
                     .build();
         }
     }
