@@ -169,12 +169,23 @@ public class SpotService {
         );
     }
 
+    // 스팟 삭제
+    @Transactional
+    public SpotMessage deleteSpot(Long currentUserId, Long spotId) {
+        User user = userService.getUser(currentUserId);
+        Spot spot = spotRepository.findById(spotId)
+                .orElseThrow(() -> new SpotException(StatusCode.NOT_FOUND_SPOT));
+
+        checkIsAuthor(user, spot);
+
+        spotRepository.delete(spot);
+        return new SpotMessage(true);
+    }
+
     private static boolean isBookmarked(Long currentUserId, Spot spot) {
         return spot.getSpotBookmarkList().stream()
                 .anyMatch(it -> it.getUser().getId().equals(currentUserId));
     }
-
-    // 스팟 삭제
 
     private static void checkIsAuthor(User user, Spot spot) {// 작성자인지 확인: 수정, 삭제는 작성자만 권한을 가짐
         if (!spot.getUser().equals(user)) {

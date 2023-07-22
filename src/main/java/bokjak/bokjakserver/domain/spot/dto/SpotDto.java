@@ -161,4 +161,9 @@ public class SpotDto {
                     .build();
         }
     }
+
+    public record SpotMessage(
+            boolean result
+    ) {
+    }
 }

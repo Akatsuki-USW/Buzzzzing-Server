@@ -96,4 +96,14 @@ public class SpotController {
         SpotDetailResponse response = spotService.updateSpot(principalDetails.getUserId(), spotId, updateSpotRequest);
         return success(response);
     }
+
+    @DeleteMapping("/spots/{spotId}")
+    public ApiResponse<SpotMessage> deleteSpot(
+            @PathVariable Long spotId,
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ) {
+        authService.checkIsBannedUser(principalDetails.getUser());
+        SpotMessage message = spotService.deleteSpot(principalDetails.getUserId(), spotId);
+        return success(message);
+    }
 }
