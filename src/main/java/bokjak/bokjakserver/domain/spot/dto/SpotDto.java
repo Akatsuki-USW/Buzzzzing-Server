@@ -41,6 +41,23 @@ public class SpotDto {
         }
     }
 
+    @Builder
+    public record UpdateSpotRequest(
+            @NotBlank @Size(max = SPOT_TITLE_MAX_LENGTH)
+            String title,
+            @NotBlank @Size(max = SPOT_ADDRESS_MAX_LENGTH)
+            String address,
+            @NotBlank @Size(max = SPOT_CONTENT_MAX_LENGTH)
+            String content,
+            @NotNull @Size(max = SPOT_IMAGE_MAX_SIZE)
+            List<String> imageUrls,
+            @NotNull
+            Long locationId,
+            @NotNull
+            Long spotCategoryId
+    ) {
+    }
+
     /* Response */
     @Builder
     public record SpotCardResponse(

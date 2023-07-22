@@ -69,7 +69,7 @@ public enum StatusCode {
      */
     NOT_FOUND_SPOT(404, 5500, "not found spot."),
     NOT_FOUND_SPOT_CATEGORY(404, 5600, "not found spot category."),
-
+    NOT_SPOT_AUTHOR(403, 5650, "not spot author"),
 
     /**
      * report

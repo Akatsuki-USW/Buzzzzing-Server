@@ -76,4 +76,15 @@ public class Spot extends BaseEntity {
     public void addSpotImages(List<SpotImage> spotImages) {
         spotImageList.addAll(spotImages);
     }
+
+    public void update(Location location, SpotCategory spotCategory, String title, String address, String content, List<SpotImage> spotImages) {
+        this.location = location;
+        this.spotCategory = spotCategory;
+        this.title = title;
+        this.address = address;
+        this.content = content;
+        this.spotImageList.clear();
+        this.spotImageList.addAll(spotImages);
+    }
+
 }

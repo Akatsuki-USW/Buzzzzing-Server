@@ -26,7 +26,4 @@ public interface SpotRepositoryCustom {
     // 내가 작성한 스팟 조회
     Page<Spot> getMySpots(Pageable pageable, Long cursorId, Long userId);
     // 내가 댓글 단 글 조회
-    // 생성
-    // 수정
-    // 삭제
 }

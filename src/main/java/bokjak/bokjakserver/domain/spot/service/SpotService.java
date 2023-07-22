@@ -120,6 +120,7 @@ public class SpotService {
     }
 
     // 스팟 생성
+    // TODO locationId, spotCategoryId Request DTO에 담기 -> Controller 수정 -> API 명세 수정
     @Transactional
     public SpotIdResponse createSpot(Long currentUserId, Long locationId, Long spotCategoryId, CreateSpotRequest createSpotRequest) {
         User user = userService.getUser(currentUserId);
@@ -134,6 +135,43 @@ public class SpotService {
 
         return SpotIdResponse.of(spot);
     }
+
     // 스팟 수정
+    @Transactional
+    public SpotDetailResponse updateSpot(Long currentUserId, Long spotId, UpdateSpotRequest updateSpotRequest) {
+        User user = userService.getUser(currentUserId);
+        Spot spot = spotRepository.findById(spotId)
+                .orElseThrow(() -> new SpotException(StatusCode.NOT_FOUND_SPOT));
+
+        checkIsAuthor(user, spot);
+
+        Location location = locationRepository.findById(updateSpotRequest.locationId())
+                .orElseThrow(() -> new LocationException(StatusCode.NOT_FOUND_LOCATION));
+        SpotCategory spotCategory = spotCategoryRepository.findById(updateSpotRequest.spotCategoryId())
+                .orElseThrow(() -> new CategoryException(StatusCode.NOT_FOUND_SPOT_CATEGORY));
+
+        spot.update(
+                location,
+                spotCategory,
+                updateSpotRequest.title(),
+                updateSpotRequest.address(),
+                updateSpotRequest.content(),
+                updateSpotRequest.imageUrls().stream().map(it -> SpotImage.of(spot, it)).toList()
+        );
+
+        // TODO 이전의 상세 조회 응답값에서 달라진게 없다. 안 주면 어떨까 (spot_bookmark 조회 쿼리 1 낭비)
+        boolean isBookmarked = spot.getSpotBookmarkList().stream()
+                .anyMatch(it -> it.getUser().getId().equals(currentUserId));
+        boolean isAuthor = spot.getUser().getId().equals(currentUserId);
+
+        return SpotDetailResponse.of(spot, isBookmarked, isAuthor);
+    }
+
     // 스팟 삭제
+
+    private void checkIsAuthor(User user, Spot spot) {// 작성자인지 확인: 수정, 삭제는 작성자만 권한을 가짐
+        if (!spot.getUser().equals(user)) {
+            throw new SpotException(StatusCode.NOT_SPOT_AUTHOR);
+        }
+    }
 }
