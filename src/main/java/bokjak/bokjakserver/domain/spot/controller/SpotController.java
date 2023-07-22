@@ -76,15 +76,13 @@ public class SpotController {
         return success(response);
     }
 
-    @PostMapping("/{locationId}/category/{spotCategoryId}/spots")
-    public ApiResponse<SpotIdResponse> createSpot(
-            @PathVariable Long locationId,
-            @PathVariable Long spotCategoryId,
+    @PostMapping("/spots")
+    public ApiResponse<SpotDetailResponse> createSpot(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @Valid @RequestBody CreateSpotRequest createSpotRequest
     ) {
         authService.checkIsBannedUser(principalDetails.getUser());
-        SpotIdResponse response = spotService.createSpot(principalDetails.getUserId(), locationId, spotCategoryId, createSpotRequest);
+        SpotDetailResponse response = spotService.createSpot(principalDetails.getUserId(), createSpotRequest);
         return success(response);
     }
 

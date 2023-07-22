@@ -85,8 +85,7 @@ public class SpotService {
         Spot spot = spotRepository.getSpot(spotId)
                 .orElseThrow(() -> new SpotException(StatusCode.NOT_FOUND_SPOT));
 
-        boolean isBookmarked = spot.getSpotBookmarkList().stream()
-                .anyMatch(it -> it.getUser().getId().equals(currentUserId));
+        boolean isBookmarked = isBookmarked(currentUserId, spot);
         boolean isAuthor = spot.getUser().getId().equals(currentUserId);
 
         return SpotDetailResponse.of(spot, isBookmarked, isAuthor);
@@ -120,20 +119,23 @@ public class SpotService {
     }
 
     // 스팟 생성
-    // TODO locationId, spotCategoryId Request DTO에 담기 -> Controller 수정 -> API 명세 수정
     @Transactional
-    public SpotIdResponse createSpot(Long currentUserId, Long locationId, Long spotCategoryId, CreateSpotRequest createSpotRequest) {
+    public SpotDetailResponse createSpot(Long currentUserId, CreateSpotRequest createSpotRequest) {
         User user = userService.getUser(currentUserId);
-        Location location = locationRepository.findById(locationId)
+        Location location = locationRepository.findById(createSpotRequest.locationId())
                 .orElseThrow(() -> new LocationException(StatusCode.NOT_FOUND_LOCATION));
-        SpotCategory spotCategory = spotCategoryRepository.findById(spotCategoryId)
+        SpotCategory spotCategory = spotCategoryRepository.findById(createSpotRequest.spotCategoryId())
                 .orElseThrow(() -> new CategoryException(StatusCode.NOT_FOUND_SPOT_CATEGORY));
 
         Spot spot = spotRepository.save(createSpotRequest.toEntity(user, location, spotCategory));
 
         createSpotRequest.imageUrls().forEach(imageUrl -> spot.addSpotImage(SpotImage.of(spot, imageUrl)));
 
-        return SpotIdResponse.of(spot);
+        return SpotDetailResponse.of(
+                spot,
+                isBookmarked(currentUserId, spot),
+                spot.getUser().getId().equals(currentUserId)
+        );
     }
 
     // 스팟 수정
@@ -159,17 +161,22 @@ public class SpotService {
                 updateSpotRequest.imageUrls().stream().map(it -> SpotImage.of(spot, it)).toList()
         );
 
-        // TODO 이전의 상세 조회 응답값에서 달라진게 없다. 안 주면 어떨까 (spot_bookmark 조회 쿼리 1 낭비)
-        boolean isBookmarked = spot.getSpotBookmarkList().stream()
-                .anyMatch(it -> it.getUser().getId().equals(currentUserId));
-        boolean isAuthor = spot.getUser().getId().equals(currentUserId);
+        // TODO 이전의 상세 조회 응답값에서 달라진게 없다. 고민해보자 (spot_bookmark 조회 쿼리 1 낭비)
+        return SpotDetailResponse.of(
+                spot,
+                isBookmarked(currentUserId, spot),
+                spot.getUser().getId().equals(currentUserId)
+        );
+    }
 
-        return SpotDetailResponse.of(spot, isBookmarked, isAuthor);
+    private static boolean isBookmarked(Long currentUserId, Spot spot) {
+        return spot.getSpotBookmarkList().stream()
+                .anyMatch(it -> it.getUser().getId().equals(currentUserId));
     }
 
     // 스팟 삭제
 
-    private void checkIsAuthor(User user, Spot spot) {// 작성자인지 확인: 수정, 삭제는 작성자만 권한을 가짐
+    private static void checkIsAuthor(User user, Spot spot) {// 작성자인지 확인: 수정, 삭제는 작성자만 권한을 가짐
         if (!spot.getUser().equals(user)) {
             throw new SpotException(StatusCode.NOT_SPOT_AUTHOR);
         }
