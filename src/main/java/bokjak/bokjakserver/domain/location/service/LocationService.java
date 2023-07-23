@@ -79,9 +79,6 @@ public class LocationService {
         LocalDateTime start = CustomDateUtils.makePastWeekDayDateTime(Calendar.MONDAY, LocalTime.MIN);// 월요일 00시 00
         LocalDateTime end = CustomDateUtils.makePastWeekDayDateTime(Calendar.SUNDAY, LocalTime.MAX);  // 일요일 24시 59
 
-        System.out.println("start = " + start);
-        System.out.println("end = " + end);
-
         Page<Location> resultPage = locationRepository.getTopOfWeeklyAverageCongestion(pageable, start, end);
 
         return makeLocationCardPageResponse(currentUser, resultPage);
