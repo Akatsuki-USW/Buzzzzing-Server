@@ -44,6 +44,25 @@ public class LocationDto {
     }
 
     @Builder
+    public record LocationSimpleCardResponse(
+            Long id,
+            String name,
+            Long categoryId,
+            String categoryName,
+            String categoryIconUrl
+    ) {
+        public static LocationSimpleCardResponse of(Location location) {
+            return LocationSimpleCardResponse.builder()
+                    .id(location.getId())
+                    .name(location.getName())
+                    .categoryId(location.getLocationCategory().getId())
+                    .categoryName(location.getLocationCategory().getName())
+                    .categoryIconUrl(location.getLocationCategory().getIconImageUrl())
+                    .build();
+        }
+    }
+
+    @Builder
     public record LocationDetailResponse(
             Long id,
             String name,

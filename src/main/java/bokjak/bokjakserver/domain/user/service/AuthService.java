@@ -147,6 +147,13 @@ public class AuthService {
         else throw new UserException(StatusCode.REVOKE_USER);
     }
 
+    // TODO Interceptor, Security .hasAuthority 등 고민. 컨트롤러 내부 로직 타기 전에 처리하고 싶다.
+    public void checkIsBannedUser(User user) {  // 작성 권한 체크: BANNED 유저는 작성, 수정, 삭제 할 수 없음
+        if (user.getUserStatus().equals(UserStatus.BANNED)) {
+            throw new AuthException(StatusCode.BANNED_USER);
+        }
+    }
+
     @Transactional
     public void checkUserStatus(User user) {
         UserStatus userStatus = user.getUserStatus();

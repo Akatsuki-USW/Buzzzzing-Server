@@ -16,4 +16,5 @@ public class GlobalConstants {
     public static final String CONTENT_CONGESTION_LEVEL = "congestionLevel";
     public static final int CONGESTION_STATISTIC_START_TIME = 9;
     public static final int CONGESTION_PREDICTION_WEEK = 1;
+
 }

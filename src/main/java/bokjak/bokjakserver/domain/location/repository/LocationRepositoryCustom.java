@@ -19,8 +19,10 @@ public interface LocationRepositoryCustom {
             CongestionLevel cursorCongestionLevel
     );
 
+    Page<Location> getLocations(Pageable pageable,Long cursorId);
+
     Page<Location> getTopOfWeeklyAverageCongestion(Pageable pageable, LocalDateTime start, LocalDateTime end);
 
-    Page<Location> getBookmarked(Pageable pageable, Long userId);
+    Page<Location> getBookmarked(Pageable pageable, Long cursorId, Long userId);
 
 }

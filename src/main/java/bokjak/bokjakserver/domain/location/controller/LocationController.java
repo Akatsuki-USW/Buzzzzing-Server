@@ -4,9 +4,11 @@ import bokjak.bokjakserver.common.dto.ApiResponse;
 import bokjak.bokjakserver.common.dto.PageResponse;
 import bokjak.bokjakserver.config.security.PrincipalDetails;
 import bokjak.bokjakserver.domain.congestion.dto.CongestionDto.DailyCongestionStatisticResponse;
+import bokjak.bokjakserver.domain.location.dto.LocationDto;
 import bokjak.bokjakserver.domain.location.dto.LocationDto.BookmarkResponse;
 import bokjak.bokjakserver.domain.location.dto.LocationDto.LocationCardResponse;
 import bokjak.bokjakserver.domain.location.dto.LocationDto.LocationDetailResponse;
+import bokjak.bokjakserver.domain.location.dto.LocationDto.LocationSimpleCardResponse;
 import bokjak.bokjakserver.domain.location.service.LocationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static bokjak.bokjakserver.common.constant.GlobalConstants.*;
+import static bokjak.bokjakserver.common.constant.GlobalConstants.TOP_LOCATIONS_SIZE;
 import static bokjak.bokjakserver.common.dto.ApiResponse.success;
 
 @Slf4j
@@ -29,7 +31,7 @@ public class LocationController {
     private final LocationService locationService;
 
     @GetMapping
-    public ApiResponse<PageResponse<LocationCardResponse>> getLocations(
+    public ApiResponse<PageResponse<LocationCardResponse>> getLocationsBasedOnCongestion(
             @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable,
             @RequestParam(required = false) Long cursorId,
             @RequestParam(required = false) String keyword,
@@ -38,6 +40,15 @@ public class LocationController {
             @RequestParam(required = false) List<Long> categoryIds
     ) {
         PageResponse<LocationCardResponse> pageResponse = locationService.search(pageable, cursorId, keyword, categoryIds, congestionSort, cursorCongestionLevel);
+        return success(pageResponse);
+    }
+
+    @GetMapping("/simple")
+    public ApiResponse<PageResponse<LocationSimpleCardResponse>> getSimpleLocations(
+            @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable,
+            @RequestParam(required = false) Long cursorId
+    ) {
+        PageResponse<LocationSimpleCardResponse> pageResponse = locationService.getLocations(pageable, cursorId);
         return success(pageResponse);
     }
 
@@ -66,13 +77,14 @@ public class LocationController {
 
     @GetMapping("/bookmarks/me")
     public ApiResponse<PageResponse<LocationCardResponse>> getMyBookmarkedLocations(
-            @PageableDefault(sort = "id", direction = Sort.Direction.DESC, size = TOP_LOCATIONS_SIZE) Pageable pageable
+            @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(required = false) Long cursorId
     ) {
-        PageResponse<LocationCardResponse> pageResponse = locationService.getMyBookmarkedLocations(pageable);
+        PageResponse<LocationCardResponse> pageResponse = locationService.getMyBookmarkedLocations(pageable, cursorId);
         return success(pageResponse);
     }
 
-    @PostMapping("{locationId}/bookmarks")
+    @PostMapping("/{locationId}/bookmarks")
     public ApiResponse<BookmarkResponse> bookmark(@PathVariable Long locationId, @AuthenticationPrincipal PrincipalDetails principalDetails) {
         BookmarkResponse response = locationService.bookmark(locationId, principalDetails.getUserId());
         return success(response);

@@ -16,6 +16,7 @@ import bokjak.bokjakserver.domain.congestion.repository.DailyCongestionStatistic
 import bokjak.bokjakserver.domain.location.dto.LocationDto.BookmarkResponse;
 import bokjak.bokjakserver.domain.location.dto.LocationDto.LocationCardResponse;
 import bokjak.bokjakserver.domain.location.dto.LocationDto.LocationDetailResponse;
+import bokjak.bokjakserver.domain.location.dto.LocationDto.LocationSimpleCardResponse;
 import bokjak.bokjakserver.domain.location.exception.LocationException;
 import bokjak.bokjakserver.domain.location.model.Location;
 import bokjak.bokjakserver.domain.location.repository.LocationRepository;
@@ -50,7 +51,7 @@ public class LocationService {
     private final DailyCongestionStatisticRepository dailyCongestionStatisticRepository;
     private final LocationBookmarkRepository locationBookmarkRepository;
 
-    // 로케이션 리스트 조회
+    // 로케이션 혼잡도 기반 검색
     public PageResponse<LocationCardResponse> search(
             Pageable pageable,
             Long cursorId,
@@ -72,6 +73,15 @@ public class LocationService {
         return makeLocationCardPageResponse(currentUser, resultPage);
     }
 
+    // 로케이션 단순 리스트 조회
+    public PageResponse<LocationSimpleCardResponse> getLocations(Pageable pageable,Long cursorId) {
+        Page<Location> locations = locationRepository.getLocations(pageable, cursorId);
+
+        Page<LocationSimpleCardResponse> responsePage = locations.map(LocationSimpleCardResponse::of);
+
+        return PageResponse.of(responsePage);
+    }
+
     // 혼잡도 낮은순 TOP N 조회 : 주간 통계 기반 정렬
     public PageResponse<LocationCardResponse> getTopRelaxingLocations(Pageable pageable) {
         User currentUser = userService.getCurrentUser();
@@ -85,9 +95,9 @@ public class LocationService {
     }
 
     // 내가 북마크한 로케이션 리스트 조회
-    public PageResponse<LocationCardResponse> getMyBookmarkedLocations(Pageable pageable) {
+    public PageResponse<LocationCardResponse> getMyBookmarkedLocations(Pageable pageable, Long cursorId) {
         User currentUser = userService.getCurrentUser();
-        Page<Location> resultPage = locationRepository.getBookmarked(pageable, currentUser.getId());
+        Page<Location> resultPage = locationRepository.getBookmarked(pageable, cursorId, currentUser.getId());
 
         return makeLocationCardPageResponse(currentUser, resultPage);
     }

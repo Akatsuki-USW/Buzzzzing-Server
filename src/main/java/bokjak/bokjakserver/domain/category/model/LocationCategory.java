@@ -1,5 +1,6 @@
 package bokjak.bokjakserver.domain.category.model;
 
+import bokjak.bokjakserver.common.constant.ConstraintConstants;
 import bokjak.bokjakserver.domain.location.model.Location;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -23,7 +24,7 @@ public class LocationCategory {
     private Long id;
 
     @NotNull
-    @Size(max = 45)
+    @Size(max = ConstraintConstants.LOCATION_CATEGORY_NAME_MAX_LENGTH)
     private String name;
 
     @URL

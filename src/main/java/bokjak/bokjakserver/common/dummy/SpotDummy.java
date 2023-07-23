@@ -38,8 +38,13 @@ public class SpotDummy {
             log.info("[5] 스팟 데이터가 이미 존재");
         } else {
             createSpots();
-            createSpotImages();
             log.info("[5] 스팟 더미 생성 완료");
+        }
+        if (spotImageRepository.count() > 0) {
+            log.info("[5-1] 스팟 이미지 데이터가 이미 존재");
+        } else {
+            createSpotImages();
+            log.info("[5-1] 스팟 더미 생성 완료");
         }
     }
 
@@ -60,7 +65,6 @@ public class SpotDummy {
                         .user(allUser.get(i))
                         .spotCategory(category) // 3가지 중 1 랜덤
                         .address(location.getName() + i + "근처")
-                        .spotName(location.getName() + i + "번째 스팟")
                         .title(location.getName() + " 근처 " + category.getName())
                         .content(strings.get((int) (Math.random() * 100) % 3))
                         .build());

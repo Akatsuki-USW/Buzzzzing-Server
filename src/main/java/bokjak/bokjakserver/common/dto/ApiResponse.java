@@ -1,5 +1,6 @@
 package bokjak.bokjakserver.common.dto;
 
+import bokjak.bokjakserver.common.exception.StatusCode;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AccessLevel;
 import lombok.Getter;

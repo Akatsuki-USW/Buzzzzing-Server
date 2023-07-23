@@ -1,5 +1,6 @@
 package bokjak.bokjakserver.domain.comment.model;
 
+import bokjak.bokjakserver.common.constant.ConstraintConstants;
 import bokjak.bokjakserver.common.model.BaseEntity;
 import bokjak.bokjakserver.domain.spot.model.Spot;
 import bokjak.bokjakserver.domain.user.model.User;
@@ -31,7 +32,7 @@ public class Comment extends BaseEntity {
     private Spot spot;
 
     @NotNull
-    @Size(max = 300)
+    @Size(max = ConstraintConstants.COMMENT_CONTENT_MAX_LENGTH)
     private String content;
 
     // 추후 대댓글 구현시 사용
