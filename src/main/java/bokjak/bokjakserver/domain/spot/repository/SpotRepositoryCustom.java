@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface SpotRepositoryCustom {
     // 리스트 조회
-    Page<Spot> getSpotsExceptBlocked(
+    Page<Spot> findAllByLocationAndCategoriesExceptBlockedAuthors(
             Long userId,
             Pageable pageable,
             Long cursorId,
@@ -17,13 +17,20 @@ public interface SpotRepositoryCustom {
             List<Long> categoryIds
     );
 
+    Page<Spot> findAllByCategoriesExceptBlockedAuthors(
+            Long userId,
+            Pageable pageable,
+            Long cursorId,
+            List<Long> categoryIds
+    );
+
     // 상세 조회
-    Optional<Spot> getSpot(Long spotId);
+    Optional<Spot> findOne(Long spotId);
 
     // 내가 북마크한 스팟 조회
-    Page<Spot> getBookmarked(Pageable pageable, Long cursorId, Long userId);
+    Page<Spot> findAllBookmarked(Pageable pageable, Long cursorId, Long userId);
 
     // 내가 작성한 스팟 조회
-    Page<Spot> getMySpots(Pageable pageable, Long cursorId, Long userId);
+    Page<Spot> findAllMy(Pageable pageable, Long cursorId, Long userId);
     // 내가 댓글 단 글 조회
 }

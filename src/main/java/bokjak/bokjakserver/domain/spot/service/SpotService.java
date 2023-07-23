@@ -40,8 +40,8 @@ public class SpotService {
     private final SpotCategoryRepository spotCategoryRepository;
 
 
-    // 스팟 리스트 조회
-    public PageResponse<SpotCardResponse> getSpots(
+    // 스팟 리스트 조회: 특정 로케이션
+    public PageResponse<SpotCardResponse> getSpotsByLocationAndCategoriesExceptBlockedAuthors(
             Long currentUserId,
             Pageable pageable,
             Long cursorId,
@@ -49,7 +49,20 @@ public class SpotService {
             List<Long> categoryIds
     ) {
         User user = userService.getUser(currentUserId);
-        Page<Spot> resultPage = spotRepository.getSpotsExceptBlocked(user.getId(), pageable, cursorId, locationId, categoryIds);
+        Page<Spot> resultPage = spotRepository.findAllByLocationAndCategoriesExceptBlockedAuthors(user.getId(), pageable, cursorId, locationId, categoryIds);
+
+        return makeSpotCardResponsePageResponse(user, resultPage);
+    }
+
+    // 스팟 리스트 조회: 모든 로케이션
+    public PageResponse<SpotCardResponse> getSpotsByCategoriesExceptBlockedAuthors(
+            Long currentUserId,
+            Pageable pageable,
+            Long cursorId,
+            List<Long> categoryIds
+    ) {
+        User user = userService.getUser(currentUserId);
+        Page<Spot> resultPage = spotRepository.findAllByCategoriesExceptBlockedAuthors(user.getId(), pageable, cursorId, categoryIds);
 
         return makeSpotCardResponsePageResponse(user, resultPage);
     }
@@ -57,7 +70,7 @@ public class SpotService {
     // 내가 북마크한 스팟 리스트 조회
     public PageResponse<SpotCardResponse> getMyBookmarkedSpots(Long currentUserId, Pageable pageable, Long cursorId) {
         User user = userService.getUser(currentUserId);
-        Page<Spot> resultPage = spotRepository.getBookmarked(pageable, cursorId, currentUserId);
+        Page<Spot> resultPage = spotRepository.findAllBookmarked(pageable, cursorId, currentUserId);
 
         return makeSpotCardResponsePageResponse(user, resultPage);
     }
@@ -65,7 +78,7 @@ public class SpotService {
     // 내가 쓴 스팟 리스트 조회
     public PageResponse<SpotCardResponse> getMySpots(Long currentUserId, Pageable pageable, Long cursorId) {
         User user = userService.getUser(currentUserId);
-        Page<Spot> resultPage = spotRepository.getMySpots(pageable, cursorId, currentUserId);
+        Page<Spot> resultPage = spotRepository.findAllMy(pageable, cursorId, currentUserId);
 
         return makeSpotCardResponsePageResponse(user, resultPage);
     }
@@ -82,7 +95,7 @@ public class SpotService {
 
     // 스팟 상세 조회
     public SpotDetailResponse getSpotDetail(Long currentUserId, Long spotId) {
-        Spot spot = spotRepository.getSpot(spotId)
+        Spot spot = spotRepository.findOne(spotId)
                 .orElseThrow(() -> new SpotException(StatusCode.NOT_FOUND_SPOT));
 
         boolean isBookmarked = isBookmarked(currentUserId, spot);

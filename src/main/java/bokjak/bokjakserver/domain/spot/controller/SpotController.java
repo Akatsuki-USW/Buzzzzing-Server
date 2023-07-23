@@ -27,14 +27,25 @@ public class SpotController {
     private final AuthService authService;
 
     @GetMapping("/{locationId}/spots")
-    public ApiResponse<PageResponse<SpotCardResponse>> getSpots(
+    public ApiResponse<PageResponse<SpotCardResponse>> getSpotsByLocation(
             @PathVariable Long locationId,
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PageableDefault Pageable pageable,
             @RequestParam(required = false) Long cursorId,
             @RequestParam(required = false) List<Long> categoryIds
     ) {
-        PageResponse<SpotCardResponse> pageResponse = spotService.getSpots(principalDetails.getUserId(), pageable, cursorId, locationId, categoryIds);
+        PageResponse<SpotCardResponse> pageResponse = spotService.getSpotsByLocationAndCategoriesExceptBlockedAuthors(principalDetails.getUserId(), pageable, cursorId, locationId, categoryIds);
+        return success(pageResponse);
+    }
+
+    @GetMapping("/spots")
+    public ApiResponse<PageResponse<SpotCardResponse>> getSpots(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PageableDefault Pageable pageable,
+            @RequestParam(required = false) Long cursorId,
+            @RequestParam(required = false) List<Long> categoryIds
+    ) {
+        PageResponse<SpotCardResponse> pageResponse = spotService.getSpotsByCategoriesExceptBlockedAuthors(principalDetails.getUserId(), pageable, cursorId, categoryIds);
         return success(pageResponse);
     }
 
