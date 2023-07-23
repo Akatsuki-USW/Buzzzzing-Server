@@ -16,6 +16,7 @@ public enum StatusCode {
     METHOD_NOT_ALLOWED(405, 9020, "method not allowed."),
     HTTP_CLIENT_ERROR(400, 9030, "http client error."),
     INVALID_REQUEST_PARAM(400, 9100, "invalid request param."),
+    NOT_FOUND_URL(404, 9110, "not found url request"),
 
     AWS_S3_UPLOAD_FAIL(400, 9040, "AWS S3 upload fail."),
     AWS_S3_DELETE_FAIL(400, 9050, "AWS S3 delete fail."),
