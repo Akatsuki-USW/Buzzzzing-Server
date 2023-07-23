@@ -6,12 +6,6 @@ public class GlobalConstants {
      */
     public static final String[] APPOINTED_URIS = {"/auth/login/admin", "/auth/reissue", "/auth/login", "/auth/signup", "/users/check/nickname/**", "/hello/**", "/categories/**", "/files"};
 
-
-    /**
-     * Category
-     */
-    public static final int WEEK_SIZE = 7;
-
     /**
      * Location
      */
