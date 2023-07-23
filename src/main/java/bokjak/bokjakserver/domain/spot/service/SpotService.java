@@ -49,6 +49,8 @@ public class SpotService {
             List<Long> categoryIds
     ) {
         User user = userService.getUser(currentUserId);
+        if (!locationRepository.existsById(locationId)) throw new LocationException(StatusCode.NOT_FOUND_LOCATION);
+
         Page<Spot> resultPage = spotRepository.findAllByLocationAndCategoriesExceptBlockedAuthors(user.getId(), pageable, cursorId, locationId, categoryIds);
 
         return makeSpotCardResponsePageResponse(user, resultPage);
