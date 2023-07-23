@@ -11,8 +11,6 @@ name: Java Gradle CI/CD Pipeline using Docker Hub
 on:
   push:
     branches: [ "develop" ]
-  # pull_request:
-    # branches: [ "develop" ]
 
 permissions:
   contents: read
@@ -85,3 +83,32 @@ jobs:
             docker tag ${{ secrets.DOCKER_USERNAME }}/buzzing-server:${GITHUB_SHA::7} buzzing-server
             docker rm -f $(docker ps -qa)
             docker run -d --name server -e TZ=Asia/Seoul -p 8080:8090 buzzing-server
+            
+            ## 서버 헬스 체크
+            TARGET_URL=localhost PORT=8080
+
+            for RETRY_COUNT in 1 2 3 4 5 6 7 8 9 10; do
+              echo "> #${RETRY_COUNT} trying..."
+              RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}" $TARGET_URL:$PORT/hello)
+
+              if [ "${RESPONSE_CODE}" -eq 200 ]; then
+                echo "> New WAS successfully running"
+                exit 0
+              elif [ ${RETRY_COUNT} -eq 10 ]; then
+                echo "> Health check failed."
+                exit 1
+              fi
+              sleep 10
+            done
+
+      ## 배포 결과를 슬랙 채널에 전송
+      - name: action-slack  # https://github.com/8398a7/action-slack/blob/v2/README.md
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          author_name: Buzzzzing-Server
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+          if_mention: failure,cancelled
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+        if: always() # Pick up events even if the job fails or is canceled.
