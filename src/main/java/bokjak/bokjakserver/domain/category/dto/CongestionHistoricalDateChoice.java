@@ -3,6 +3,7 @@ package bokjak.bokjakserver.domain.category.dto;
 import bokjak.bokjakserver.common.constant.GlobalConstants;
 import bokjak.bokjakserver.common.exception.StatusCode;
 import bokjak.bokjakserver.domain.category.exception.CategoryException;
+import bokjak.bokjakserver.util.CustomDateUtils;
 import bokjak.bokjakserver.util.enums.EnumModel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,19 +35,13 @@ public enum CongestionHistoricalDateChoice implements EnumModel<String> {
 
     // toDateTime: congestionDateFilter에 대해 요청된 요일(name 필드)에 따라 값을 다르게 변환. SQL 날짜 형식에 맞도록 포맷
     public static String toDateTime(CongestionHistoricalDateChoice choice) {
-        Calendar calendar = Calendar.getInstance();
-        // 한 주의 시작 요일 설정: 복쟉복쟉의 일주일 시작 요일은 월요일, 반면 Calendar의 디폴트 시작 요일은 일요일
-        calendar.setFirstDayOfWeek(Calendar.MONDAY);
-        // 일주일 전으로 설정: 과거 일주일간의 혼잡도 데이터를 보기 위함
-        calendar.add(Calendar.DATE, -GlobalConstants.WEEK_SIZE);
-        // 요일에 따라 날짜 설정
-        calendar.set(Calendar.DAY_OF_WEEK, switchChoiceToCalendarDayOfWeek(choice));
+        Calendar calendar = CustomDateUtils.makePastWeekDayDate(switchChoiceToDayOfWeek(choice));
 
         SimpleDateFormat formatter = new SimpleDateFormat(GlobalConstants.DATE_FORMAT);
         return formatter.format(calendar.getTime());
     }
 
-    private static int switchChoiceToCalendarDayOfWeek(CongestionHistoricalDateChoice choice) {// choice에 따라 다른 요일값으로 설정
+    private static int switchChoiceToDayOfWeek(CongestionHistoricalDateChoice choice) {// choice에 따라 다른 요일값으로 설정
         return switch (choice) {
             case MON -> Calendar.MONDAY;
             case TUE -> Calendar.TUESDAY;
