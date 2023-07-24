@@ -22,6 +22,7 @@ import bokjak.bokjakserver.domain.location.model.Location;
 import bokjak.bokjakserver.domain.location.repository.LocationRepository;
 import bokjak.bokjakserver.domain.user.model.User;
 import bokjak.bokjakserver.domain.user.service.UserService;
+import bokjak.bokjakserver.util.CustomDateUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -85,13 +86,8 @@ public class LocationService {
     public PageResponse<LocationCardResponse> getTopRelaxingLocations(Pageable pageable) {
         User currentUser = userService.getCurrentUser();
 
-        Calendar startDate = Calendar.getInstance(), endDate = Calendar.getInstance();
-        startDate.add(Calendar.DATE, -GlobalConstants.WEEK_SIZE);
-        startDate.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-        endDate.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);// Calendar의 주 시작 기준은 일~월, 복쟉복쟉은 월~일
-
-        LocalDateTime start = makeZonedDateTime(startDate, LocalTime.MIN);  // 월요일 00시 00
-        LocalDateTime end = makeZonedDateTime(endDate, LocalTime.MAX);      // 일요일 24시 59
+        LocalDateTime start = CustomDateUtils.makePastWeekDayDateTime(Calendar.MONDAY, LocalTime.MIN);// 월요일 00시 00
+        LocalDateTime end = CustomDateUtils.makePastWeekDayDateTime(Calendar.SUNDAY, LocalTime.MAX);  // 일요일 24시 59
 
         Page<Location> resultPage = locationRepository.getTopOfWeeklyAverageCongestion(pageable, start, end);
 
@@ -168,14 +164,6 @@ public class LocationService {
     }
 
     /* private 함수 */
-
-    private LocalDateTime makeZonedDateTime(Calendar calendar, LocalTime localTime) {
-        return ZonedDateTime.of(
-                LocalDate.ofInstant(calendar.toInstant(), calendar.getTimeZone().toZoneId()),
-                localTime,
-                ZoneId.systemDefault()
-        ).toLocalDateTime();
-    }
 
     private PageResponse<LocationCardResponse> makeLocationCardPageResponse(User currentUser, Page<Location> resultPage) {
         List<Long> bookmarkedLocationIdList = locationBookmarkRepository.findAllByUser(currentUser).stream()

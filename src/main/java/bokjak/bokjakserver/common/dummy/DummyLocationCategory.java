@@ -13,8 +13,7 @@ public enum DummyLocationCategory {
     PARK("공원", "https://buz-s3.s3.ap-southeast-2.amazonaws.com/constant/park.png"),
     MART("마트", "https://buz-s3.s3.ap-southeast-2.amazonaws.com/constant/mart.png"),
     VACATION("휴양지", "https://buz-s3.s3.ap-southeast-2.amazonaws.com/constant/vacation_spot.png"),
-    MARKET("시장", "https://buz-s3.s3.ap-southeast-2.amazonaws.com/constant/market.png"),
-    ALL("종합", null);
+    MARKET("시장", "https://buz-s3.s3.ap-southeast-2.amazonaws.com/constant/market.png");
 
     private final String name;
     private final String iconImageUrl;

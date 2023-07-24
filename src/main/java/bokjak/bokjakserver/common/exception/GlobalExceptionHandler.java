@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.io.IOException;
 
@@ -122,6 +123,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ApiResponse.error(StatusCode.INTERNAL_SERVER_ERROR.getStatusCode(), ex.getMessage()));
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiResponse<?> handleNotFoundUrl(final NoHandlerFoundException ex) {
+        log.error("not found url request {} - {}", ex.getClass().getSimpleName(), ex.getMessage());
+        return error(NOT_FOUND_URL.getStatusCode(), NOT_FOUND_URL.getMessage());
+
     }
 }
 

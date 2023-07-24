@@ -58,6 +58,13 @@ dependencies {
 	// S3
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
+	// fcm 추가
+	implementation("com.google.firebase:firebase-admin:6.8.1")
+	implementation("com.squareup.okhttp3:okhttp:4.9.1")
+
+	// json simple
+	implementation("com.googlecode.json-simple:json-simple:1.1.1")
+
 }
 
 tasks.named('test') {

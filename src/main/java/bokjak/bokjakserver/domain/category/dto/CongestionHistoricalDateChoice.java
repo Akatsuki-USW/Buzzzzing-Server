@@ -3,6 +3,7 @@ package bokjak.bokjakserver.domain.category.dto;
 import bokjak.bokjakserver.common.constant.GlobalConstants;
 import bokjak.bokjakserver.common.exception.StatusCode;
 import bokjak.bokjakserver.domain.category.exception.CategoryException;
+import bokjak.bokjakserver.util.CustomDateUtils;
 import bokjak.bokjakserver.util.enums.EnumModel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,25 +35,23 @@ public enum CongestionHistoricalDateChoice implements EnumModel<String> {
 
     // toDateTime: congestionDateFilter에 대해 요청된 요일(name 필드)에 따라 값을 다르게 변환. SQL 날짜 형식에 맞도록 포맷
     public static String toDateTime(CongestionHistoricalDateChoice choice) {
-        Calendar calendar = Calendar.getInstance();
-        if (choice != SUN) calendar.add(Calendar.DATE, -GlobalConstants.WEEK_SIZE);// 일주일 전
-
-        switch (choice) {
-            case MON -> calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-            case TUE -> calendar.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
-            case WED -> calendar.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
-            case THU -> calendar.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
-            case FRI -> calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
-            case SAT -> calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
-            case SUN -> calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-
-            default -> throw new IllegalArgumentException(StatusCode.INTERNAL_SERVER_ERROR.getMessage());  // Internal Error 이여야 함
-        }
+        Calendar calendar = CustomDateUtils.makePastWeekDayDate(switchChoiceToDayOfWeek(choice));
 
         SimpleDateFormat formatter = new SimpleDateFormat(GlobalConstants.DATE_FORMAT);
         return formatter.format(calendar.getTime());
     }
 
+    private static int switchChoiceToDayOfWeek(CongestionHistoricalDateChoice choice) {// choice에 따라 다른 요일값으로 설정
+        return switch (choice) {
+            case MON -> Calendar.MONDAY;
+            case TUE -> Calendar.TUESDAY;
+            case WED -> Calendar.WEDNESDAY;
+            case THU -> Calendar.THURSDAY;
+            case FRI -> Calendar.FRIDAY;
+            case SAT -> Calendar.SATURDAY;
+            case SUN -> Calendar.SUNDAY;
+        };
+    }
     @Override
     public String getKey() {
         return name();

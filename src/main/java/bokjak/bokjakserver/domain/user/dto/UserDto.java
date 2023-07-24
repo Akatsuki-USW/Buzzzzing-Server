@@ -1,6 +1,7 @@
 package bokjak.bokjakserver.domain.user.dto;
 
 import bokjak.bokjakserver.domain.user.model.User;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 
 public class UserDto {
@@ -18,10 +19,18 @@ public class UserDto {
         }
     }
 
-    public record UpdateUserInfoRequest(String email, String nickname, String profileImageUrl) {}
+    public record UpdateUserInfoRequest(
+            @NotBlank
+            String email,
+            @NotBlank
+            String nickname,
+            @NotBlank
+            String profileImageUrl) {}
 
 
-    public record HideRequest(Long blockUserId) {}
+    public record HideRequest(
+            @NotBlank
+            Long blockUserId) {}
 
     public record HideResponse(boolean blockedResult) {}
 

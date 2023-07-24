@@ -16,6 +16,7 @@ public enum StatusCode {
     METHOD_NOT_ALLOWED(405, 9020, "method not allowed."),
     HTTP_CLIENT_ERROR(400, 9030, "http client error."),
     INVALID_REQUEST_PARAM(400, 9100, "invalid request param."),
+    NOT_FOUND_URL(404, 9110, "not found url request"),
 
     AWS_S3_UPLOAD_FAIL(400, 9040, "AWS S3 upload fail."),
     AWS_S3_DELETE_FAIL(400, 9050, "AWS S3 delete fail."),
@@ -80,7 +81,17 @@ public enum StatusCode {
     NOT_FOUND_REPORT_TARGET(404,3020,"report target not found."),
     ALREADY_BAN_USER(400,3030,"already ban user."),
     NOT_CORRECT_USER_AND_TARGET(404, 3040,"not correct writer and report target id"),
-    OVER_CONTENT_LENGTH(400,3080,"limit of the number of words.");
+    OVER_CONTENT_LENGTH(400,3080,"limit of the number of words."),
+
+
+    /**
+     * Notification
+     */
+    GET_FCM_ACCESS_TOKEN_ERROR(400,4500,"fcm access token get failed"),
+    FCM_MESSAGE_JSON_PARSING_ERROR(400,4510,"fcm message json parsing failed"),
+    SEND_FCM_PUSH_ERROR(400,4520,"send fcm push message failed"),
+    NOT_FOUND_NOTIFICATION(404, 4530, "not found notification error");
+
 
     private final int HttpCode;
     private final int statusCode;
