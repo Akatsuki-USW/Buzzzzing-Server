@@ -4,7 +4,33 @@ public class GlobalConstants {
     /**
      * Common
      */
-    public static final String[] APPOINTED_URIS = {"/auth/login/admin", "/auth/reissue", "/auth/login", "/auth/signup", "/users/check/nickname/**", "/hello/**", "/categories/**", "/files"};
+    public static final String[] APPOINTED_URIS = {
+            "/auth/login/admin",
+            "/auth/reissue",
+            "/auth/login",
+            "/auth/signup",
+            "/users/check/nickname/**",
+            "/hello/**",
+            "/categories/**",
+            "/files",
+
+            "/api-docs/**",
+            "/v1/api-docs",
+            "/v2/api-docs",
+            "/docs/**",
+            "/favicon.ico",
+            "/configuration/ui",
+            "/swagger-resources/**",
+            "/configuration/security",
+            "/swagger-ui.html",
+            "/swagger-ui/#",
+            "/webjars/**",
+            "/swagger/**",
+            "/swagger-ui/**",
+            "/",
+            "/csrf",
+            "/error"
+    };
 
     /**
      * Location
