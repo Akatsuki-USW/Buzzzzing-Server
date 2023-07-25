@@ -32,17 +32,6 @@ public class GlobalConstants {
             "/error"
     };
 
-
-    /**
-     * swagger
-     */
-    public static final String[] SWAGGER_PATHS = {
-            "/**"
-    };
-    public static final String SWAGGER_TITLE = "복쟉복쟉 API 명세서";
-    public static final String SWAGGER_DESCRIPTION = "\uD83D\uDE80 Realtime Congestion Based Location Recommendation Service - 복쟉복쟉 Server의 API 명세서입니다.";
-    public static final String SWAGGER_VERSION_1 = "v1";
-
     /**
      * Location
      */
