@@ -17,6 +17,8 @@ import bokjak.bokjakserver.domain.spot.model.SpotImage;
 import bokjak.bokjakserver.domain.spot.repository.SpotRepository;
 import bokjak.bokjakserver.domain.user.model.User;
 import bokjak.bokjakserver.domain.user.service.UserService;
+import bokjak.bokjakserver.util.s3.S3SaveDir;
+import bokjak.bokjakserver.util.s3.service.AwsS3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -34,11 +36,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SpotService {
     private final UserService userService;
+    private final AwsS3Service awsS3Service;
     private final SpotRepository spotRepository;
     private final SpotBookmarkRepository spotBookmarkRepository;
     private final LocationRepository locationRepository;
     private final SpotCategoryRepository spotCategoryRepository;
-
 
     // 스팟 리스트 조회: 특정 로케이션
     public PageResponse<SpotCardResponse> getSpotsByLocationAndCategoriesExceptBlockedAuthors(
@@ -190,6 +192,13 @@ public class SpotService {
         checkIsAuthor(user, spot);
 
         spotRepository.delete(spot);
+
+        // 스팟 이미지 파일 전체 삭제
+        List<String> imageUrlList = spot.getSpotImageList().stream().map(SpotImage::getImageUrl).toList();
+        for (String url : imageUrlList) {
+            awsS3Service.deleteSingleFile(S3SaveDir.SPOT, url);
+        }
+
         return new SpotMessage(true);
     }
 

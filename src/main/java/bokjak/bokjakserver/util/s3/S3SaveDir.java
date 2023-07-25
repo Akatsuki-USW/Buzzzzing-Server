@@ -6,12 +6,11 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public enum S3SaveDir {
-    USER_PROFILE("/user/profile", "user/profile/"),
-    SPOT("/spot", "spot/"),
-    ETC("/etc", "etc/");
+    USER_PROFILE("/user/profile"),
+    SPOT("/spot"),
+    ETC("/etc");
 
-    public final String backPath;
-    public final String frontPath;
+    public final String path;
 
     public static S3SaveDir toEnum(String stringParam) {
         return switch (stringParam) {

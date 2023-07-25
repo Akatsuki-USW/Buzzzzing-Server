@@ -9,7 +9,10 @@ import bokjak.bokjakserver.util.s3.dto.AwsS3Dto.UploadFileRequest;
 import bokjak.bokjakserver.util.s3.exception.AwsS3Exception;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.*;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,9 +38,6 @@ public class AwsS3Service {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    @Value("${cloud.aws.region.static}")
-    private String region;
-
     private static final String FILE_EXTENSION_SEPARATOR = ".";
     private static final String URL_SEPARATOR = "/";
     private static final String S3_OBJECT_NAME_PATTERN = "{0}_{1}.{2}";
@@ -46,12 +46,12 @@ public class AwsS3Service {
         String currentUserSocialEmail = getCurrentUserSocialEmail();
 
         List<FileDto> uploadedFiles = uploadFileRequest.files().stream()
-                .map(file -> uploadSingleFile(file, uploadFileRequest.type(), currentUserSocialEmail))
+                .map(file -> uploadSingleFile(file, S3SaveDir.toEnum(uploadFileRequest.type()), currentUserSocialEmail))
                 .toList();
         return new FileListDto(uploadedFiles);
     }
 
-    public FileDto uploadSingleFile(final MultipartFile multipartFile, final String stringParam, final String owner) {
+    public FileDto uploadSingleFile(final MultipartFile multipartFile, final S3SaveDir saveDir, final String owner) {
         validateFileExist(multipartFile);
 
         String key = buildKey(Objects.requireNonNull(multipartFile.getOriginalFilename()), owner);
@@ -59,8 +59,7 @@ public class AwsS3Service {
         ObjectMetadata objectMetadata = new ObjectMetadata();   // 생성할 S3 Object의 메타 데이터 설정
         objectMetadata.setContentType(multipartFile.getContentType());
         objectMetadata.setContentLength(multipartFile.getSize());
-        S3SaveDir saveDir = S3SaveDir.toEnum(stringParam);  // 경로명 변수
-        String bucketName = bucket + saveDir.backPath;
+        String bucketName = bucket + saveDir.path;
 
         try (InputStream inputStream = multipartFile.getInputStream()) {
             amazonS3Client.putObject(new PutObjectRequest(bucketName, key, inputStream, objectMetadata)    // 업로드
@@ -87,22 +86,21 @@ public class AwsS3Service {
     }
 
     public FileListDto updateFiles(final UpdateFileRequest updateFileRequest) {
-        String type = updateFileRequest.type();
+        S3SaveDir saveDir = S3SaveDir.toEnum(updateFileRequest.type());
         String currentUserSocialEmail = getCurrentUserSocialEmail();
 
         updateFileRequest.urlsToDelete()
-                .forEach(url -> deleteSingleFile(type, url));
+                .forEach(url -> deleteSingleFile(saveDir, url));
 
         List<FileDto> uploadedFiles = updateFileRequest.newFiles().stream()
-                .map(file -> uploadSingleFile(file, type, currentUserSocialEmail))
+                .map(file -> uploadSingleFile(file, saveDir, currentUserSocialEmail))
                 .toList();
         return new FileListDto(uploadedFiles);
     }
 
-    public void deleteSingleFile(final String type, final String url) {
+    public void deleteSingleFile(final S3SaveDir saveDir, final String url) {
         String key = buildKey(url);
-        S3SaveDir saveDir = S3SaveDir.toEnum(type);
-        String bucketName = bucket + saveDir.backPath;
+        String bucketName = bucket + saveDir.path;
 
         try {
             amazonS3Client.deleteObject(new DeleteObjectRequest(bucketName, key)); // TODO 삭제 응답 확인 -> 예외 처리

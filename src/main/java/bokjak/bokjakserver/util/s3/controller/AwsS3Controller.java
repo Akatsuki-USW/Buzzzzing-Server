@@ -1,6 +1,7 @@
 package bokjak.bokjakserver.util.s3.controller;
 
 import bokjak.bokjakserver.common.dto.ApiResponse;
+import bokjak.bokjakserver.util.s3.S3SaveDir;
 import bokjak.bokjakserver.util.s3.dto.AwsS3Dto.DeleteFileResponse;
 import bokjak.bokjakserver.util.s3.dto.AwsS3Dto.FileListDto;
 import bokjak.bokjakserver.util.s3.dto.AwsS3Dto.UpdateFileRequest;
@@ -18,6 +19,7 @@ import static bokjak.bokjakserver.common.dto.ApiResponse.success;
 public class AwsS3Controller {
     private final AwsS3Service awsS3Service;
 
+    // TODO refactor 업로드, 업데이트 type은 query parameter로 받는게 좋아 보임
     @PostMapping
     public ApiResponse<FileListDto> uploadFiles(@Valid @ModelAttribute UploadFileRequest uploadFileRequest) {
         return success(awsS3Service.uploadFiles(uploadFileRequest));
@@ -33,7 +35,7 @@ public class AwsS3Controller {
             @PathVariable(value = "type") String type,
             @RequestParam String fileUrl
     ) {
-        awsS3Service.deleteSingleFile(type, fileUrl);
+        awsS3Service.deleteSingleFile(S3SaveDir.toEnum(type), fileUrl);
         return success(DeleteFileResponse.success());
     }
 }
