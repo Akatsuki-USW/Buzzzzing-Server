@@ -16,6 +16,7 @@ import java.util.Optional;
 
 import static bokjak.bokjakserver.domain.bookmark.model.QSpotBookmark.spotBookmark;
 import static bokjak.bokjakserver.domain.category.model.QSpotCategory.spotCategory;
+import static bokjak.bokjakserver.domain.comment.model.QComment.comment;
 import static bokjak.bokjakserver.domain.location.model.QLocation.location;
 import static bokjak.bokjakserver.domain.spot.model.QSpot.spot;
 import static bokjak.bokjakserver.domain.spot.model.QSpotImage.spotImage;
@@ -94,6 +95,24 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
                 query.fetch(),
                 pageable,
                 selectMySpotsTotalCountQuery(userId)::fetchOne
+        );
+    }
+
+    @Override
+    public Page<Spot> findAllCommentedByMeExceptBlockedAuthors(Pageable pageable, Long cursorId, Long userId) {
+        JPAQuery<Spot> query = selectSpotsExceptBlockedAuthorsPrefix(userId)
+                .where(spot.id.in(JPAExpressions    // 현재 유저가 작성한 댓글들의 부모 스팟들
+                        .select(comment.spot.id)
+                        .from(comment)
+                        .where(comment.user.id.eq(userId))))
+                .where(ltCursorId(cursorId))    // 최신순
+                .orderBy(spot.id.desc())
+                .limit(pageable.getPageSize());
+
+        return PageableExecutionUtils.getPage(
+                query.fetch(),
+                pageable,
+                findAllCommentedByMeExceptBlockedAuthorsCountQuery(userId)::fetchOne
         );
     }
 
@@ -180,6 +199,17 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
                 .join(spot.user, user)
                 .leftJoin(spot.spotBookmarkList, spotBookmark)
                 .where(spot.user.id.eq(userId));
+    }
+
+    private JPAQuery<Long> findAllCommentedByMeExceptBlockedAuthorsCountQuery(Long userId) {
+        return queryFactory.select(spot.count()).from(spot)
+                .where(spot.user.id.notIn(JPAExpressions.select(userBlockUser.blockedUser.id)  // 차단한 유저 제외
+                        .from(userBlockUser)
+                        .where(userBlockUser.blockerUser.id.eq(userId))))
+                .where(spot.id.in(JPAExpressions    // 현재 유저가 작성한 댓글들의 부모 스팟들
+                        .select(comment.spot.id)
+                        .from(comment)
+                        .where(comment.user.id.eq(userId))));
     }
 
     /**

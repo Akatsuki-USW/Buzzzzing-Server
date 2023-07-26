@@ -127,8 +127,9 @@ public class SwaggerConstants {
             내가 작성한 스팟들을 최신순(id 내림차순)으로 조회합니다.""";
     public static final String SPOT_GET_COMMENTED = "내가 댓글단 스팟 조회";
     public static final String SPOT_GET_COMMENTED_DESCRIPTION = """
-            현재 유저가 작성한 댓글을 전체 조회
-            """;
+            차단한 유저를 제외
+            
+            내가 댓글을 작성한 스팟들을 최신순(id 내림차순)으로 조회합니다.""";
     public static final String SPOT_CREATE = "스팟 생성";
     public static final String SPOT_CREATE_DESCRIPTION = """
             |  | 타입 | 제약 조건 | 설명 |
@@ -153,8 +154,8 @@ public class SwaggerConstants {
     /**
      * Comment
      */
-    public static final String TAG_COMMENT = "Comment";
-    public static final String TAG_COMMENT_DESCRIPTION = "댓글 API";
+    public static final String TAG_COMMENT = "Spot Comment";
+    public static final String TAG_COMMENT_DESCRIPTION = "스팟 댓글 API";
 
     public static final String COMMENT_GET_ALL = "스팟 댓글 리스트 조회";
     public static final String COMMENT_GET_ALL_DESCRIPTION = """

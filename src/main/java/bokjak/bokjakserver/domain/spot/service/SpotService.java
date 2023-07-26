@@ -83,6 +83,13 @@ public class SpotService {
         return makeSpotCardResponsePageResponse(currentUserId, resultPage);
     }
 
+    // 내가 댓글 단 스팟 리스트 조회
+    public PageResponse<SpotCardResponse> getSpotsCommentedByMeExceptBlockedAuthors(Long currentUserId, Pageable pageable, Long cursorId) {
+        Page<Spot> resultPage = spotRepository.findAllCommentedByMeExceptBlockedAuthors(pageable, cursorId, currentUserId);
+
+        return makeSpotCardResponsePageResponse(currentUserId, resultPage);
+    }
+
     private PageResponse<SpotCardResponse> makeSpotCardResponsePageResponse(Long userId, Page<Spot> resultPage) {
         List<Long> bookmarkedSpotIdList = spotBookmarkRepository.findAllByUserId(userId).stream()
                 .map(it -> it.getSpot().getId()).toList();
