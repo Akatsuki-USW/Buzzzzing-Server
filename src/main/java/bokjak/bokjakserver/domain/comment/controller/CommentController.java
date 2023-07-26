@@ -6,6 +6,7 @@ import bokjak.bokjakserver.common.dto.PageResponse;
 import bokjak.bokjakserver.config.security.PrincipalDetails;
 import bokjak.bokjakserver.domain.comment.dto.CommentDto.CommentCardResponse;
 import bokjak.bokjakserver.domain.comment.dto.CommentDto.CreateSpotCommentRequest;
+import bokjak.bokjakserver.domain.comment.dto.CommentDto.UpdateSpotCommentRequest;
 import bokjak.bokjakserver.domain.comment.service.CommentService;
 import bokjak.bokjakserver.domain.user.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -56,7 +57,19 @@ public class CommentController {
         CommentCardResponse response = commentService.createSpotComment(principalDetails.getUserId(), spotId, createSpotCommentRequest);
         return success(response);
     }
+
     // 스팟 댓글 수정
+    @PutMapping("/comments/{commentId}")
+    @Operation(summary = SwaggerConstants.COMMENT_UPDATE, description = SwaggerConstants.COMMENT_UPDATE_DESCRIPTION)
+    public ApiResponse<CommentCardResponse> updateSpotComment(
+            @PathVariable Long commentId,
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @Valid @RequestBody UpdateSpotCommentRequest updateSpotCommentRequest
+    ) {
+        authService.checkIsBannedUser(principalDetails.getUser());
+        CommentCardResponse response = commentService.updateSpotComment(principalDetails.getUserId(), commentId, updateSpotCommentRequest);
+        return success(response);
+    }
     // 스팟 댓글 삭제
 
 }

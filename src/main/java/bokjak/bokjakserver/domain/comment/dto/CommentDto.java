@@ -32,6 +32,13 @@ public class CommentDto {
         }
     }
 
+    @Builder
+    public record UpdateSpotCommentRequest(
+            @NotNull @Size(max = COMMENT_CONTENT_MAX_LENGTH)
+            String content
+    ) {
+    }
+
     /* Response */
     @Builder
     public record CommentCardResponse(

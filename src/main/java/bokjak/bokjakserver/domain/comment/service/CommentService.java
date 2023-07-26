@@ -4,6 +4,8 @@ import bokjak.bokjakserver.common.dto.PageResponse;
 import bokjak.bokjakserver.common.exception.StatusCode;
 import bokjak.bokjakserver.domain.comment.dto.CommentDto.CommentCardResponse;
 import bokjak.bokjakserver.domain.comment.dto.CommentDto.CreateSpotCommentRequest;
+import bokjak.bokjakserver.domain.comment.dto.CommentDto.UpdateSpotCommentRequest;
+import bokjak.bokjakserver.domain.comment.exception.CommentException;
 import bokjak.bokjakserver.domain.comment.model.Comment;
 import bokjak.bokjakserver.domain.comment.repository.CommentRepository;
 import bokjak.bokjakserver.domain.spot.exception.SpotException;
@@ -37,6 +39,7 @@ public class CommentService {
         return PageResponse.of(resultPage);
     }
 
+    // 스팟 댓글 생성
     @Transactional
     public CommentCardResponse createSpotComment(Long currentUserId, Long spotId, CreateSpotCommentRequest createSpotCommentRequest) {
         User user = userService.getUser(currentUserId);
@@ -49,8 +52,19 @@ public class CommentService {
         return CommentCardResponse.of(comment, isAuthor);
     }
 
-    // 스팟 댓글 생성
     // 스팟 댓글 수정
+    @Transactional
+    public CommentCardResponse updateSpotComment(Long currentUserId, Long commentId, UpdateSpotCommentRequest updateSpotCommentRequest) {
+        User user = userService.getUser(currentUserId);
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentException(StatusCode.NOT_FOUND_COMMENT));
+
+        comment.update(updateSpotCommentRequest.content());
+        boolean isAuthor = comment.getUser().equals(user);  // 작성자 여부(always true)
+
+        return CommentCardResponse.of(comment, isAuthor);
+    }
+
     // 스팟 댓글 삭제
 
 }
