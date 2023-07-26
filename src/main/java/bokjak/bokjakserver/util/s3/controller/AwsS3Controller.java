@@ -2,6 +2,7 @@ package bokjak.bokjakserver.util.s3.controller;
 
 import bokjak.bokjakserver.common.constant.SwaggerConstants;
 import bokjak.bokjakserver.common.dto.ApiResponse;
+import bokjak.bokjakserver.util.s3.S3SaveDir;
 import bokjak.bokjakserver.util.s3.dto.AwsS3Dto.DeleteFileResponse;
 import bokjak.bokjakserver.util.s3.dto.AwsS3Dto.FileListDto;
 import bokjak.bokjakserver.util.s3.dto.AwsS3Dto.UpdateFileRequest;
@@ -38,13 +39,12 @@ public class AwsS3Controller {
     }
 
     @DeleteMapping("/{type}")
-    @SecurityRequirement(name = SwaggerConstants.SECURITY_SCHEME_NAME)
     @Operation(summary = SwaggerConstants.S3_FILE_DELETE, description = SwaggerConstants.S3_FILE_DELETE_DESCRIPTION)
     public ApiResponse<DeleteFileResponse> deleteFile(
             @PathVariable(value = "type") String type,
             @RequestParam String fileUrl
     ) {
-        awsS3Service.deleteSingleFile(type, fileUrl);
+        awsS3Service.deleteSingleFile(S3SaveDir.toEnum(type), fileUrl);
         return success(DeleteFileResponse.success());
     }
 }

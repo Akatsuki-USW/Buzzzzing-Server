@@ -17,6 +17,8 @@ import bokjak.bokjakserver.domain.spot.model.SpotImage;
 import bokjak.bokjakserver.domain.spot.repository.SpotRepository;
 import bokjak.bokjakserver.domain.user.model.User;
 import bokjak.bokjakserver.domain.user.service.UserService;
+import bokjak.bokjakserver.util.s3.S3SaveDir;
+import bokjak.bokjakserver.util.s3.service.AwsS3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -34,11 +36,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SpotService {
     private final UserService userService;
+    private final AwsS3Service awsS3Service;
     private final SpotRepository spotRepository;
     private final SpotBookmarkRepository spotBookmarkRepository;
     private final LocationRepository locationRepository;
     private final SpotCategoryRepository spotCategoryRepository;
-
 
     // 스팟 리스트 조회: 특정 로케이션
     public PageResponse<SpotCardResponse> getSpotsByLocationAndCategoriesExceptBlockedAuthors(
@@ -48,10 +50,11 @@ public class SpotService {
             Long locationId,
             List<Long> categoryIds
     ) {
-        User user = userService.getUser(currentUserId);
-        Page<Spot> resultPage = spotRepository.findAllByLocationAndCategoriesExceptBlockedAuthors(user.getId(), pageable, cursorId, locationId, categoryIds);
+        if (!locationRepository.existsById(locationId)) throw new LocationException(StatusCode.NOT_FOUND_LOCATION);
 
-        return makeSpotCardResponsePageResponse(user, resultPage);
+        Page<Spot> resultPage = spotRepository.findAllByLocationAndCategoriesExceptBlockedAuthors(currentUserId, pageable, cursorId, locationId, categoryIds);
+
+        return makeSpotCardResponsePageResponse(currentUserId, resultPage);
     }
 
     // 스팟 리스트 조회: 모든 로케이션
@@ -61,30 +64,27 @@ public class SpotService {
             Long cursorId,
             List<Long> categoryIds
     ) {
-        User user = userService.getUser(currentUserId);
-        Page<Spot> resultPage = spotRepository.findAllByCategoriesExceptBlockedAuthors(user.getId(), pageable, cursorId, categoryIds);
+        Page<Spot> resultPage = spotRepository.findAllByCategoriesExceptBlockedAuthors(currentUserId, pageable, cursorId, categoryIds);
 
-        return makeSpotCardResponsePageResponse(user, resultPage);
+        return makeSpotCardResponsePageResponse(currentUserId, resultPage);
     }
 
     // 내가 북마크한 스팟 리스트 조회
     public PageResponse<SpotCardResponse> getMyBookmarkedSpots(Long currentUserId, Pageable pageable, Long cursorId) {
-        User user = userService.getUser(currentUserId);
         Page<Spot> resultPage = spotRepository.findAllBookmarked(pageable, cursorId, currentUserId);
 
-        return makeSpotCardResponsePageResponse(user, resultPage);
+        return makeSpotCardResponsePageResponse(currentUserId, resultPage);
     }
 
     // 내가 쓴 스팟 리스트 조회
     public PageResponse<SpotCardResponse> getMySpots(Long currentUserId, Pageable pageable, Long cursorId) {
-        User user = userService.getUser(currentUserId);
         Page<Spot> resultPage = spotRepository.findAllMy(pageable, cursorId, currentUserId);
 
-        return makeSpotCardResponsePageResponse(user, resultPage);
+        return makeSpotCardResponsePageResponse(currentUserId, resultPage);
     }
 
-    private PageResponse<SpotCardResponse> makeSpotCardResponsePageResponse(User user, Page<Spot> resultPage) {
-        List<Long> bookmarkedSpotIdList = spotBookmarkRepository.findAllByUser(user).stream()
+    private PageResponse<SpotCardResponse> makeSpotCardResponsePageResponse(Long userId, Page<Spot> resultPage) {
+        List<Long> bookmarkedSpotIdList = spotBookmarkRepository.findAllByUserId(userId).stream()
                 .map(it -> it.getSpot().getId()).toList();
 
         Page<SpotCardResponse> responsePage = resultPage
@@ -133,11 +133,11 @@ public class SpotService {
 
     // 스팟 생성
     @Transactional
-    public SpotDetailResponse createSpot(Long currentUserId, CreateSpotRequest createSpotRequest) {
+    public SpotDetailResponse createSpot(Long currentUserId, Long locationId, Long spotCategoryId, CreateSpotRequest createSpotRequest) {
         User user = userService.getUser(currentUserId);
-        Location location = locationRepository.findById(createSpotRequest.locationId())
+        Location location = locationRepository.findById(locationId)
                 .orElseThrow(() -> new LocationException(StatusCode.NOT_FOUND_LOCATION));
-        SpotCategory spotCategory = spotCategoryRepository.findById(createSpotRequest.spotCategoryId())
+        SpotCategory spotCategory = spotCategoryRepository.findById(spotCategoryId)
                 .orElseThrow(() -> new CategoryException(StatusCode.NOT_FOUND_SPOT_CATEGORY));
 
         Spot spot = spotRepository.save(createSpotRequest.toEntity(user, location, spotCategory));
@@ -192,6 +192,13 @@ public class SpotService {
         checkIsAuthor(user, spot);
 
         spotRepository.delete(spot);
+
+        // 스팟 이미지 파일 전체 삭제
+        List<String> imageUrlList = spot.getSpotImageList().stream().map(SpotImage::getImageUrl).toList();
+        for (String url : imageUrlList) {
+            awsS3Service.deleteSingleFile(S3SaveDir.SPOT, url);
+        }
+
         return new SpotMessage(true);
     }
 
