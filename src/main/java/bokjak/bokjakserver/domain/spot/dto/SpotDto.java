@@ -27,11 +27,7 @@ public class SpotDto {
             @NotBlank @Size(max = SPOT_CONTENT_MAX_LENGTH)
             String content,
             @NotNull @Size(max = SPOT_IMAGE_MAX_SIZE)
-            List<String> imageUrls,
-            @NotNull
-            Long locationId,
-            @NotNull
-            Long spotCategoryId
+            List<String> imageUrls
     ) {
         public Spot toEntity(User user, Location location, SpotCategory spotCategory) {
             return Spot.builder()
