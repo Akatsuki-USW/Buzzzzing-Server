@@ -133,11 +133,11 @@ public class SpotService {
 
     // 스팟 생성
     @Transactional
-    public SpotDetailResponse createSpot(Long currentUserId, CreateSpotRequest createSpotRequest) {
+    public SpotDetailResponse createSpot(Long currentUserId, Long locationId, Long spotCategoryId, CreateSpotRequest createSpotRequest) {
         User user = userService.getUser(currentUserId);
-        Location location = locationRepository.findById(createSpotRequest.locationId())
+        Location location = locationRepository.findById(locationId)
                 .orElseThrow(() -> new LocationException(StatusCode.NOT_FOUND_LOCATION));
-        SpotCategory spotCategory = spotCategoryRepository.findById(createSpotRequest.spotCategoryId())
+        SpotCategory spotCategory = spotCategoryRepository.findById(spotCategoryId)
                 .orElseThrow(() -> new CategoryException(StatusCode.NOT_FOUND_SPOT_CATEGORY));
 
         Spot spot = spotRepository.save(createSpotRequest.toEntity(user, location, spotCategory));

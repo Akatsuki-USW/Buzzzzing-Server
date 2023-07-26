@@ -99,14 +99,16 @@ public class SpotController {
         return success(response);
     }
 
-    @PostMapping("/spots")
+    @PostMapping("/{locationId}/spot-categories/{spotCategoryId}/spots")
     @Operation(summary = SwaggerConstants.SPOT_CREATE, description = SwaggerConstants.SPOT_CREATE_DESCRIPTION)
     public ApiResponse<SpotDetailResponse> createSpot(
+            @PathVariable Long locationId,
+            @PathVariable Long spotCategoryId,
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @Valid @RequestBody CreateSpotRequest createSpotRequest
     ) {
         authService.checkIsBannedUser(principalDetails.getUser());
-        SpotDetailResponse response = spotService.createSpot(principalDetails.getUserId(), createSpotRequest);
+        SpotDetailResponse response = spotService.createSpot(principalDetails.getUserId(), locationId, spotCategoryId, createSpotRequest);
         return success(response);
     }
 
