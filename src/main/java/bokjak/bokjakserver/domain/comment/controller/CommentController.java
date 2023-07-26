@@ -5,11 +5,13 @@ import bokjak.bokjakserver.common.dto.ApiResponse;
 import bokjak.bokjakserver.common.dto.PageResponse;
 import bokjak.bokjakserver.config.security.PrincipalDetails;
 import bokjak.bokjakserver.domain.comment.dto.CommentDto.CommentCardResponse;
+import bokjak.bokjakserver.domain.comment.dto.CommentDto.CreateSpotCommentRequest;
 import bokjak.bokjakserver.domain.comment.service.CommentService;
 import bokjak.bokjakserver.domain.user.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -43,6 +45,17 @@ public class CommentController {
     }
 
     // 스팟 댓글 생성
+    @PostMapping("/{spotId}/comments")
+    @Operation(summary = SwaggerConstants.COMMENT_CREATE, description = SwaggerConstants.COMMENT_CREATE_DESCRIPTION)
+    public ApiResponse<CommentCardResponse> createSpotComment(
+            @PathVariable Long spotId,
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @Valid @RequestBody CreateSpotCommentRequest createSpotCommentRequest
+    ) {
+        authService.checkIsBannedUser(principalDetails.getUser());
+        CommentCardResponse response = commentService.createSpotComment(principalDetails.getUserId(), spotId, createSpotCommentRequest);
+        return success(response);
+    }
     // 스팟 댓글 수정
     // 스팟 댓글 삭제
 

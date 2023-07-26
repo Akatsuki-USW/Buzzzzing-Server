@@ -1,12 +1,36 @@
 package bokjak.bokjakserver.domain.comment.dto;
 
+import bokjak.bokjakserver.domain.category.model.SpotCategory;
 import bokjak.bokjakserver.domain.comment.model.Comment;
+import bokjak.bokjakserver.domain.location.model.Location;
+import bokjak.bokjakserver.domain.spot.model.Spot;
+import bokjak.bokjakserver.domain.user.model.User;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
+import static bokjak.bokjakserver.common.constant.ConstraintConstants.*;
+import static bokjak.bokjakserver.common.constant.ConstraintConstants.SPOT_IMAGE_MAX_SIZE;
 
 public class CommentDto {
     /* Request */
+    @Builder
+    public record CreateSpotCommentRequest(
+            @NotNull @Size(max = COMMENT_CONTENT_MAX_LENGTH)
+            String content
+    ) {
+        public Comment toEntity(User user, Spot spot) {
+            return Comment.builder()
+                    .user(user)
+                    .spot(spot)
+                    .content(content)
+                    .build();
+        }
+    }
 
     /* Response */
     @Builder
