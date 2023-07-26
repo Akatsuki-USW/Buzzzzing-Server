@@ -3,6 +3,7 @@ package bokjak.bokjakserver.domain.comment.service;
 import bokjak.bokjakserver.common.dto.PageResponse;
 import bokjak.bokjakserver.common.exception.StatusCode;
 import bokjak.bokjakserver.domain.comment.dto.CommentDto.CommentCardResponse;
+import bokjak.bokjakserver.domain.comment.dto.CommentDto.CommentMessage;
 import bokjak.bokjakserver.domain.comment.dto.CommentDto.CreateSpotCommentRequest;
 import bokjak.bokjakserver.domain.comment.dto.CommentDto.UpdateSpotCommentRequest;
 import bokjak.bokjakserver.domain.comment.exception.CommentException;
@@ -66,5 +67,22 @@ public class CommentService {
     }
 
     // 스팟 댓글 삭제
+    @Transactional
+    public CommentMessage deleteSpotComment(Long currentUserId, Long commentId) {
+        User user = userService.getUser(currentUserId);
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new CommentException(StatusCode.NOT_FOUND_COMMENT));
 
+        checkIsAuthor(user, comment);
+
+        commentRepository.delete(comment);
+
+        return new CommentMessage(true);
+    }
+
+    private static void checkIsAuthor(User user, Comment comment) {// 작성자인지 확인: 수정, 삭제는 작성자만 권한을 가짐
+        if (!comment.getUser().equals(user)) {
+            throw new CommentException(StatusCode.NOT_AUTHOR);
+        }
+    }
 }

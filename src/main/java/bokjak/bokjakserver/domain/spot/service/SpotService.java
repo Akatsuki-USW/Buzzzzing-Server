@@ -202,7 +202,7 @@ public class SpotService {
 
     private static void checkIsAuthor(User user, Spot spot) {// 작성자인지 확인: 수정, 삭제는 작성자만 권한을 가짐
         if (!spot.getUser().equals(user)) {
-            throw new SpotException(StatusCode.NOT_SPOT_AUTHOR);
+            throw new SpotException(StatusCode.NOT_AUTHOR);
         }
     }
 }

@@ -65,4 +65,8 @@ public class CommentDto {
         }
     }
 
+    public record CommentMessage(
+            boolean result
+    ) {
+    }
 }
