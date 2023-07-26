@@ -158,6 +158,9 @@ public class SwaggerConstants {
 
     public static final String COMMENT_GET_ALL = "스팟 댓글 리스트 조회";
     public static final String COMMENT_GET_ALL_DESCRIPTION = """
+            특정 스팟의 모든 댓글을 조회합니다.
+            차단한 유저가 작성한 댓글들은 제외
+            
             💡 추후 대댓글 구현시 sequence, depth 필드가 생길 수 있음
             """;
     public static final String COMMENT_CREATE = "스팟 댓글 생성";
