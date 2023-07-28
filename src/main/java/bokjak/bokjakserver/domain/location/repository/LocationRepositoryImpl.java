@@ -46,7 +46,7 @@ public class LocationRepositoryImpl implements LocationRepositoryCustom {
                         ? gtCursorId(cursorId)
                         : gtCursor(cursorId, congestionLevelSortOrder, cursorCongestionLevel))
                 .where(inLocationCategoryId(categoryIds))
-                .orderBy(specifyCongestionSortOrder(congestionLevelSortOrder), location.id.asc())
+                .orderBy(specifyCongestionSortOrder(congestionLevelSortOrder), location.id.asc())// 혼잡도, location_id 오름차순
                 .limit(pageable.getPageSize());
 
         return PageableExecutionUtils.getPage(
@@ -60,6 +60,7 @@ public class LocationRepositoryImpl implements LocationRepositoryCustom {
     public Page<Location> getLocations(Pageable pageable,Long cursorId) {
         JPAQuery<Location> query = queryFactory.selectFrom(location)
                 .where(gtCursorId(cursorId))
+                .orderBy(location.id.asc())// location_id 오름차순
                 .limit(pageable.getPageSize());
 
         return PageableExecutionUtils.getPage(
@@ -75,7 +76,7 @@ public class LocationRepositoryImpl implements LocationRepositoryCustom {
         JPAQuery<Location> query = selectLocationsBasedOnCongestionPrefix()
                 .leftJoin(location.weeklyCongestionStatisticList, weeklyCongestionStatistic)
                 .where(weeklyCongestionStatistic.createdAt.between(start, end))
-                .orderBy(weeklyCongestionStatistic.averageCongestionLevel.asc())
+                .orderBy(weeklyCongestionStatistic.averageCongestionLevel.asc(), location.id.asc()) // 평균 혼잡도 오름차순, location_id 오름차순
                 .limit(pageable.getPageSize());
 
         return PageableExecutionUtils.getPage(
@@ -90,6 +91,7 @@ public class LocationRepositoryImpl implements LocationRepositoryCustom {
         JPAQuery<Location> query = selectLocationsBasedOnCongestionPrefix()
                 .where(locationBookmark.user.id.eq(userId))// 특정 user의 Bookmark와 JOIN
                 .where(gtCursorId(cursorId))
+                .orderBy(location.id.asc()) // location_id 오름차순
                 .limit(pageable.getPageSize());
 
         return PageableExecutionUtils.getPage(
