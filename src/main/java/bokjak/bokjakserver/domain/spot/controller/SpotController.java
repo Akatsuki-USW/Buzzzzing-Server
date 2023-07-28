@@ -79,6 +79,17 @@ public class SpotController {
         return success(pageResponse);
     }
 
+    @GetMapping("/spots/me/commented")
+    @Operation(summary = SwaggerConstants.SPOT_GET_COMMENTED, description = SwaggerConstants.SPOT_GET_COMMENTED_DESCRIPTION)
+    public ApiResponse<PageResponse<SpotCardResponse>> getCommentedSpotsByMe(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PageableDefault Pageable pageable,
+            @RequestParam(required = false) Long cursorId
+    ) {
+        PageResponse<SpotCardResponse> pageResponse = spotService.getSpotsCommentedByMeExceptBlockedAuthors(principalDetails.getUserId(), pageable, cursorId);
+        return success(pageResponse);
+    }
+
     @GetMapping("/spots/{spotId}")
     @Operation(summary = SwaggerConstants.SPOT_GET_DETAIL, description = SwaggerConstants.SPOT_GET_DETAIL_DESCRIPTION)
     public ApiResponse<SpotDetailResponse> getSpotDetail(

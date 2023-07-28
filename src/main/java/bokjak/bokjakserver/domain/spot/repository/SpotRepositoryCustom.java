@@ -32,5 +32,8 @@ public interface SpotRepositoryCustom {
 
     // 내가 작성한 스팟 조회
     Page<Spot> findAllMy(Pageable pageable, Long cursorId, Long userId);
+
     // 내가 댓글 단 글 조회
+    Page<Spot> findAllCommentedByMeExceptBlockedAuthors(Pageable pageable, Long cursorId, Long userId);
+
 }
