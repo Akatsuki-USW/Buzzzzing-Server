@@ -51,6 +51,14 @@ public class AwsS3Service {
         return new FileListDto(uploadedFiles);
     }
 
+    public List<String> uploadFiles(S3SaveDir saveDir, List<MultipartFile> files) {
+        String currentUserSocialEmail = getCurrentUserSocialEmail();
+
+        return files.stream()
+                .map(file -> uploadSingleFile(file, saveDir, currentUserSocialEmail).fileUrl())
+                .toList();
+    }
+
     public FileDto uploadSingleFile(final MultipartFile multipartFile, final S3SaveDir saveDir, final String owner) {
         validateFileExist(multipartFile);
 
@@ -96,6 +104,10 @@ public class AwsS3Service {
                 .map(file -> uploadSingleFile(file, saveDir, currentUserSocialEmail))
                 .toList();
         return new FileListDto(uploadedFiles);
+    }
+
+    public void deleteFiles(S3SaveDir saveDir, List<String> imageUrls) {
+        imageUrls.forEach(url -> deleteSingleFile(saveDir, url));
     }
 
     public void deleteSingleFile(final S3SaveDir saveDir, final String url) {
