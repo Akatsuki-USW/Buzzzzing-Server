@@ -31,7 +31,7 @@ public class CommentController {
     private final AuthService authService;
 
     // 스팟별 댓글 리스트 조회
-    @GetMapping("/{spotId}/comments")
+    @GetMapping("/{spotId}/comments/parents")
     @Operation(summary = SwaggerConstants.COMMENT_GET_ALL_PARENT, description = SwaggerConstants.COMMENT_GET_ALL_PARENT_DESCRIPTION)
     public ApiResponse<PageResponse<CommentCardResponse>> getParentComments(
             @PathVariable Long spotId,
@@ -44,7 +44,7 @@ public class CommentController {
     }
 
     // 대댓글 리스트 조회
-    @GetMapping("/comments/{parentId}")
+    @GetMapping("/comments/{parentId}/children")
     @Operation(summary = SwaggerConstants.COMMENT_GET_ALL_CHILD, description = SwaggerConstants.COMMENT_GET_ALL_CHILD_DESCRIPTION)
     public ApiResponse<PageResponse<CommentCardResponse>> getChildComments(
             @PathVariable Long parentId,
@@ -56,8 +56,8 @@ public class CommentController {
         return success(pageResponse);
     }
 
-    // 스팟 댓글 생성
-    @PostMapping("/{spotId}/comments")
+    // 댓글 생성
+    @PostMapping("/{spotId}/comments/parents")
     @Operation(summary = SwaggerConstants.COMMENT_CREATE_PARENT, description = SwaggerConstants.COMMENT_CREATE_PARENT_DESCRIPTION)
     public ApiResponse<CommentCardResponse> createParentComment(
             @PathVariable Long spotId,
@@ -70,7 +70,7 @@ public class CommentController {
     }
 
     // 대댓글 생성
-    @PostMapping("/comments/{parentId}")
+    @PostMapping("/comments/{parentId}/children")
     @Operation(summary = SwaggerConstants.COMMENT_CREATE_CHILD, description = SwaggerConstants.COMMENT_CREATE_CHILD_DESCRIPTION)
     public ApiResponse<CommentCardResponse> createChildComment(
             @PathVariable Long parentId,
@@ -82,7 +82,7 @@ public class CommentController {
         return success(response);
     }
 
-    // 스팟 댓글 수정
+    // 댓글, 대댓글 수정
     @PutMapping("/comments/{commentId}")
     @Operation(summary = SwaggerConstants.COMMENT_UPDATE, description = SwaggerConstants.COMMENT_UPDATE_DESCRIPTION)
     public ApiResponse<CommentCardResponse> updateSpotComment(
@@ -95,7 +95,7 @@ public class CommentController {
         return success(response);
     }
 
-    // 스팟 댓글 삭제
+    // 댓글, 대댓글 삭제
     @DeleteMapping("/comments/{commentId}")
     @Operation(summary = SwaggerConstants.COMMENT_DELETE, description = SwaggerConstants.COMMENT_DELETE_DESCRIPTION)
     public ApiResponse<CommentMessage> deleteSpotComment(

@@ -178,7 +178,7 @@ public class SwaggerConstants {
     public static final String COMMENT_UPDATE = "댓글, 대댓글 수정";
     public static final String COMMENT_UPDATE_DESCRIPTION = """
             댓글, 대댓글을 수정합니다.""";
-    public static final String COMMENT_DELETE = "스팟 댓글, 대댓글 삭제";
+    public static final String COMMENT_DELETE = "댓글, 대댓글 삭제";
     public static final String COMMENT_DELETE_DESCRIPTION = """
             댓글, 대댓글을 삭제합니다.""";
 
