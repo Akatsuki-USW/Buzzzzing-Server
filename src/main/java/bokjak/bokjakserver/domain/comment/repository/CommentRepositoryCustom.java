@@ -5,5 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface CommentRepositoryCustom {
-    Page<Comment> findAllBySpotExceptBlockedAuthors(Pageable pageable, Long cursorId, Long spotId, Long userId);
+    Page<Comment> findAllParentBySpotExceptBlockedAuthors(Pageable pageable, Long cursorId, Long spotId, Long userId);
+
+    Page<Comment> findAllChildrenByParentExceptBlockedAuthors(Pageable pageable, Long cursorId, Long parentId, Long userId);
+
 }
