@@ -1,10 +1,12 @@
 package bokjak.bokjakserver.domain.user.controller;
 
+import bokjak.bokjakserver.common.constant.SwaggerConstants;
 import bokjak.bokjakserver.common.dto.ApiResponse;
 import bokjak.bokjakserver.config.jwt.JwtDto;
 import bokjak.bokjakserver.domain.user.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +47,7 @@ public class AuthController {
     }
 
     @Operation(summary = AUTH_LOGOUT)
+    @SecurityRequirement(name = SwaggerConstants.SECURITY_SCHEME_NAME)
     @PostMapping("/logout")
     public ApiResponse<LogoutResponse> logout() {
         return success(authService.logout());
