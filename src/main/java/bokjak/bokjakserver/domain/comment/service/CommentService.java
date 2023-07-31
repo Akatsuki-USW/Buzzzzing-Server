@@ -92,8 +92,7 @@ public class CommentService {
 
         checkIsAuthor(user, comment);
 
-        // TODO CASCADE 방지 해보기. parentId = null로 바꾸고
-        commentRepository.delete(comment);
+        comment.logicallyDelete();
 
         return new CommentMessage(true);
     }

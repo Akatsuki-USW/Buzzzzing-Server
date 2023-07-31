@@ -73,7 +73,7 @@ public class CommentDto {
                             .userProfileImageUrl(author.getProfileImageUrl())
                             .isAuthor(author.getId().equals(userId))
                             .build();
-                } else {// TODO 삭제 로직에 따라 else 절 필요 없을 수 있음
+                } else {
                     return CommentCardResponse.builder()
                             .parentId(comment.isParent() ? null : comment.getParent().getId())
                             .id(comment.getId())

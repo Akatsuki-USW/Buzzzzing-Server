@@ -64,7 +64,7 @@ public class Comment extends BaseEntity {
         this.childList.add(child);
     }
 
-    public void softDelete() {  // 댓글 삭제시 대댓글은 삭제하지 않음
+    public void logicallyDelete() {  // 논리적 삭제(소프트 딜리트와 유사)
         this.presence = false;
     }
 
