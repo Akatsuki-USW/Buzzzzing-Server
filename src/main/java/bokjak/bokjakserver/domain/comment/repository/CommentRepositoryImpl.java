@@ -45,9 +45,8 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
     }
 
     @Override
-    // TODO 실제 쿼리 확인. comment 끼리 충돌할 듯
     public Page<Comment> findAllChildrenByParentExceptBlockedAuthors(Pageable pageable, Long cursorId, Long parentId, Long userId) {
-        QComment qParent = new QComment("parent");  // 부모 댓글 Q 객체
+        QComment qParent = new QComment("qParent");  // 부모 댓글 Q 객체
 
         JPAQuery<Comment> query = queryFactory.selectFrom(comment)
                 .join(comment.parent, qParent).fetchJoin()

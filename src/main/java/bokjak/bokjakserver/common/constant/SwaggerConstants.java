@@ -157,7 +157,7 @@ public class SwaggerConstants {
     public static final String TAG_COMMENT = "Spot Comment";
     public static final String TAG_COMMENT_DESCRIPTION = "스팟 댓글 API";
 
-    public static final String COMMENT_GET_ALL_PARENT = "스팟 댓글 리스트 조회";
+    public static final String COMMENT_GET_ALL_PARENT = "댓글 리스트 조회";
     public static final String COMMENT_GET_ALL_PARENT_DESCRIPTION = """
             특정 스팟의 모든 댓글을 조회합니다.
             차단한 유저가 작성한 댓글들은 제외
@@ -169,17 +169,17 @@ public class SwaggerConstants {
             차단한 유저가 작성한 대댓글들은 제외
             
             """;
-    public static final String COMMENT_CREATE_PARENT = "스팟 댓글 생성";
+    public static final String COMMENT_CREATE_PARENT = "댓글 생성";
     public static final String COMMENT_CREATE_PARENT_DESCRIPTION = """
             .""";
     public static final String COMMENT_CREATE_CHILD = "대댓글 생성";
     public static final String COMMENT_CREATE_CHILD_DESCRIPTION = """
             .""";
-    public static final String COMMENT_UPDATE = "스팟 댓글 수정";
+    public static final String COMMENT_UPDATE = "댓글, 대댓글 수정";
     public static final String COMMENT_UPDATE_DESCRIPTION = """
-            .""";
-    public static final String COMMENT_DELETE = "스팟 댓글 삭제";
+            댓글, 대댓글을 수정합니다.""";
+    public static final String COMMENT_DELETE = "스팟 댓글, 대댓글 삭제";
     public static final String COMMENT_DELETE_DESCRIPTION = """
-            .""";
+            댓글, 대댓글을 삭제합니다.""";
 
 }

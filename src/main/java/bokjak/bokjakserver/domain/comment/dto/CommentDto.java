@@ -48,6 +48,7 @@ public class CommentDto {
     public record CommentCardResponse(
             boolean presence,
             Long parentId,
+            int childCount,
             Long id,
             String content,
             LocalDateTime createdAt,
@@ -62,8 +63,9 @@ public class CommentDto {
                     User author = comment.getUser();
 
                     return CommentCardResponse.builder()
-                            .parentId(comment.isParent() ? null : comment.getParent().getId())
                             .presence(comment.isPresence())
+                            .parentId(comment.isParent() ? null : comment.getParent().getId())
+                            .childCount(comment.isParent() ? comment.getChildList().size() : 0) // 대댓글의 경우 항상 0
                             .id(comment.getId())
                             .content(comment.getContent())
                             .createdAt(comment.getCreatedAt())
@@ -76,6 +78,7 @@ public class CommentDto {
                 } else {
                     return CommentCardResponse.builder()
                             .parentId(comment.isParent() ? null : comment.getParent().getId())
+                            .childCount(comment.isParent() ? comment.getChildList().size() : 0) // 대댓글의 경우 항상 0
                             .id(comment.getId())
                             .presence(comment.isPresence())
                             .build();
