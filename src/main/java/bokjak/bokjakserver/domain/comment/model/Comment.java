@@ -9,6 +9,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Builder
@@ -35,13 +38,28 @@ public class Comment extends BaseEntity {
     @Size(max = ConstraintConstants.COMMENT_CONTENT_MAX_LENGTH)
     private String content;
 
-    // 추후 대댓글 구현시 사용
-    private Long sequence;
+    private boolean presence = true;
 
-    private Long depth;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_comment_id")
+    private Comment parent;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "parent")
+    List<Comment> childList = new ArrayList<>();
 
     /* 편의 메서드 */
     public void update(String content) {
         this.content = content;
     }
+
+    public void addChild(Comment child) {
+        child.parent = this;
+        this.childList.add(child);
+    }
+
+    public void softDelete() {  // 댓글 삭제시 대댓글은 삭제하지 않음
+        this.presence = false;
+    }
+
 }
