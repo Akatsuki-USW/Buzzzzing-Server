@@ -42,11 +42,17 @@ public class Comment extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_comment_id")
-    private Comment parent;
+    private Comment parent; // 댓글, 대댓글 2가지로 나뉨. 무한 대댓글 아님
 
     @Builder.Default
     @OneToMany(mappedBy = "parent")
     List<Comment> childList = new ArrayList<>();
+
+    // PrePersist : presence의 디폴트 값을 true로
+    @PrePersist
+    public void setDefaultPresence() {
+        this.presence = true;
+    }
 
     /* 편의 메서드 */
     public void update(String content) {
