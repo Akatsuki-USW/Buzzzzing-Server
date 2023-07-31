@@ -45,44 +45,8 @@ public class CommentDto {
 
     /* Response */
     @Builder
-    public record ParentCommentCardResponse(
-            Long id,
-            String content,
+    public record CommentCardResponse(
             boolean presence,
-            LocalDateTime createdAt,
-            LocalDateTime updatedAt,
-            Long userId,
-            String userNickname,
-            String userProfileImageUrl,
-            boolean isAuthor
-    ) {
-        public static ParentCommentCardResponse of(Comment comment, Long userId) {
-            if (comment.isPresence()) { // 삭제 여부에 따라 분기처리
-                User author = comment.getUser();
-
-                return ParentCommentCardResponse.builder()
-                        .id(comment.getId())
-                        .content(comment.getContent())
-                        .presence(comment.isPresence())
-                        .createdAt(comment.getCreatedAt())
-                        .updatedAt(comment.getUpdatedAt())
-                        .userId(author.getId())
-                        .userNickname(author.getNickname())
-                        .userProfileImageUrl(author.getProfileImageUrl())
-                        .isAuthor(author.getId().equals(userId))
-                        .build();
-
-            } else {
-                return ParentCommentCardResponse.builder()
-                        .id(comment.getId())
-                        .presence(comment.isPresence())
-                        .build();
-            }
-        }
-    }
-
-    @Builder
-    public record ChildCommentCardResponse(
             Long parentId,
             Long id,
             String content,
@@ -93,20 +57,31 @@ public class CommentDto {
             String userProfileImageUrl,
             boolean isAuthor
     ) {
-        public static ChildCommentCardResponse of(Comment comment, Long userId) {
-            return ChildCommentCardResponse.builder()
-                    .id(comment.getId())
-                    .parentId(comment.getParent().getId())
-                    .content(comment.getContent())
-                    .createdAt(comment.getCreatedAt())
-                    .updatedAt(comment.getUpdatedAt())
-                    .userId(comment.getUser().getId())
-                    .userNickname(comment.getUser().getNickname())
-                    .userProfileImageUrl(comment.getUser().getProfileImageUrl())
-                    .isAuthor(comment.getUser().getId().equals(userId))
-                    .build();
+        public static CommentCardResponse of(Comment comment, Long userId) {
+                if (comment.isPresence()) {// 존재 여부에 따라 분기처리
+                    User author = comment.getUser();
+
+                    return CommentCardResponse.builder()
+                            .parentId(comment.isParent() ? null : comment.getParent().getId())
+                            .presence(comment.isPresence())
+                            .id(comment.getId())
+                            .content(comment.getContent())
+                            .createdAt(comment.getCreatedAt())
+                            .updatedAt(comment.getUpdatedAt())
+                            .userId(author.getId())
+                            .userNickname(author.getNickname())
+                            .userProfileImageUrl(author.getProfileImageUrl())
+                            .isAuthor(author.getId().equals(userId))
+                            .build();
+                } else {// TODO 삭제 로직에 따라 else 절 필요 없을 수 있음
+                    return CommentCardResponse.builder()
+                            .parentId(comment.isParent() ? null : comment.getParent().getId())
+                            .id(comment.getId())
+                            .presence(comment.isPresence())
+                            .build();
+                }
+            }
         }
-    }
 
     public record CommentMessage(
             boolean result

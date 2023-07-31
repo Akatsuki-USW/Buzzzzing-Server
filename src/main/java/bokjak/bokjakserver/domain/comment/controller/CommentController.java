@@ -33,65 +33,65 @@ public class CommentController {
     // 스팟별 댓글 리스트 조회
     @GetMapping("/{spotId}/comments")
     @Operation(summary = SwaggerConstants.COMMENT_GET_ALL_PARENT, description = SwaggerConstants.COMMENT_GET_ALL_PARENT_DESCRIPTION)
-    public ApiResponse<PageResponse<ParentCommentCardResponse>> getParentComments(
+    public ApiResponse<PageResponse<CommentCardResponse>> getParentComments(
             @PathVariable Long spotId,
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PageableDefault Pageable pageable,
             @RequestParam(required = false) Long cursorId
     ) {
-        PageResponse<ParentCommentCardResponse> pageResponse = commentService.getParentComments(principalDetails.getUserId(), pageable, cursorId, spotId);
+        PageResponse<CommentCardResponse> pageResponse = commentService.getParentComments(principalDetails.getUserId(), pageable, cursorId, spotId);
         return success(pageResponse);
     }
 
     // 대댓글 리스트 조회
     @GetMapping("/comments/{parentId}")
     @Operation(summary = SwaggerConstants.COMMENT_GET_ALL_CHILD, description = SwaggerConstants.COMMENT_GET_ALL_CHILD_DESCRIPTION)
-    public ApiResponse<PageResponse<ChildCommentCardResponse>> getChildComments(
+    public ApiResponse<PageResponse<CommentCardResponse>> getChildComments(
             @PathVariable Long parentId,
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PageableDefault Pageable pageable,
             @RequestParam(required = false) Long cursorId
     ) {
-        PageResponse<ChildCommentCardResponse> pageResponse = commentService.getChildComments(principalDetails.getUserId(), pageable, cursorId, parentId);
+        PageResponse<CommentCardResponse> pageResponse = commentService.getChildComments(principalDetails.getUserId(), pageable, cursorId, parentId);
         return success(pageResponse);
     }
 
     // 스팟 댓글 생성
     @PostMapping("/{spotId}/comments")
     @Operation(summary = SwaggerConstants.COMMENT_CREATE_PARENT, description = SwaggerConstants.COMMENT_CREATE_PARENT_DESCRIPTION)
-    public ApiResponse<ParentCommentCardResponse> createParentComment(
+    public ApiResponse<CommentCardResponse> createParentComment(
             @PathVariable Long spotId,
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @Valid @RequestBody CreateSpotCommentRequest createSpotCommentRequest
     ) {
         authService.checkIsBannedUser(principalDetails.getUser());
-        ParentCommentCardResponse response = commentService.createParentComment(principalDetails.getUserId(), spotId, createSpotCommentRequest);
+        CommentCardResponse response = commentService.createParentComment(principalDetails.getUserId(), spotId, createSpotCommentRequest);
         return success(response);
     }
 
     // 대댓글 생성
     @PostMapping("/comments/{parentId}")
     @Operation(summary = SwaggerConstants.COMMENT_CREATE_CHILD, description = SwaggerConstants.COMMENT_CREATE_CHILD_DESCRIPTION)
-    public ApiResponse<ChildCommentCardResponse> createChildComment(
+    public ApiResponse<CommentCardResponse> createChildComment(
             @PathVariable Long parentId,
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @Valid @RequestBody CreateSpotCommentRequest createSpotCommentRequest
     ) {
         authService.checkIsBannedUser(principalDetails.getUser());
-        ChildCommentCardResponse response = commentService.createChildComment(principalDetails.getUserId(), parentId, createSpotCommentRequest);
+        CommentCardResponse response = commentService.createChildComment(principalDetails.getUserId(), parentId, createSpotCommentRequest);
         return success(response);
     }
 
     // 스팟 댓글 수정
     @PutMapping("/comments/{commentId}")
     @Operation(summary = SwaggerConstants.COMMENT_UPDATE, description = SwaggerConstants.COMMENT_UPDATE_DESCRIPTION)
-    public ApiResponse<ParentCommentCardResponse> updateSpotComment(
+    public ApiResponse<CommentCardResponse> updateSpotComment(
             @PathVariable Long commentId,
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @Valid @RequestBody UpdateSpotCommentRequest updateSpotCommentRequest
     ) {
         authService.checkIsBannedUser(principalDetails.getUser());
-        ParentCommentCardResponse response = commentService.updateSpotComment(principalDetails.getUserId(), commentId, updateSpotCommentRequest);
+        CommentCardResponse response = commentService.updateSpotComment(principalDetails.getUserId(), commentId, updateSpotCommentRequest);
         return success(response);
     }
 

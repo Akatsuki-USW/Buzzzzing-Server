@@ -29,37 +29,37 @@ public class CommentService {
     private final CommentRepository commentRepository;
 
     // 스팟별 댓글 리스트 조회
-    public PageResponse<ParentCommentCardResponse> getParentComments(Long currentUserId, Pageable pageable, Long cursorId, Long spotId) {
+    public PageResponse<CommentCardResponse> getParentComments(Long currentUserId, Pageable pageable, Long cursorId, Long spotId) {
         Page<Comment> comments = commentRepository.findAllParentBySpotExceptBlockedAuthors(pageable, cursorId, spotId, currentUserId);
 
-        Page<ParentCommentCardResponse> resultPage = comments
-                .map(it -> ParentCommentCardResponse.of(it, currentUserId)); // 작성자 여부
+        Page<CommentCardResponse> resultPage = comments
+                .map(it -> CommentCardResponse.of(it, currentUserId));
         return PageResponse.of(resultPage);
     }
 
     // 대댓글 리스트 조회
-    public PageResponse<ChildCommentCardResponse> getChildComments(Long currentUserId, Pageable pageable, Long cursorId, Long parentId) {
+    public PageResponse<CommentCardResponse> getChildComments(Long currentUserId, Pageable pageable, Long cursorId, Long parentId) {
         Page<Comment> comments = commentRepository.findAllChildrenByParentExceptBlockedAuthors(pageable, cursorId, parentId, currentUserId);
 
-        Page<ChildCommentCardResponse> resultPage = comments.map(it -> ChildCommentCardResponse.of(it, currentUserId));
+        Page<CommentCardResponse> resultPage = comments.map(it -> CommentCardResponse.of(it, currentUserId));
         return PageResponse.of(resultPage);
     }
 
     // 스팟 댓글 생성
     @Transactional
-    public ParentCommentCardResponse createParentComment(Long currentUserId, Long spotId, CreateSpotCommentRequest createSpotCommentRequest) {
+    public CommentCardResponse createParentComment(Long currentUserId, Long spotId, CreateSpotCommentRequest createSpotCommentRequest) {
         User user = userService.getUser(currentUserId);
         Spot spot = spotRepository.findById(spotId)
                 .orElseThrow(() -> new SpotException(StatusCode.NOT_FOUND_SPOT));
 
         Comment comment = commentRepository.save(createSpotCommentRequest.toEntity(user, spot));
 
-        return ParentCommentCardResponse.of(comment, currentUserId);
+        return CommentCardResponse.of(comment, currentUserId);
     }
 
     // 대댓글 생성
     @Transactional
-    public ChildCommentCardResponse createChildComment(Long currentUserId, Long parentId, CreateSpotCommentRequest createSpotCommentRequest) {
+    public CommentCardResponse createChildComment(Long currentUserId, Long parentId, CreateSpotCommentRequest createSpotCommentRequest) {
         User user = userService.getUser(currentUserId);
         Comment parent = commentRepository.findById(parentId)
                 .orElseThrow(() -> new CommentException(StatusCode.NOT_FOUND_COMMENT));
@@ -68,19 +68,19 @@ public class CommentService {
 
         Comment comment = commentRepository.save(createSpotCommentRequest.toEntity(user, parent));
 
-        return ChildCommentCardResponse.of(comment, currentUserId);
+        return CommentCardResponse.of(comment, currentUserId);
     }
 
     // 스팟 댓글 수정
     @Transactional
-    public ParentCommentCardResponse updateSpotComment(Long currentUserId, Long commentId, UpdateSpotCommentRequest updateSpotCommentRequest) {
+    public CommentCardResponse updateSpotComment(Long currentUserId, Long commentId, UpdateSpotCommentRequest updateSpotCommentRequest) {
         User user = userService.getUser(currentUserId);
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentException(StatusCode.NOT_FOUND_COMMENT));
 
         comment.update(updateSpotCommentRequest.content());
 
-        return ParentCommentCardResponse.of(comment, currentUserId);
+            return CommentCardResponse.of(comment, currentUserId);
     }
 
     // 스팟 댓글 삭제

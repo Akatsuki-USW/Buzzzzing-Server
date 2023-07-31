@@ -38,7 +38,7 @@ public class Comment extends BaseEntity {
     @Size(max = ConstraintConstants.COMMENT_CONTENT_MAX_LENGTH)
     private String content;
 
-    private boolean presence = true;
+    private boolean presence;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_comment_id")
@@ -68,4 +68,7 @@ public class Comment extends BaseEntity {
         this.presence = false;
     }
 
+    public boolean isParent() {
+        return this.parent == null;
+    }
 }
