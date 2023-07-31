@@ -10,6 +10,8 @@ import lombok.Builder;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static bokjak.bokjakserver.util.CustomDateUtils.customDateFormat;
+
 public class NotificationDto {
     public record NotifyParams(
             User receiver, NotificationType type, Long redirectTargetId, String title, String content
@@ -69,7 +71,7 @@ public class NotificationDto {
             Long redirectTargetId,
             String title,
             String body,
-            LocalDateTime createdAt,
+            String createdAt,
             boolean isRead
     ) {
         @Builder
@@ -85,7 +87,7 @@ public class NotificationDto {
                     .redirectTargetId(notification.getRedirectTargetId())
                     .title(notification.getTitle())
                     .body(notification.getContent())
-                    .createdAt(notification.getCreatedAt())
+                    .createdAt(customDateFormat(notification.getCreatedAt()))
                     .isRead(notification.isRead())
                     .build();
         }
