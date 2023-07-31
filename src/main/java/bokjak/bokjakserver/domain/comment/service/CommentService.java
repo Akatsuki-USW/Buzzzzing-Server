@@ -47,7 +47,7 @@ public class CommentService {
 
     // 스팟 댓글 생성
     @Transactional
-    public ParentCommentCardResponse createSpotComment(Long currentUserId, Long spotId, CreateSpotCommentRequest createSpotCommentRequest) {
+    public ParentCommentCardResponse createParentComment(Long currentUserId, Long spotId, CreateSpotCommentRequest createSpotCommentRequest) {
         User user = userService.getUser(currentUserId);
         Spot spot = spotRepository.findById(spotId)
                 .orElseThrow(() -> new SpotException(StatusCode.NOT_FOUND_SPOT));
@@ -55,6 +55,20 @@ public class CommentService {
         Comment comment = commentRepository.save(createSpotCommentRequest.toEntity(user, spot));
 
         return ParentCommentCardResponse.of(comment, currentUserId);
+    }
+
+    // 대댓글 생성
+    @Transactional
+    public ChildCommentCardResponse createChildComment(Long currentUserId, Long parentId, CreateSpotCommentRequest createSpotCommentRequest) {
+        User user = userService.getUser(currentUserId);
+        Comment parent = commentRepository.findById(parentId)
+                .orElseThrow(() -> new CommentException(StatusCode.NOT_FOUND_COMMENT));
+        // 부모 댓글이 삭제된 경우 (논리적 에러)
+        if (!parent.isPresence()) throw new CommentException(StatusCode.NOT_FOUND_COMMENT);
+
+        Comment comment = commentRepository.save(createSpotCommentRequest.toEntity(user, parent));
+
+        return ChildCommentCardResponse.of(comment, currentUserId);
     }
 
     // 스팟 댓글 수정
@@ -78,6 +92,7 @@ public class CommentService {
 
         checkIsAuthor(user, comment);
 
+        // TODO CASCADE 방지 해보기. parentId = null로 바꾸고
         commentRepository.delete(comment);
 
         return new CommentMessage(true);

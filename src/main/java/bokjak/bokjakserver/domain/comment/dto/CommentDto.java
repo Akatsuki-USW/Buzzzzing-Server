@@ -26,10 +26,10 @@ public class CommentDto {
                     .build();
         }
 
-        public Comment toEntity(User user, Spot spot, Comment parent) { // 대댓글
+        public Comment toEntity(User user, Comment parent) { // 대댓글
             return Comment.builder()
                     .user(user)
-                    .spot(spot)
+                    .spot(parent.getSpot())
                     .parent(parent)
                     .content(this.content)
                     .build();
@@ -48,6 +48,7 @@ public class CommentDto {
     public record ParentCommentCardResponse(
             Long id,
             String content,
+            boolean presence,
             LocalDateTime createdAt,
             LocalDateTime updatedAt,
             Long userId,
@@ -56,13 +57,13 @@ public class CommentDto {
             boolean isAuthor
     ) {
         public static ParentCommentCardResponse of(Comment comment, Long userId) {
-            User author = comment.getUser();
+            if (comment.isPresence()) { // 삭제 여부에 따라 분기처리
+                User author = comment.getUser();
 
-            // TODO presence에 따라 분기처리
-            if (comment.isPresence()) {
                 return ParentCommentCardResponse.builder()
                         .id(comment.getId())
                         .content(comment.getContent())
+                        .presence(comment.isPresence())
                         .createdAt(comment.getCreatedAt())
                         .updatedAt(comment.getUpdatedAt())
                         .userId(author.getId())
@@ -74,7 +75,7 @@ public class CommentDto {
             } else {
                 return ParentCommentCardResponse.builder()
                         .id(comment.getId())
-                        .isAuthor(author.getId().equals(userId))
+                        .presence(comment.isPresence())
                         .build();
             }
         }

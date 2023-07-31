@@ -32,7 +32,7 @@ public class CommentController {
 
     // 스팟별 댓글 리스트 조회
     @GetMapping("/{spotId}/comments")
-    @Operation(summary = SwaggerConstants.COMMENT_GET_ALL_CHILD, description = SwaggerConstants.COMMENT_GET_ALL_PARENT_DESCRIPTION)
+    @Operation(summary = SwaggerConstants.COMMENT_GET_ALL_PARENT, description = SwaggerConstants.COMMENT_GET_ALL_PARENT_DESCRIPTION)
     public ApiResponse<PageResponse<ParentCommentCardResponse>> getParentComments(
             @PathVariable Long spotId,
             @AuthenticationPrincipal PrincipalDetails principalDetails,
@@ -58,14 +58,27 @@ public class CommentController {
 
     // 스팟 댓글 생성
     @PostMapping("/{spotId}/comments")
-    @Operation(summary = SwaggerConstants.COMMENT_CREATE, description = SwaggerConstants.COMMENT_CREATE_DESCRIPTION)
-    public ApiResponse<ParentCommentCardResponse> createSpotComment(
+    @Operation(summary = SwaggerConstants.COMMENT_CREATE_PARENT, description = SwaggerConstants.COMMENT_CREATE_PARENT_DESCRIPTION)
+    public ApiResponse<ParentCommentCardResponse> createParentComment(
             @PathVariable Long spotId,
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @Valid @RequestBody CreateSpotCommentRequest createSpotCommentRequest
     ) {
         authService.checkIsBannedUser(principalDetails.getUser());
-        ParentCommentCardResponse response = commentService.createSpotComment(principalDetails.getUserId(), spotId, createSpotCommentRequest);
+        ParentCommentCardResponse response = commentService.createParentComment(principalDetails.getUserId(), spotId, createSpotCommentRequest);
+        return success(response);
+    }
+
+    // 대댓글 생성
+    @PostMapping("/comments/{parentId}")
+    @Operation(summary = SwaggerConstants.COMMENT_CREATE_CHILD, description = SwaggerConstants.COMMENT_CREATE_CHILD_DESCRIPTION)
+    public ApiResponse<ChildCommentCardResponse> createChildComment(
+            @PathVariable Long parentId,
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @Valid @RequestBody CreateSpotCommentRequest createSpotCommentRequest
+    ) {
+        authService.checkIsBannedUser(principalDetails.getUser());
+        ChildCommentCardResponse response = commentService.createChildComment(principalDetails.getUserId(), parentId, createSpotCommentRequest);
         return success(response);
     }
 

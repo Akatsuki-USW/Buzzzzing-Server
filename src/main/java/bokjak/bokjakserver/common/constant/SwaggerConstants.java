@@ -169,10 +169,12 @@ public class SwaggerConstants {
             차단한 유저가 작성한 대댓글들은 제외
             
             """;
-    public static final String COMMENT_CREATE = "스팟 댓글 생성";
-    public static final String COMMENT_CREATE_DESCRIPTION = """
-            ⚠️ 추후 대댓글 구현시 parentCommentId 생김
-            """;
+    public static final String COMMENT_CREATE_PARENT = "스팟 댓글 생성";
+    public static final String COMMENT_CREATE_PARENT_DESCRIPTION = """
+            .""";
+    public static final String COMMENT_CREATE_CHILD = "대댓글 생성";
+    public static final String COMMENT_CREATE_CHILD_DESCRIPTION = """
+            .""";
     public static final String COMMENT_UPDATE = "스팟 댓글 수정";
     public static final String COMMENT_UPDATE_DESCRIPTION = """
             .""";
