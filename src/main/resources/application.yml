@@ -1,0 +1,60 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  data:
+    web:
+      pageable:
+        default-page-size: 10  # @PageableDefault로 대체
+        max-page-size: 500
+        one-indexed-parameters: true
+
+  messages:
+    basename: errors
+
+logging.level:
+  org.hibernate:
+    SQL: debug # SQL logger를 통해서 찍어야 함.
+    type : trace
+
+server:
+  error:
+    include-stacktrace: on_param
+    include-exception: true
+  servlet:
+    session:
+      tracking-modes: cookie
+  port: 8090
+  tomcat:
+    keep-alive-timeout: 300
+
+springdoc:
+  swagger-ui:
+    path: /api-docs.html
+    tagsSorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /api-docs
+  show-actuator: true
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
+
+---
+
+spring:
+  profiles:
+    active: prod
+
+---
+
+spring:
+  profiles:
+    active: dev
+
+---
+
+spring:
+  profiles:
+    active: local
