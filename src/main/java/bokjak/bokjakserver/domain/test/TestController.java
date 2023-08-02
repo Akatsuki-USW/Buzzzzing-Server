@@ -35,7 +35,7 @@ public class TestController {
                 .content("자기 자신의 아이디를 리턴")
                 .build();
         notificationService.pushMessage(params);
-        return ApiResponse.success(notificationService.getMyNotifications(currentUser));
+        return ApiResponse.success(notificationService.getMyNotifications(currentUser.getId()));
     }
 
     @GetMapping("/send/email")

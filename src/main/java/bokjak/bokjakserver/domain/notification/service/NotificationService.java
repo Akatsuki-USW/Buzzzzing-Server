@@ -44,8 +44,8 @@ public class NotificationService {
         receiver.addNotification(notification);
     }
 
-    public NotificationListResponse getMyNotifications(User user) {
-        User loginUser = userRepository.findById(user.getId())
+    public NotificationListResponse getMyNotifications(Long userId) {
+        User loginUser = userRepository.findById(userId)
                 .orElseThrow(() -> new NotificationException(StatusCode.NOT_FOUND_USER));
 
         return NotificationListResponse.of(loginUser.getNotificationList().stream()
@@ -57,8 +57,8 @@ public class NotificationService {
     }
 
     @Transactional
-    public NotificationResponse readNotification(Long notificationId, User user) {
-        User loginUser = userRepository.findById(user.getId()).orElseThrow(
+    public NotificationResponse readNotification(Long notificationId, Long userId) {
+        User loginUser = userRepository.findById(userId).orElseThrow(
                 () -> new NotificationException(StatusCode.NOT_FOUND_USER)
         );
 

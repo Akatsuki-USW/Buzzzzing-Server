@@ -184,9 +184,9 @@ public class AuthService {
     }
 
     @Transactional
-    public LogoutResponse logout() {
-        User user = userRepository.findBySocialEmail(getCurrentUserSocialEmail())
-                .orElseThrow(() -> new UserException(StatusCode.NOT_FOUND_USER));
+    public LogoutResponse logout(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserException(StatusCode.NOT_FOUND_USER));
+
         RefreshToken refreshToken = refreshTokenRepository.findByUser(user)
                 .orElseThrow(() -> new AuthException(StatusCode.NOT_FOUND_REFRESH_TOKEN));
         refreshTokenRepository.delete(refreshToken);
