@@ -40,6 +40,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       
+      ## yml 파일 생성
+      - name: Set up yml file
+        env:
+          YAML_SECRET: ${{ secrets.APPLICATION_DEV_YML }}
+          YAML_DIR: src/main/resources
+          YAML_FILE_NAME: application-dev.yml
+        run: echo $YAML_SECRET | base64 --decode > $YAML_DIR/$YAML_FILE_NAME
+        
       ## FCM 설정 파일 셋업
       - name: Set up Json file
         env:
