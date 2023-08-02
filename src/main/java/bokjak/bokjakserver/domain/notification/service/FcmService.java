@@ -73,7 +73,7 @@ public class FcmService {
         }
     }
 
-    @Async
+    @Async(value = "AsyncBean")
     public CompletableFuture<Boolean> sendPushMessage(String fcmToken, NotificationDto.NotifyParams params) {
         String message = makeMessage(fcmToken, params);
         String accessToken = getAccessToken();

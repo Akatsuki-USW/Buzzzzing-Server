@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,7 +93,8 @@ public class SleepingUserService {
     }
 
 
-    private void sendMail(User beforeSleepingUser) {
+    @Async
+    public void sendMail(User beforeSleepingUser) {
         MimeMessage message = javaMailSender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -100,6 +102,28 @@ public class SleepingUserService {
             helper.setTo(beforeSleepingUser.getEmail());
             ConcurrentHashMap<String, String> emailValues = new ConcurrentHashMap<>();
             emailValues.put("nickname", beforeSleepingUser.getNickname());
+
+            Context context = new Context();
+            emailValues.forEach((key, value) -> {
+                context.setVariable(key, value);
+            });
+
+            String html = templateEngine.process("convertSleepingMail.html", context);
+            helper.setText(html, true);
+            javaMailSender.send(message);
+        } catch (MessagingException e) {
+            log.warn("휴면계정 메일 전송에 실패했습니다.");
+        }
+    }
+
+    @Async(value = "AsyncBean")
+    public void sendMail(String email) {
+        MimeMessage message = javaMailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setSubject("복작복작 - 휴면계정으로 전환안내");
+            helper.setTo(email);
+            ConcurrentHashMap<String, String> emailValues = new ConcurrentHashMap<>();
 
             Context context = new Context();
             emailValues.forEach((key, value) -> {

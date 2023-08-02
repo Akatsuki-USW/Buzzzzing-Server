@@ -96,6 +96,7 @@ public class AuthDto {
 
     public record SigningUser(String socialEmail, String socialUuid, String socialType) {}
     public record ReissueRequest(
+            @Schema(example = "eyJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE2NjQ2")
             @NotBlank
             String refreshToken) {}
 
