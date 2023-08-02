@@ -2,10 +2,7 @@ package bokjak.bokjakserver.domain.comment.service;
 
 import bokjak.bokjakserver.common.dto.PageResponse;
 import bokjak.bokjakserver.common.exception.StatusCode;
-import bokjak.bokjakserver.domain.comment.dto.CommentDto.CommentCardResponse;
-import bokjak.bokjakserver.domain.comment.dto.CommentDto.CommentMessage;
-import bokjak.bokjakserver.domain.comment.dto.CommentDto.CreateSpotCommentRequest;
-import bokjak.bokjakserver.domain.comment.dto.CommentDto.UpdateSpotCommentRequest;
+import bokjak.bokjakserver.domain.comment.dto.CommentDto.*;
 import bokjak.bokjakserver.domain.comment.exception.CommentException;
 import bokjak.bokjakserver.domain.comment.model.Comment;
 import bokjak.bokjakserver.domain.comment.repository.CommentRepository;
@@ -32,25 +29,46 @@ public class CommentService {
     private final CommentRepository commentRepository;
 
     // 스팟별 댓글 리스트 조회
-    public PageResponse<CommentCardResponse> getSpotComments(Long currentUserId, Pageable pageable, Long cursorId, Long spotId) {
-        Page<Comment> comments = commentRepository.findAllBySpotExceptBlockedAuthors(pageable, cursorId, spotId, currentUserId);
+    public PageResponse<CommentCardResponse> getParentComments(Long currentUserId, Pageable pageable, Long cursorId, Long spotId) {
+        Page<Comment> comments = commentRepository.findAllParentBySpotExceptBlockedAuthors(pageable, cursorId, spotId, currentUserId);
 
         Page<CommentCardResponse> resultPage = comments
-                .map(it -> CommentCardResponse.of(it, it.getUser().getId().equals(currentUserId))); // 작성자 여부
+                .map(it -> CommentCardResponse.of(it, currentUserId));
+        return PageResponse.of(resultPage);
+    }
+
+    // 대댓글 리스트 조회
+    public PageResponse<CommentCardResponse> getChildComments(Long currentUserId, Pageable pageable, Long cursorId, Long parentId) {
+        Page<Comment> comments = commentRepository.findAllChildrenByParentExceptBlockedAuthors(pageable, cursorId, parentId, currentUserId);
+
+        Page<CommentCardResponse> resultPage = comments.map(it -> CommentCardResponse.of(it, currentUserId));
         return PageResponse.of(resultPage);
     }
 
     // 스팟 댓글 생성
     @Transactional
-    public CommentCardResponse createSpotComment(Long currentUserId, Long spotId, CreateSpotCommentRequest createSpotCommentRequest) {
+    public CommentCardResponse createParentComment(Long currentUserId, Long spotId, CreateSpotCommentRequest createSpotCommentRequest) {
         User user = userService.getUser(currentUserId);
         Spot spot = spotRepository.findById(spotId)
                 .orElseThrow(() -> new SpotException(StatusCode.NOT_FOUND_SPOT));
 
         Comment comment = commentRepository.save(createSpotCommentRequest.toEntity(user, spot));
-        boolean isAuthor = comment.getUser().equals(user);  // 작성자 여부(always true)
 
-        return CommentCardResponse.of(comment, isAuthor);
+        return CommentCardResponse.of(comment, currentUserId);
+    }
+
+    // 대댓글 생성
+    @Transactional
+    public CommentCardResponse createChildComment(Long currentUserId, Long parentId, CreateSpotCommentRequest createSpotCommentRequest) {
+        User user = userService.getUser(currentUserId);
+        Comment parent = commentRepository.findById(parentId)
+                .orElseThrow(() -> new CommentException(StatusCode.NOT_FOUND_COMMENT));
+        // 부모 댓글이 삭제된 경우 (논리적 에러)
+        if (!parent.isPresence()) throw new CommentException(StatusCode.NOT_FOUND_COMMENT);
+
+        Comment comment = commentRepository.save(createSpotCommentRequest.toEntity(user, parent));
+
+        return CommentCardResponse.of(comment, currentUserId);
     }
 
     // 스팟 댓글 수정
@@ -61,9 +79,8 @@ public class CommentService {
                 .orElseThrow(() -> new CommentException(StatusCode.NOT_FOUND_COMMENT));
 
         comment.update(updateSpotCommentRequest.content());
-        boolean isAuthor = comment.getUser().equals(user);  // 작성자 여부(always true)
 
-        return CommentCardResponse.of(comment, isAuthor);
+            return CommentCardResponse.of(comment, currentUserId);
     }
 
     // 스팟 댓글 삭제
@@ -75,7 +92,7 @@ public class CommentService {
 
         checkIsAuthor(user, comment);
 
-        commentRepository.delete(comment);
+        comment.logicallyDelete();
 
         return new CommentMessage(true);
     }
