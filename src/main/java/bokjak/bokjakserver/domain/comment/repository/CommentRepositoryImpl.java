@@ -27,7 +27,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
         JPAQuery<Comment> query = queryFactory.selectFrom(comment)
                 .join(comment.spot, spot).fetchJoin()
                 .join(comment.user, user).fetchJoin()
-                .orderBy(comment.id.desc()) // 최신순
+                .orderBy(comment.id.asc()) // 오래된 순
                 .where(spot.id.eq(spotId)   // 특정 스팟의
                         .and(comment.parent.isNull())   // 부모 없는 댓글
                         .and(user.id.notIn(JPAExpressions   // 차단한 유저 제외
@@ -51,7 +51,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
         JPAQuery<Comment> query = queryFactory.selectFrom(comment)
                 .join(comment.parent, qParent).fetchJoin()
                 .join(comment.user, user).fetchJoin()
-                .orderBy(comment.id.desc()) // 최신순
+                .orderBy(comment.id.asc()) // 오래된 순
                 .where(qParent.id.eq(parentId)   // 특정 부모 댓글의
                         .and(user.id.notIn(JPAExpressions   // 차단한 유저 제외
                                 .select(userBlockUser.blockedUser.id)
