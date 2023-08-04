@@ -40,21 +40,3 @@ springdoc:
   show-actuator: true
   default-produces-media-type: application/json
   default-consumes-media-type: application/json
-
----
-
-spring:
-  profiles:
-    active: prod
-
----
-
-spring:
-  profiles:
-    active: dev
-
----
-
-spring:
-  profiles:
-    active: local
