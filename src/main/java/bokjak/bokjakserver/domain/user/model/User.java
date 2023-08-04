@@ -134,6 +134,11 @@ public class User extends BaseEntity {
         notificationList.add(notification);
     }
 
+    public void addBan(Ban ban) {
+        if (banList == null) banList = new ArrayList<>();
+        banList.add(ban);
+    }
+
     public void removeBlockerUser(UserBlockUser userBlockUser) {
         blockerUserList.remove(userBlockUser);
     }
