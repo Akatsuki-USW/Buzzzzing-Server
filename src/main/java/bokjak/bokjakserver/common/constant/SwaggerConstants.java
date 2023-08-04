@@ -251,4 +251,11 @@ public class SwaggerConstants {
     public static final String NOTIFICATION_READ = "알림 읽음 표시";
     public static final String NOTIFICATION_READ_DESCRIPTION = "알림을 클릭해서 리다이렉트해야 읽음 표시";
 
+    /**
+     * Ban
+     */
+    public static final String TAG_BAN = "Ban";
+    public static final String TAG_BAN_DESCRIPTION = "Ban API";
+    public static final String BAN_ME = "제제 내역 조회";
+
 }
