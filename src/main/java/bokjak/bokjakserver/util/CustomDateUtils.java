@@ -34,4 +34,8 @@ public class CustomDateUtils {
     public static String customDateFormat(LocalDateTime localDateTime) {
         return localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
+
+    public static String customDateFormatOnlyDate(LocalDateTime localDateTime) {
+        return localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    }
 }
