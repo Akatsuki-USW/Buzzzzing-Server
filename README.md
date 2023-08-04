@@ -13,8 +13,8 @@
 
 - 소셜 로그인 (카카오)
 - 서울시, SK API 혼잡도 데이터 적재
-- 장소 목록, 장소별 혼잡도 현황, 과거 데이터 기반 미래 혼잡도 예측
-- 장소별 스팟(세부 장소 추천) 및 댓글, 대댓글
+- 장소 조회 및 혼잡도 현황, 과거 데이터 기반 미래 혼잡도 예측
+- 장소별 스팟(세부 장소 추천) 조회 및 댓글, 대댓글
 - 휴면 유저 공지 메일 스케줄링
 - 유저 신고 및 차단
 - 앱 활동 푸시 알림(FCM)
@@ -26,12 +26,14 @@
 - Spring Security, OAuth2, JWT
 - JPA, Spring Data JPA, QueryDSL
 - MySQL
-- AWS Hosting : EC2, RDS, S3, CloudWatch, SMS
+- AWS Hosting : EC2, RDS, S3, CloudWatch, SNS
 - CI/CD : Github Actions, Docker
 - Firebase Cloud Messaging
 - Spring Scheduling. Spring Mail
 - Test : JUnit, Mock
+- Swagger
 
+## 🔍 Architecture
 ### ERD
 ![buzzing_erd](https://github.com/Akatsuki-USW/Buzzzzing-Server/assets/72124326/2248f961-ade7-4a59-a716-be7422c8edf7)
 
