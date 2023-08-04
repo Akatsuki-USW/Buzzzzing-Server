@@ -31,15 +31,15 @@ public class ReportService {
     private final SpotRepository spotRepository;
 
     @Transactional
-    public ReportIdResponse createReport(User currentUser, ReportRequest reportRequest) {
-        User reporter = userRepository.findById(currentUser.getId()).orElseThrow(() -> new ReportException(StatusCode.NOT_FOUND_USER));
+    public ReportIdResponse createReport(Long userId, ReportRequest reportRequest) {
+        User reporter = userRepository.findById(userId).orElseThrow(() -> new ReportException(StatusCode.NOT_FOUND_USER));
         User reportedUser = userRepository.findById(reportRequest.reportedUserId()).orElseThrow(() -> new ReportException(StatusCode.NOT_FOUND_REPORTED_USER));
         checkContentLength(reportRequest);
         checkIsReport(reportedUser);
         Report report = reportRequest.toEntity(reporter, reportedUser);
         checkExistSpotOrComment(report.getReportTarget(), report.getTargetId(), reportedUser);
         boolean exists = reportRepository.existsByReporterAndReportedUserAndReportTargetAndTargetId(
-                currentUser, reportedUser, report.getReportTarget(), report.getTargetId());
+                reporter, reportedUser, report.getReportTarget(), report.getTargetId());
         if (exists) throw new ReportException(StatusCode.REPORT_DUPLICATION);
 
         reportRepository.save(report);
