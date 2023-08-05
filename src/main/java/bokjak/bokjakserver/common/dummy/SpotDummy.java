@@ -22,7 +22,7 @@ import java.util.List;
 
 @Slf4j
 @Component("spotDummy")
-@DependsOn({"userDummy", "locationDummy", "congestionDummy"})
+@DependsOn({"userDummy", "congestionDummy"})
 @RequiredArgsConstructor
 @Transactional
 public class SpotDummy {
@@ -58,7 +58,7 @@ public class SpotDummy {
             strings.add("나쁘지 않았다.");
             strings.add("별 거 없었다.");
 
-            for (int i = 0; i < 10; i++) {// 유저 10명
+            for (int i = 0; i < 3; i++) {// 유저 10명
                 SpotCategory category = allCategory.get((int) (Math.random() * 100) % 3);
                 spotRepository.save(Spot.builder()
                         .location(location)
