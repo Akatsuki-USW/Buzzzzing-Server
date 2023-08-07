@@ -9,10 +9,13 @@ import bokjak.bokjakserver.domain.comment.dto.CommentDto.UpdateSpotCommentReques
 import bokjak.bokjakserver.domain.comment.exception.CommentException;
 import bokjak.bokjakserver.domain.comment.model.Comment;
 import bokjak.bokjakserver.domain.comment.repository.CommentRepository;
+import bokjak.bokjakserver.domain.notification.dto.NotificationDto.NotifyParams;
+import bokjak.bokjakserver.domain.notification.service.NotificationService;
 import bokjak.bokjakserver.domain.spot.exception.SpotException;
 import bokjak.bokjakserver.domain.spot.model.Spot;
 import bokjak.bokjakserver.domain.spot.repository.SpotRepository;
 import bokjak.bokjakserver.domain.user.model.User;
+import bokjak.bokjakserver.domain.user.repository.UserRepository;
 import bokjak.bokjakserver.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +23,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 
 @Slf4j
@@ -30,6 +35,8 @@ public class CommentService {
     private final UserService userService;
     private final SpotRepository spotRepository;
     private final CommentRepository commentRepository;
+    private final NotificationService notificationService;
+    private final UserRepository userRepository;
 
     // 스팟별 댓글 리스트 조회
     public PageResponse<CommentCardResponse> getParentComments(Long currentUserId, Pageable pageable, Long cursorId, Long spotId) {
@@ -54,11 +61,17 @@ public class CommentService {
     // 스팟 댓글 생성
     @Transactional
     public CommentCardResponse createParentComment(Long currentUserId, Long spotId, CreateSpotCommentRequest createSpotCommentRequest) {
-        User user = userService.getUser(currentUserId);
+        User commentAuthor = userService.getUser(currentUserId);
         Spot spot = spotRepository.findById(spotId)
                 .orElseThrow(() -> new SpotException(StatusCode.NOT_FOUND_SPOT));
 
-        Comment comment = commentRepository.save(createSpotCommentRequest.toEntity(user, spot));
+        Comment comment = commentRepository.save(createSpotCommentRequest.toEntity(commentAuthor, spot));
+
+        User spotAuthor = spot.getUser();
+        boolean equals = checkIsSameUser(spotAuthor, commentAuthor);
+        if (!equals) {
+            notificationService.pushMessage(NotifyParams.ofCreateSpotComment(spotAuthor,spot,comment));
+        }
 
         return CommentCardResponse.of(comment, currentUserId);
     }
@@ -74,6 +87,30 @@ public class CommentService {
 
         Comment comment = commentRepository.save(createSpotCommentRequest.toEntity(user, parent));
 
+
+        Spot spot = parent.getSpot();
+
+        boolean equals = checkIsSameUser(parent.getUser(), user);
+        if (!equals) {
+            notificationService.pushMessage(NotifyParams.ofCreateSpotCommentComment(parent,spot,comment));
+        }
+        else {
+            List<Comment> childCommentList = commentRepository.findAllByParent(parent);
+            List<Long> userIdList = childCommentList.stream()
+                    .filter(c -> !checkIsSameUser(c.getUser(),parent.getUser()))
+                    .map(c -> c.getUser().getId())
+                    .distinct()
+                    .toList();
+
+            userIdList.forEach(c -> {
+                User notifyToUser = userRepository.findById(c).orElseThrow(() -> new SpotException(StatusCode.NOT_FOUND_USER));
+                notificationService.pushMessage(NotifyParams.ofCreateSpotCommentComment(
+                        notifyToUser,spot,comment));
+                    }
+            );
+
+        }
+        // todo 대댓글에 Author가 답글 달 시 그 댓글에 참여한 모두가 알림받게 하고 싶다.
         return CommentCardResponse.of(comment, currentUserId);
     }
 
@@ -107,5 +144,9 @@ public class CommentService {
         if (!comment.getUser().equals(user)) {
             throw new CommentException(StatusCode.NOT_AUTHOR);
         }
+    }
+
+    private static boolean checkIsSameUser(User Author, User user) {
+        return Author.getId().equals(user.getId());
     }
 }
