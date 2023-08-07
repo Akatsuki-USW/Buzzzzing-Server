@@ -146,7 +146,7 @@ public class CommentService {
         }
     }
 
-    private static boolean checkIsSameUser(User Author, User user) {
-        return Author.getId().equals(user.getId());
+    private static boolean checkIsSameUser(User author, User user) {
+        return author.getId().equals(user.getId());
     }
 }
