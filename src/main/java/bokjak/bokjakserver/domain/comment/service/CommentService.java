@@ -2,7 +2,10 @@ package bokjak.bokjakserver.domain.comment.service;
 
 import bokjak.bokjakserver.common.dto.PageResponse;
 import bokjak.bokjakserver.common.exception.StatusCode;
-import bokjak.bokjakserver.domain.comment.dto.CommentDto.*;
+import bokjak.bokjakserver.domain.comment.dto.CommentDto.CommentCardResponse;
+import bokjak.bokjakserver.domain.comment.dto.CommentDto.CommentMessage;
+import bokjak.bokjakserver.domain.comment.dto.CommentDto.CreateSpotCommentRequest;
+import bokjak.bokjakserver.domain.comment.dto.CommentDto.UpdateSpotCommentRequest;
 import bokjak.bokjakserver.domain.comment.exception.CommentException;
 import bokjak.bokjakserver.domain.comment.model.Comment;
 import bokjak.bokjakserver.domain.comment.repository.CommentRepository;
@@ -13,8 +16,8 @@ import bokjak.bokjakserver.domain.user.model.User;
 import bokjak.bokjakserver.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,19 +33,22 @@ public class CommentService {
 
     // 스팟별 댓글 리스트 조회
     public PageResponse<CommentCardResponse> getParentComments(Long currentUserId, Pageable pageable, Long cursorId, Long spotId) {
-        Page<Comment> comments = commentRepository.findAllParentBySpotExceptBlockedAuthors(pageable, cursorId, spotId, currentUserId);
+        Slice<Comment> comments = commentRepository.findAllParentBySpotExceptBlockedAuthors(pageable, cursorId, spotId, currentUserId);
+        Long total = commentRepository.countAllParentBySpotExceptBlockedAuthors(spotId, currentUserId);
 
-        Page<CommentCardResponse> resultPage = comments
-                .map(it -> CommentCardResponse.of(it, currentUserId));
-        return PageResponse.of(resultPage);
+        Slice<CommentCardResponse> result = comments.map(it -> CommentCardResponse.of(it, currentUserId));
+
+        return PageResponse.of(result, total);
     }
 
     // 대댓글 리스트 조회
     public PageResponse<CommentCardResponse> getChildComments(Long currentUserId, Pageable pageable, Long cursorId, Long parentId) {
-        Page<Comment> comments = commentRepository.findAllChildrenByParentExceptBlockedAuthors(pageable, cursorId, parentId, currentUserId);
+        Slice<Comment> comments = commentRepository.findAllChildrenByParentExceptBlockedAuthors(pageable, cursorId, parentId, currentUserId);
+        Long total = commentRepository.countAllChildrenByParentExceptBlockedAuthors(parentId, currentUserId);
 
-        Page<CommentCardResponse> resultPage = comments.map(it -> CommentCardResponse.of(it, currentUserId));
-        return PageResponse.of(resultPage);
+        Slice<CommentCardResponse> result = comments.map(it -> CommentCardResponse.of(it, currentUserId));
+
+        return PageResponse.of(result, total);
     }
 
     // 스팟 댓글 생성
@@ -80,7 +86,7 @@ public class CommentService {
 
         comment.update(updateSpotCommentRequest.content());
 
-            return CommentCardResponse.of(comment, currentUserId);
+        return CommentCardResponse.of(comment, currentUserId);
     }
 
     // 스팟 댓글 삭제
