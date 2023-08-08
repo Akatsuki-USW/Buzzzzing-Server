@@ -21,14 +21,13 @@ public class NotificationDto {
 
         public static NotifyParams ofCreateSpotComment(
                 User spotAuthor,
-                User commentAuthor,
                 Spot spot,
                 Comment comment
         ) {
             String content = """
-                    '%s'님이 '%s'님의 게시글에 댓글을 남겼어요 : %s
+                    %s님이 %s님의 게시글에 댓글을 남겼어요 : %s
                     """.formatted(
-                            commentAuthor.getNickname(),
+                            comment.getUser().getNickname(),
                     spotAuthor.getNickname(),
                     comment.getContent()
             );
@@ -41,22 +40,40 @@ public class NotificationDto {
                     .build();
         }
 
-        public static NotifyParams ofCreateFeedCommentComment(
-                User commentAuthor,
-                Spot spot,
+        public static NotifyParams ofCreateSpotCommentComment(
                 Comment parentComment,
-                Comment comment
+                Spot spot,
+                Comment childComment
         ) {
             String content = """
-                    '%s'님이 '%s'님의 댓글에 대댓글을 남겼어요 : %s
+                    %s님이 %s님의 댓글에 대댓글을 남겼어요 : %s
                     """.formatted(
-                            commentAuthor.getNickname(),
+                    childComment.getUser().getNickname(),
                     parentComment.getUser().getNickname(),
-                    comment.getUser().getNickname(),
-                    comment.getContent()
+                    childComment.getContent()
             );
             return NotifyParams.builder()
-                    .receiver(commentAuthor)
+                    .receiver(parentComment.getUser())
+                    .type(NotificationType.CREATE_SPOT_COMMENT_COMMENT)
+                    .redirectTargetId(spot.getId())
+                    .title(spot.getTitle())
+                    .content(content)
+                    .build();
+        }
+
+        public static NotifyParams ofCreateSpotCommentComment(
+                User notifyTarget,
+                Spot spot,
+                Comment childComment
+        ) {
+            String content = """
+                    %s님이 대댓글을 남겼어요 : %s
+                    """.formatted(
+                    childComment.getUser().getNickname(),
+                    childComment.getContent()
+            );
+            return NotifyParams.builder()
+                    .receiver(notifyTarget)
                     .type(NotificationType.CREATE_SPOT_COMMENT_COMMENT)
                     .redirectTargetId(spot.getId())
                     .title(spot.getTitle())
