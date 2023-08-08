@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -49,6 +50,14 @@ public class AwsS3Service {
                 .map(file -> uploadSingleFile(file, S3SaveDir.toEnum(uploadFileRequest.type()), currentUserSocialEmail))
                 .toList();
         return new FileListDto(uploadedFiles);
+    }
+
+    public List<String> uploadFiles(S3SaveDir saveDir, List<MultipartFile> files) {
+        String currentUserSocialEmail = getCurrentUserSocialEmail();
+
+        return files.stream()
+                .map(file -> uploadSingleFile(file, saveDir, currentUserSocialEmail).fileUrl())
+                .toList();
     }
 
     public FileDto uploadSingleFile(final MultipartFile multipartFile, final S3SaveDir saveDir, final String owner) {
@@ -96,6 +105,10 @@ public class AwsS3Service {
                 .map(file -> uploadSingleFile(file, saveDir, currentUserSocialEmail))
                 .toList();
         return new FileListDto(uploadedFiles);
+    }
+
+    public void deleteMultipleFile(S3SaveDir saveDir, List<String> imageUrls) {
+        imageUrls.forEach(url -> deleteSingleFile(saveDir, url));
     }
 
     public void deleteSingleFile(final S3SaveDir saveDir, final String url) {

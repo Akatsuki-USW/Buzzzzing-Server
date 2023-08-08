@@ -16,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static bokjak.bokjakserver.common.dto.ApiResponse.success;
 
 @RestController
@@ -39,12 +41,13 @@ public class AwsS3Controller {
     }
 
     @DeleteMapping("/{type}")
+    @SecurityRequirement(name = SwaggerConstants.SECURITY_SCHEME_NAME)
     @Operation(summary = SwaggerConstants.S3_FILE_DELETE, description = SwaggerConstants.S3_FILE_DELETE_DESCRIPTION)
-    public ApiResponse<DeleteFileResponse> deleteFile(
+    public ApiResponse<DeleteFileResponse> deleteFiles(
             @PathVariable(value = "type") String type,
-            @RequestParam String fileUrl
+            @RequestParam List<String> fileUrl
     ) {
-        awsS3Service.deleteSingleFile(S3SaveDir.toEnum(type), fileUrl);
+        awsS3Service.deleteMultipleFile(S3SaveDir.toEnum(type), fileUrl);
         return success(DeleteFileResponse.success());
     }
 }
