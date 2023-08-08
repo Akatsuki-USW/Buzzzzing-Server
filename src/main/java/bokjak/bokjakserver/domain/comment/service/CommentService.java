@@ -110,7 +110,6 @@ public class CommentService {
             );
 
         }
-        // todo 대댓글에 Author가 답글 달 시 그 댓글에 참여한 모두가 알림받게 하고 싶다.
         return CommentCardResponse.of(comment, currentUserId);
     }
 
