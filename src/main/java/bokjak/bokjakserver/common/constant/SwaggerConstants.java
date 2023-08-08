@@ -43,7 +43,7 @@ public class SwaggerConstants {
             `profile` : 유저 프로필 이미지
             `spot` : 추천 스팟 이미지
             """;
-    public static final String S3_FILE_DELETE = "단일 이미지 파일 삭제";
+    public static final String S3_FILE_DELETE = "복수 이미지 파일 삭제";
     public static final String S3_FILE_DELETE_DESCRIPTION = """
             .""";
     public static final String S3_FILE_UPDATE = "이미지 파일 업데이트";

@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -106,7 +107,7 @@ public class AwsS3Service {
         return new FileListDto(uploadedFiles);
     }
 
-    public void deleteFiles(S3SaveDir saveDir, List<String> imageUrls) {
+    public void deleteMultipleFile(S3SaveDir saveDir, List<String> imageUrls) {
         imageUrls.forEach(url -> deleteSingleFile(saveDir, url));
     }
 
