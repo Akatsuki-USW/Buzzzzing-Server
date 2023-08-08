@@ -15,6 +15,9 @@ application-prod.yml
 memo.md
 /src/main/resources/buzzzzing-firebase-private-key.json
 
+/src/main/java/bokjak/bokjakserver/common/dummy/LocationDummy.java
+
+
 ### STS ###
 .apt_generated
 .classpath
