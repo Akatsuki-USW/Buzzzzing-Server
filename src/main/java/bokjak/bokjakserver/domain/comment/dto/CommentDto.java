@@ -1,20 +1,15 @@
 package bokjak.bokjakserver.domain.comment.dto;
 
-import bokjak.bokjakserver.domain.category.model.SpotCategory;
 import bokjak.bokjakserver.domain.comment.model.Comment;
-import bokjak.bokjakserver.domain.location.model.Location;
 import bokjak.bokjakserver.domain.spot.model.Spot;
 import bokjak.bokjakserver.domain.user.model.User;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-import static bokjak.bokjakserver.common.constant.ConstraintConstants.*;
-import static bokjak.bokjakserver.common.constant.ConstraintConstants.SPOT_IMAGE_MAX_SIZE;
+import static bokjak.bokjakserver.common.constant.ConstraintConstants.COMMENT_CONTENT_MAX_LENGTH;
 
 public class CommentDto {
     /* Request */
@@ -23,11 +18,20 @@ public class CommentDto {
             @NotNull @Size(max = COMMENT_CONTENT_MAX_LENGTH)
             String content
     ) {
-        public Comment toEntity(User user, Spot spot) {
+        public Comment toEntity(User user, Spot spot) { // 댓글
             return Comment.builder()
                     .user(user)
                     .spot(spot)
-                    .content(content)
+                    .content(this.content)
+                    .build();
+        }
+
+        public Comment toEntity(User user, Comment parent) { // 대댓글
+            return Comment.builder()
+                    .user(user)
+                    .spot(parent.getSpot())
+                    .parent(parent)
+                    .content(this.content)
                     .build();
         }
     }
@@ -42,6 +46,9 @@ public class CommentDto {
     /* Response */
     @Builder
     public record CommentCardResponse(
+            boolean presence,
+            Long parentId,
+            int childCount,
             Long id,
             String content,
             LocalDateTime createdAt,
@@ -51,19 +58,33 @@ public class CommentDto {
             String userProfileImageUrl,
             boolean isAuthor
     ) {
-        public static CommentCardResponse of(Comment comment, boolean isAuthor) {
-            return CommentCardResponse.builder()
-                    .id(comment.getId())
-                    .content(comment.getContent())
-                    .createdAt(comment.getCreatedAt())
-                    .updatedAt(comment.getUpdatedAt())
-                    .userId(comment.getUser().getId())
-                    .userNickname(comment.getUser().getNickname())
-                    .userProfileImageUrl(comment.getUser().getProfileImageUrl())
-                    .isAuthor(isAuthor)
-                    .build();
+        public static CommentCardResponse of(Comment comment, Long userId) {
+                if (comment.isPresence()) {// 존재 여부에 따라 분기처리
+                    User author = comment.getUser();
+
+                    return CommentCardResponse.builder()
+                            .presence(comment.isPresence())
+                            .parentId(comment.isParent() ? null : comment.getParent().getId())
+                            .childCount(comment.isParent() ? comment.getChildList().size() : 0) // 대댓글의 경우 항상 0
+                            .id(comment.getId())
+                            .content(comment.getContent())
+                            .createdAt(comment.getCreatedAt())
+                            .updatedAt(comment.getUpdatedAt())
+                            .userId(author.getId())
+                            .userNickname(author.getNickname())
+                            .userProfileImageUrl(author.getProfileImageUrl())
+                            .isAuthor(author.getId().equals(userId))
+                            .build();
+                } else {
+                    return CommentCardResponse.builder()
+                            .parentId(comment.isParent() ? null : comment.getParent().getId())
+                            .childCount(comment.isParent() ? comment.getChildList().size() : 0) // 대댓글의 경우 항상 0
+                            .id(comment.getId())
+                            .presence(comment.isPresence())
+                            .build();
+                }
+            }
         }
-    }
 
     public record CommentMessage(
             boolean result

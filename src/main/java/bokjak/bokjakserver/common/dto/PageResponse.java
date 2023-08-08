@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,11 +27,18 @@ public class PageResponse<T> {
                 .build();
     }
 
-    public static <T> PageResponse<T> ofCursor(Page<T> page, Long totalElements) {
+    public static <T> PageResponse<T> of(Slice<T> slice) {
+        return PageResponse.<T>builder()
+                .last(slice.isLast())
+                .content(slice.getContent())
+                .build();
+    }
+
+    public static <T> PageResponse<T> of(Slice<T> slice, Long totalElements) {
         return PageResponse.<T>builder()
                 .totalElements(totalElements)
-                .last(page.isLast())
-                .content(page.getContent())
+                .last(slice.isLast())
+                .content(slice.getContent())
                 .build();
     }
 

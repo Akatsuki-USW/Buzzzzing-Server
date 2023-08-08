@@ -39,15 +39,16 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-
-      ## 1. yml 파일 생성
+      
+      ## yml 파일 생성
       - name: Set up yml file
         env:
-          YAML_SECRET: ${{ secrets.APPLICATION_YML }}
+          YAML_SECRET: ${{ secrets.APPLICATION_DEV_YML }}
           YAML_DIR: src/main/resources
-          YAML_FILE_NAME: application.yml
+          YAML_FILE_NAME: application-dev.yml
         run: echo $YAML_SECRET | base64 --decode > $YAML_DIR/$YAML_FILE_NAME
-      
+        
+      ## FCM 설정 파일 셋업
       - name: Set up Json file
         env:
           JSON_SECRET: ${{ secrets.FIREBASE_PRIVATE_KEY_JSON }}
@@ -55,13 +56,13 @@ jobs:
           JSON_FILE_NAME: buzzzzing-firebase-private-key.json
         run: echo $JSON_SECRET | base64 --decode > $JSON_DIR/$JSON_FILE_NAME
         
-      ## 2. gradlew 권한 부여 및 빌드
+      ## gradlew 권한 부여 및 빌드
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew bootJar
 
-      ## 3. 이미지 생성 -> 도커 허브에 Push
+      ## 이미지 생성 -> 도커 허브에 Push
       - name: Docker build
         run: |
           docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
@@ -69,7 +70,7 @@ jobs:
           docker tag ${{ secrets.DOCKER_USERNAME }}/buzzing-server ${{ secrets.DOCKER_USERNAME }}/buzzing-server:${GITHUB_SHA::7}
           docker push ${{ secrets.DOCKER_USERNAME }}/buzzing-server:${GITHUB_SHA::7}  # Github에서 기본적으로 제공하는 환경변수 commit SHA
 
-      ## 4. 도커 허브의 이미지를 리눅스 인스턴스에 받아와서 run
+      ## 도커 허브의 이미지를 리눅스 인스턴스에 받아와서 run
       - name: Deploy
         uses: appleboy/ssh-action@master
         with:
@@ -87,7 +88,7 @@ jobs:
             ## 서버 헬스 체크
             TARGET_URL=localhost PORT=8080
 
-            for RETRY_COUNT in 1 2 3 4 5 6 7 8 9 10; do
+            for RETRY_COUNT in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15; do
               echo "> #${RETRY_COUNT} trying..."
               RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}" $TARGET_URL:$PORT/hello)
 

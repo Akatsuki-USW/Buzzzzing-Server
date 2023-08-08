@@ -157,22 +157,105 @@ public class SwaggerConstants {
     public static final String TAG_COMMENT = "Spot Comment";
     public static final String TAG_COMMENT_DESCRIPTION = "스팟 댓글 API";
 
-    public static final String COMMENT_GET_ALL = "스팟 댓글 리스트 조회";
-    public static final String COMMENT_GET_ALL_DESCRIPTION = """
+    public static final String COMMENT_GET_ALL_PARENT = "댓글 리스트 조회";
+    public static final String COMMENT_GET_ALL_PARENT_DESCRIPTION = """
             특정 스팟의 모든 댓글을 조회합니다.
             차단한 유저가 작성한 댓글들은 제외
             
-            💡 추후 대댓글 구현시 sequence, depth 필드가 생길 수 있음
             """;
-    public static final String COMMENT_CREATE = "스팟 댓글 생성";
-    public static final String COMMENT_CREATE_DESCRIPTION = """
-            ⚠️ 추후 대댓글 구현시 parentCommentId 생김
+    public static final String COMMENT_GET_ALL_CHILD = "대댓글 리스트 조회";
+    public static final String COMMENT_GET_ALL_CHILD_DESCRIPTION = """
+            특정 댓글의 모든 대댓글을 조회합니다.
+            차단한 유저가 작성한 대댓글들은 제외
+            
             """;
-    public static final String COMMENT_UPDATE = "스팟 댓글 수정";
+    public static final String COMMENT_CREATE_PARENT = "댓글 생성";
+    public static final String COMMENT_CREATE_PARENT_DESCRIPTION = """
+            .""";
+    public static final String COMMENT_CREATE_CHILD = "대댓글 생성";
+    public static final String COMMENT_CREATE_CHILD_DESCRIPTION = """
+            .""";
+    public static final String COMMENT_UPDATE = "댓글, 대댓글 수정";
     public static final String COMMENT_UPDATE_DESCRIPTION = """
-            .""";
-    public static final String COMMENT_DELETE = "스팟 댓글 삭제";
+            댓글, 대댓글을 수정합니다.""";
+    public static final String COMMENT_DELETE = "댓글, 대댓글 삭제";
     public static final String COMMENT_DELETE_DESCRIPTION = """
-            .""";
+            댓글, 대댓글을 삭제합니다.""";
+
+    /**
+     * Auth
+     */
+
+    public static final String TAG_AUTH = "Auth";
+    public static final String TAG_AUTH_DESCRIPTION = "Auth API";
+    public static final String AUTH_LOGIN = "로그인";
+    public static final String AUTH_LOGIN_DESCRIPTION = """
+            기존의 회원이 있다면 로그인 진행 → AccessToken, RefreshToken 발행
+            없다면, 회원가입 sign Token 발급
+            """;
+    public static final String AUTH_SIGNUP = "회원가입";
+    public static final String AUTH_REISSUE = "토큰 재발행";
+    public static final String AUTH_LOGOUT = "로그아웃";
+
+    /**
+     * User
+     */
+
+    public static final String TAG_USER = "User";
+    public static final String TAG_USER_DESCRIPTION = "User API";
+    public static final String USER_ME = "내 정보 조회";
+    public static final String USER_CHECK_NICKNAME = "닉네임 검증";
+    public static final String USER_CHECK_NICKNAME_DESCRIPTION = """
+            True 이면 사용해도 좋은 닉네임
+            False 이면 해당 닉네임이 존재함 (오류, 다른 닉네임으로 변경)
+            """;
+    public static final String USER_UPDATE_PROFILE = "프로필 업데이트";
+    public static final String USER_UPDATE_PROFILE_DESCRIPTION = """
+            닉네임, 이메일, 프로필 사진을 수정할 수 있음
+            
+            nickname, email, profileImageUrl 모두 보내야 합니다!
+            """;
+    public static final String USER_REVOKE = "회원 탈퇴";
+    public static final String USER_HIDE = "회원 차단";
+
+    /**
+     * Report
+     */
+    public static final String TAG_REPORT = "Report";
+    public static final String TAG_REPORT_DESCRIPTION = "Report API";
+    public static final String REPORT_CREATE = "신고 생성";
+    public static final String REPORT_CREATE_DESCRIPTION = """
+            **reportTarget(신고 종류)**
+                        
+            `SPOT` `// 유저추천장소`
+                        
+            `COMMENT` `//댓글`
+                        
+            **reportTargetId(신고 종류에 따른 아이디)**
+                        
+            **reportedUserId(신고 대상 아이디)**
+            """;
+
+    /**
+     * Notification
+     */
+    public static final String TAG_NOTIFICATION = "Notification";
+    public static final String TAG_NOTIFICATION_DESCRIPTION = "Notification API";
+    public static final String NOTIFICATION_ME = "알림 목록 조회";
+    public static final String NOTIFICATION_ME_DESCRIPTION = """
+            - redirectTargetId : 해당 알림을 클릭했을 때 넘어가야할 대상 id
+            - targetEntity : 해당 알림을 클릭했을 때 넘어가야할 대상 (아마도 우린 Spot밖에 없을듯 확장성을 위해 추가함)
+                        
+            정렬은 최근에 받은 순으로 했고, 최대 30개로 제한함
+            """;
+    public static final String NOTIFICATION_READ = "알림 읽음 표시";
+    public static final String NOTIFICATION_READ_DESCRIPTION = "알림을 클릭해서 리다이렉트해야 읽음 표시";
+
+    /**
+     * Ban
+     */
+    public static final String TAG_BAN = "Ban";
+    public static final String TAG_BAN_DESCRIPTION = "Ban API";
+    public static final String BAN_ME = "제제 내역 조회";
 
 }

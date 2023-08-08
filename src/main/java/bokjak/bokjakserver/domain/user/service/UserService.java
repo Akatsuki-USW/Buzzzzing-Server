@@ -37,8 +37,8 @@ public class UserService {
         return userRepository.findBySocialEmail(getCurrentUserSocialEmail()).orElseThrow(() -> new UserException(StatusCode.NOT_FOUND_USER));
     }
 
-    public UserInfoResponse getUserInfo() {
-        User user = getCurrentUser();
+    public UserInfoResponse getUserInfo(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserException(StatusCode.NOT_FOUND_USER));
         return new UserInfoResponse(user.getEmail(),user.getNickname(),user.getProfileImageUrl());
     }
 
@@ -63,8 +63,9 @@ public class UserService {
     }
 
     @Transactional
-    public UserInfoResponse updateUserInfo(UpdateUserInfoRequest updateUserInfoRequest) {
-        User currentUser = getCurrentUser();
+    public UserInfoResponse updateUserInfo(UpdateUserInfoRequest updateUserInfoRequest, Long userId) {
+        User currentUser = userRepository.findById(userId).orElseThrow(() -> new UserException(StatusCode.NOT_FOUND_USER));
+
         if (!currentUser.getNickname().equals(updateUserInfoRequest.nickname())) {
             validateDuplicateNickname(updateUserInfoRequest.nickname());
         }
@@ -75,8 +76,8 @@ public class UserService {
     }
 
     @Transactional
-    public HideResponse hideUser(HideRequest hideRequest) {
-        User currentUser = getCurrentUser();
+    public HideResponse hideUser(HideRequest hideRequest, Long userId) {
+        User currentUser = userRepository.findById(userId).orElseThrow(() -> new UserException(StatusCode.NOT_FOUND_USER));
         User blockedUser = userRepository.findById(hideRequest.blockUserId()).orElseThrow(() -> new UserException(StatusCode.NOT_FOUND_USER));
 
         boolean exists = userBlockUserRepository.existsByBlockerUserAndBlockedUser(currentUser, blockedUser);
@@ -95,8 +96,9 @@ public class UserService {
     }
 
     @Transactional
-    public AuthMessage revoke() {
-        User user = getCurrentUser();
+    public AuthMessage revoke(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new UserException(StatusCode.NOT_FOUND_USER));
+
         SocialType socialType = user.getSocialType();
         String[] split = user.getSocialEmail().split("@");
 

@@ -1,6 +1,7 @@
 package bokjak.bokjakserver.util;
 
 import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 
 public class CustomDateUtils {
@@ -28,5 +29,13 @@ public class CustomDateUtils {
                 localTime,
                 ZoneId.systemDefault()
         ).toLocalDateTime();
+    }
+
+    public static String customDateFormat(LocalDateTime localDateTime) {
+        return localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    }
+
+    public static String customDateFormatOnlyDate(LocalDateTime localDateTime) {
+        return localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 }

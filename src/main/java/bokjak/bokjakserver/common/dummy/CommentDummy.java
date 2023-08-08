@@ -30,21 +30,30 @@ public class CommentDummy {
         if (commentRepository.count() > 0) {
             log.info("[6] 댓글 데이터가 이미 존재");
         } else {
-            createSpots();
+            createComments();
             log.info("[6] 댓글 더미 생성 완료");
         }
     }
 
-    private void createSpots() {
+    private void createComments() {
         for (Spot spot : spotRepository.findAll()) {// 모든 스팟에 대해
             List<User> allUser = userRepository.findAll();
 
             for (int i = 0; i < 10; i++) {// 유저 10명
-                commentRepository.save(Comment.builder()
+                Comment parent = commentRepository.save(Comment.builder()
                         .user(allUser.get(i))
                         .spot(spot)
                         .content("댓글" + spot.getId() * (i + 1))
                         .build());
+
+                for (int j = 0; j < 5; j++) {
+                    commentRepository.save(Comment.builder()
+                            .user(allUser.get(j))
+                            .spot(spot)
+                            .parent(parent)
+                            .content(parent.getId() + "의 대댓글")
+                            .build());
+                }
             }
         }
     }

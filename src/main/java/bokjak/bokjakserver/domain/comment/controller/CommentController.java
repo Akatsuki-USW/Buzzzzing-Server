@@ -4,10 +4,7 @@ import bokjak.bokjakserver.common.constant.SwaggerConstants;
 import bokjak.bokjakserver.common.dto.ApiResponse;
 import bokjak.bokjakserver.common.dto.PageResponse;
 import bokjak.bokjakserver.config.security.PrincipalDetails;
-import bokjak.bokjakserver.domain.comment.dto.CommentDto.CommentCardResponse;
-import bokjak.bokjakserver.domain.comment.dto.CommentDto.CommentMessage;
-import bokjak.bokjakserver.domain.comment.dto.CommentDto.CreateSpotCommentRequest;
-import bokjak.bokjakserver.domain.comment.dto.CommentDto.UpdateSpotCommentRequest;
+import bokjak.bokjakserver.domain.comment.dto.CommentDto.*;
 import bokjak.bokjakserver.domain.comment.service.CommentService;
 import bokjak.bokjakserver.domain.user.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,32 +31,58 @@ public class CommentController {
     private final AuthService authService;
 
     // 스팟별 댓글 리스트 조회
-    @GetMapping("/{spotId}/comments")
-    @Operation(summary = SwaggerConstants.COMMENT_GET_ALL, description = SwaggerConstants.COMMENT_GET_ALL_DESCRIPTION)
-    public ApiResponse<PageResponse<CommentCardResponse>> getSpotComments(
+    @GetMapping("/{spotId}/comments/parents")
+    @Operation(summary = SwaggerConstants.COMMENT_GET_ALL_PARENT, description = SwaggerConstants.COMMENT_GET_ALL_PARENT_DESCRIPTION)
+    public ApiResponse<PageResponse<CommentCardResponse>> getParentComments(
             @PathVariable Long spotId,
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @PageableDefault Pageable pageable,
             @RequestParam(required = false) Long cursorId
     ) {
-        PageResponse<CommentCardResponse> pageResponse = commentService.getSpotComments(principalDetails.getUserId(), pageable, cursorId, spotId);
+        PageResponse<CommentCardResponse> pageResponse = commentService.getParentComments(principalDetails.getUserId(), pageable, cursorId, spotId);
         return success(pageResponse);
     }
 
-    // 스팟 댓글 생성
-    @PostMapping("/{spotId}/comments")
-    @Operation(summary = SwaggerConstants.COMMENT_CREATE, description = SwaggerConstants.COMMENT_CREATE_DESCRIPTION)
-    public ApiResponse<CommentCardResponse> createSpotComment(
+    // 대댓글 리스트 조회
+    @GetMapping("/comments/{parentId}/children")
+    @Operation(summary = SwaggerConstants.COMMENT_GET_ALL_CHILD, description = SwaggerConstants.COMMENT_GET_ALL_CHILD_DESCRIPTION)
+    public ApiResponse<PageResponse<CommentCardResponse>> getChildComments(
+            @PathVariable Long parentId,
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @PageableDefault Pageable pageable,
+            @RequestParam(required = false) Long cursorId
+    ) {
+        PageResponse<CommentCardResponse> pageResponse = commentService.getChildComments(principalDetails.getUserId(), pageable, cursorId, parentId);
+        return success(pageResponse);
+    }
+
+    // 댓글 생성
+    @PostMapping("/{spotId}/comments/parents")
+    @Operation(summary = SwaggerConstants.COMMENT_CREATE_PARENT, description = SwaggerConstants.COMMENT_CREATE_PARENT_DESCRIPTION)
+    public ApiResponse<CommentCardResponse> createParentComment(
             @PathVariable Long spotId,
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @Valid @RequestBody CreateSpotCommentRequest createSpotCommentRequest
     ) {
         authService.checkIsBannedUser(principalDetails.getUser());
-        CommentCardResponse response = commentService.createSpotComment(principalDetails.getUserId(), spotId, createSpotCommentRequest);
+        CommentCardResponse response = commentService.createParentComment(principalDetails.getUserId(), spotId, createSpotCommentRequest);
         return success(response);
     }
 
-    // 스팟 댓글 수정
+    // 대댓글 생성
+    @PostMapping("/comments/{parentId}/children")
+    @Operation(summary = SwaggerConstants.COMMENT_CREATE_CHILD, description = SwaggerConstants.COMMENT_CREATE_CHILD_DESCRIPTION)
+    public ApiResponse<CommentCardResponse> createChildComment(
+            @PathVariable Long parentId,
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @Valid @RequestBody CreateSpotCommentRequest createSpotCommentRequest
+    ) {
+        authService.checkIsBannedUser(principalDetails.getUser());
+        CommentCardResponse response = commentService.createChildComment(principalDetails.getUserId(), parentId, createSpotCommentRequest);
+        return success(response);
+    }
+
+    // 댓글, 대댓글 수정
     @PutMapping("/comments/{commentId}")
     @Operation(summary = SwaggerConstants.COMMENT_UPDATE, description = SwaggerConstants.COMMENT_UPDATE_DESCRIPTION)
     public ApiResponse<CommentCardResponse> updateSpotComment(
@@ -72,7 +95,7 @@ public class CommentController {
         return success(response);
     }
 
-    // 스팟 댓글 삭제
+    // 댓글, 대댓글 삭제
     @DeleteMapping("/comments/{commentId}")
     @Operation(summary = SwaggerConstants.COMMENT_DELETE, description = SwaggerConstants.COMMENT_DELETE_DESCRIPTION)
     public ApiResponse<CommentMessage> deleteSpotComment(

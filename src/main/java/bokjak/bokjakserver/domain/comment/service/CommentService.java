@@ -9,17 +9,22 @@ import bokjak.bokjakserver.domain.comment.dto.CommentDto.UpdateSpotCommentReques
 import bokjak.bokjakserver.domain.comment.exception.CommentException;
 import bokjak.bokjakserver.domain.comment.model.Comment;
 import bokjak.bokjakserver.domain.comment.repository.CommentRepository;
+import bokjak.bokjakserver.domain.notification.dto.NotificationDto.NotifyParams;
+import bokjak.bokjakserver.domain.notification.service.NotificationService;
 import bokjak.bokjakserver.domain.spot.exception.SpotException;
 import bokjak.bokjakserver.domain.spot.model.Spot;
 import bokjak.bokjakserver.domain.spot.repository.SpotRepository;
 import bokjak.bokjakserver.domain.user.model.User;
+import bokjak.bokjakserver.domain.user.repository.UserRepository;
 import bokjak.bokjakserver.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 
 @Slf4j
@@ -30,27 +35,82 @@ public class CommentService {
     private final UserService userService;
     private final SpotRepository spotRepository;
     private final CommentRepository commentRepository;
+    private final NotificationService notificationService;
+    private final UserRepository userRepository;
 
     // 스팟별 댓글 리스트 조회
-    public PageResponse<CommentCardResponse> getSpotComments(Long currentUserId, Pageable pageable, Long cursorId, Long spotId) {
-        Page<Comment> comments = commentRepository.findAllBySpotExceptBlockedAuthors(pageable, cursorId, spotId, currentUserId);
+    public PageResponse<CommentCardResponse> getParentComments(Long currentUserId, Pageable pageable, Long cursorId, Long spotId) {
+        Slice<Comment> comments = commentRepository.findAllParentBySpotExceptBlockedAuthors(pageable, cursorId, spotId, currentUserId);
+        Long total = commentRepository.countAllParentBySpotExceptBlockedAuthors(spotId, currentUserId);
 
-        Page<CommentCardResponse> resultPage = comments
-                .map(it -> CommentCardResponse.of(it, it.getUser().getId().equals(currentUserId))); // 작성자 여부
-        return PageResponse.of(resultPage);
+        Slice<CommentCardResponse> result = comments.map(it -> CommentCardResponse.of(it, currentUserId));
+
+        return PageResponse.of(result, total);
+    }
+
+    // 대댓글 리스트 조회
+    public PageResponse<CommentCardResponse> getChildComments(Long currentUserId, Pageable pageable, Long cursorId, Long parentId) {
+        Slice<Comment> comments = commentRepository.findAllChildrenByParentExceptBlockedAuthors(pageable, cursorId, parentId, currentUserId);
+        Long total = commentRepository.countAllChildrenByParentExceptBlockedAuthors(parentId, currentUserId);
+
+        Slice<CommentCardResponse> result = comments.map(it -> CommentCardResponse.of(it, currentUserId));
+
+        return PageResponse.of(result, total);
     }
 
     // 스팟 댓글 생성
     @Transactional
-    public CommentCardResponse createSpotComment(Long currentUserId, Long spotId, CreateSpotCommentRequest createSpotCommentRequest) {
-        User user = userService.getUser(currentUserId);
+    public CommentCardResponse createParentComment(Long currentUserId, Long spotId, CreateSpotCommentRequest createSpotCommentRequest) {
+        User commentAuthor = userService.getUser(currentUserId);
         Spot spot = spotRepository.findById(spotId)
                 .orElseThrow(() -> new SpotException(StatusCode.NOT_FOUND_SPOT));
 
-        Comment comment = commentRepository.save(createSpotCommentRequest.toEntity(user, spot));
-        boolean isAuthor = comment.getUser().equals(user);  // 작성자 여부(always true)
+        Comment comment = commentRepository.save(createSpotCommentRequest.toEntity(commentAuthor, spot));
 
-        return CommentCardResponse.of(comment, isAuthor);
+        User spotAuthor = spot.getUser();
+        boolean equals = checkIsSameUser(spotAuthor, commentAuthor);
+        if (!equals) {
+            notificationService.pushMessage(NotifyParams.ofCreateSpotComment(spotAuthor,spot,comment));
+        }
+
+        return CommentCardResponse.of(comment, currentUserId);
+    }
+
+    // 대댓글 생성
+    @Transactional
+    public CommentCardResponse createChildComment(Long currentUserId, Long parentId, CreateSpotCommentRequest createSpotCommentRequest) {
+        User user = userService.getUser(currentUserId);
+        Comment parent = commentRepository.findById(parentId)
+                .orElseThrow(() -> new CommentException(StatusCode.NOT_FOUND_COMMENT));
+        // 부모 댓글이 삭제된 경우 (논리적 에러)
+        if (!parent.isPresence()) throw new CommentException(StatusCode.NOT_FOUND_COMMENT);
+
+        Comment comment = commentRepository.save(createSpotCommentRequest.toEntity(user, parent));
+
+
+        Spot spot = parent.getSpot();
+
+        boolean equals = checkIsSameUser(parent.getUser(), user);
+        if (!equals) {
+            notificationService.pushMessage(NotifyParams.ofCreateSpotCommentComment(parent,spot,comment));
+        }
+        else {
+            List<Comment> childCommentList = commentRepository.findAllByParent(parent);
+            List<Long> userIdList = childCommentList.stream()
+                    .filter(c -> !checkIsSameUser(c.getUser(),parent.getUser()))
+                    .map(c -> c.getUser().getId())
+                    .distinct()
+                    .toList();
+
+            userIdList.forEach(c -> {
+                User notifyToUser = userRepository.findById(c).orElseThrow(() -> new SpotException(StatusCode.NOT_FOUND_USER));
+                notificationService.pushMessage(NotifyParams.ofCreateSpotCommentComment(
+                        notifyToUser,spot,comment));
+                    }
+            );
+
+        }
+        return CommentCardResponse.of(comment, currentUserId);
     }
 
     // 스팟 댓글 수정
@@ -61,9 +121,8 @@ public class CommentService {
                 .orElseThrow(() -> new CommentException(StatusCode.NOT_FOUND_COMMENT));
 
         comment.update(updateSpotCommentRequest.content());
-        boolean isAuthor = comment.getUser().equals(user);  // 작성자 여부(always true)
 
-        return CommentCardResponse.of(comment, isAuthor);
+        return CommentCardResponse.of(comment, currentUserId);
     }
 
     // 스팟 댓글 삭제
@@ -75,7 +134,7 @@ public class CommentService {
 
         checkIsAuthor(user, comment);
 
-        commentRepository.delete(comment);
+        comment.logicallyDelete();
 
         return new CommentMessage(true);
     }
@@ -84,5 +143,9 @@ public class CommentService {
         if (!comment.getUser().equals(user)) {
             throw new CommentException(StatusCode.NOT_AUTHOR);
         }
+    }
+
+    private static boolean checkIsSameUser(User author, User user) {
+        return author.getId().equals(user.getId());
     }
 }

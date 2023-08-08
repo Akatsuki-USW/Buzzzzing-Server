@@ -22,7 +22,7 @@ import java.util.Map;
 
 @Slf4j
 @Component("congestionDummy")
-@DependsOn("locationDummy")
+@DependsOn("userDummy")
 @RequiredArgsConstructor
 @Transactional
 public class CongestionDummy {
@@ -69,8 +69,7 @@ public class CongestionDummy {
             // daily
             for (int i = 0; i <= 28; i++) {  // 28일간의 데이터
                 ArrayList<Map<String, Integer>> list = new ArrayList<>();
-                LocalDateTime pastCreatedAt = LocalDateTime.now().minusDays(i + 1); // 미래 데이터까지 미리 넣어버리기
-                LocalDateTime futureCreatedAt = LocalDateTime.now().plusDays(i);
+                LocalDateTime pastCreatedAt = LocalDateTime.now().minusDays(i + 1);
 
 
                 for (int j = 9; j <= 24; j++) {// 9~24시
@@ -87,32 +86,17 @@ public class CongestionDummy {
                                 .createdAt(pastCreatedAt)
                                 .build()
                 );
-                dailyCongestionStatisticRepository.save(
-                        DailyCongestionStatistic.builder()
-                                .location(location)
-                                .content(Map.of("statistics", list))
-                                .createdAt(futureCreatedAt)
-                                .build()
-                );
             }
 
             // weekly
             for (int i = 0; i < 5; i++) {// 5주간의 데이터
                 LocalDateTime pastCreatedAt = LocalDateTime.now().minusWeeks(i + 1);
-                LocalDateTime futureCreatedAt = LocalDateTime.now().plusWeeks(i); // 미래 데이터까지 미리 넣어버리기
 
                 weeklyCongestionStatisticRepository.save(
                         WeeklyCongestionStatistic.builder()
                                 .location(location)
                                 .averageCongestionLevel((float) ((Math.random() * 100) % 3 + 1))
                                 .createdAt(pastCreatedAt)
-                                .build()
-                );
-                weeklyCongestionStatisticRepository.save(
-                        WeeklyCongestionStatistic.builder()
-                                .location(location)
-                                .averageCongestionLevel((float) ((Math.random() * 100) % 3 + 1))
-                                .createdAt(futureCreatedAt)
                                 .build()
                 );
             }
