@@ -159,6 +159,11 @@ public class JwtProvider {
         return new JwtDto(access,refresh);
     }
 
+    public JwtDto adminIssue(User user) {
+        String accessToken = createAccessToken(user);
+        return new JwtDto(accessToken,"");
+    }
+
     /**
      * Refresh Token으로 Access Token 재발급 (Access, Refresh 둘 다 재발급) RTR방식
      */
@@ -191,5 +196,4 @@ public class JwtProvider {
         findRefreshToken.replace(newRefreshToken);
         return new JwtDto(newAccessToken, newRefreshToken);
     }
-
 }

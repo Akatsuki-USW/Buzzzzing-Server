@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(ex.statusCode.getStatusCode(), ex.statusCode.getMessage()));
     }
 
-    @ExceptionHandler(AuthException.class)
+    @ExceptionHandler(AuthException.class)  //분리 이유: SignToken
     public ResponseEntity<?> handle(AuthException ex) {
         log.warn("{}({}) - {}", ex.getClass().getSimpleName(), ex.statusCode.getStatusCode(), ex.getMessage());
         return ResponseEntity

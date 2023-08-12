@@ -34,6 +34,7 @@ public enum StatusCode {
     NICKNAME_VALIDATE_ERROR(400,2060,"invalid nickname error"),
     BLOCK_ERROR(400,2070,"not found blockId error"),
     IS_BLOCKED_ERROR(400,2080,"isblocked error"),
+    ROLE_ACCESS_ERROR(400,2090,"role access error"),
     /**
      * Auth
      */

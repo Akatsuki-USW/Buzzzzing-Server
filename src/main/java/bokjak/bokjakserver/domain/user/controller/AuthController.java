@@ -54,4 +54,13 @@ public class AuthController {
     public ApiResponse<LogoutResponse> logout(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         return success(authService.logout(principalDetails.getUserId()));
     }
+
+    @PostMapping("/login/admin")
+    @Operation(summary = ADMIN_LOGIN, description = ADMIN_LOGIN_DESCRIPTION)
+    public ApiResponse<?> adminLogin(@RequestBody AdminLoginRequest adminLoginRequest) {
+        AuthMessage authMessage = authService.loginAdmin(adminLoginRequest);
+        return success(authMessage.detailData());
+    }
+
+
 }
