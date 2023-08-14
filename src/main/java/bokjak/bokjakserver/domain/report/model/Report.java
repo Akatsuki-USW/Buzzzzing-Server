@@ -32,4 +32,5 @@ public class Report extends BaseEntity {
     private Long targetId;
     @Column(length = 300)
     private String content;
+    private Boolean isChecked;
 }
