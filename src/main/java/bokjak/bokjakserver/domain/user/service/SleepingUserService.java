@@ -1,5 +1,7 @@
 package bokjak.bokjakserver.domain.user.service;
 
+import bokjak.bokjakserver.common.exception.StatusCode;
+import bokjak.bokjakserver.domain.user.exeption.UserException;
 import bokjak.bokjakserver.domain.user.model.SleepingUser;
 import bokjak.bokjakserver.domain.user.model.User;
 import bokjak.bokjakserver.domain.user.repository.SleepingUserRepository;
@@ -19,6 +21,7 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
@@ -64,6 +67,19 @@ public class SleepingUserService {
 
         sendMailToUsers(beforeSleepUsers);
         log.info("sendMailToBeforeSleep 스케쥴러 끝");
+    }
+
+    //3년 간 로그인 하지 않을 경우, 계정 삭제
+    @Scheduled(cron = "0 0 11 * * *")
+    public void checkSleepingUserToDelete() {
+        log.info("checkSleepingUserToDelete 스케쥴러 시작");
+        LocalDateTime time = LocalDateTime.now().minusYears(3);
+        List<SleepingUser> deleteUsers = sleepingUserRepository.findByLastLoginDateBefore(time);
+        for (SleepingUser deleteUser : deleteUsers) {
+            User user = userRepository.findById(deleteUser.getOriginalId()).orElseThrow(() -> new UserException(StatusCode.NOT_FOUND_USER));
+            user.deletedUser();
+            deleteUser.deleteUser();
+        }
     }
 
     private void sendMailToUsers(List<User> beforeSleepUsers) {
