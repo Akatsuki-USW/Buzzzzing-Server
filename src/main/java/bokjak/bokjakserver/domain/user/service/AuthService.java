@@ -81,13 +81,18 @@ public class AuthService {
         return loginMessage;
     }
 
-    private void checkIsBlackListAndRevokeUser(String socialEmail) {
+    @Transactional
+    public void checkIsBlackListAndRevokeUser(String socialEmail) {
         List<BlackList> blackLists = blackListRepository.findAll();
         List<BlackList> checkBlackList = blackLists.stream()
-                .filter(b -> passwordEncoder.matches(socialEmail, b.getSocialEmail())
-                && LocalDateTime.now().isBefore(b.getBanEndedAt()))
+                .filter(b -> passwordEncoder.matches(socialEmail, b.getSocialEmail()))
                 .toList();
         if (checkBlackList.isEmpty()) return;
+
+        else if (checkBlackList.get(0).getBanEndedAt().isBefore(LocalDateTime.now())) {
+            blackListRepository.delete(checkBlackList.get(0));
+            return;
+        }
 
         throw new UserException(StatusCode.BLACKLIST_BANNED_USER);
     }
