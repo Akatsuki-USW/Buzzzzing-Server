@@ -29,6 +29,7 @@ public class ReportDto {
                     .reportTarget(ReportTarget.toEnum(reportTarget))
                     .targetId(reportTargetId)
                     .content(content)
+                    .isChecked(false)
                     .build();
         }
     }

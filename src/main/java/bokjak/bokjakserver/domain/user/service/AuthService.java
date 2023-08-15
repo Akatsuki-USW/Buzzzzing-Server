@@ -11,10 +11,7 @@ import bokjak.bokjakserver.domain.ban.repository.BanRepository;
 import bokjak.bokjakserver.domain.user.dto.AuthDto.*;
 import bokjak.bokjakserver.domain.user.exeption.AuthException;
 import bokjak.bokjakserver.domain.user.exeption.UserException;
-import bokjak.bokjakserver.domain.user.model.RevokeUser;
-import bokjak.bokjakserver.domain.user.model.SleepingUser;
-import bokjak.bokjakserver.domain.user.model.User;
-import bokjak.bokjakserver.domain.user.model.UserStatus;
+import bokjak.bokjakserver.domain.user.model.*;
 import bokjak.bokjakserver.domain.user.repository.RevokeUserRepository;
 import bokjak.bokjakserver.domain.user.repository.SleepingUserRepository;
 import bokjak.bokjakserver.domain.user.repository.UserRepository;
@@ -36,6 +33,7 @@ import static bokjak.bokjakserver.config.security.SecurityUtils.getCurrentUserSo
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AuthService {
     
     private final RefreshTokenRepository refreshTokenRepository;
@@ -87,6 +85,14 @@ public class AuthService {
         return jwtProvider.issue(user);
     }
 
+    public JwtDto adminJwt(LoginRequest loginRequest) {
+        UsernamePasswordAuthenticationToken authenticationToken = loginRequest.toAuthentication();
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        User user = principal.getUser();
+        return jwtProvider.adminIssue(user);
+    }
+
     @Transactional
     public SignAuthMessage signUp(SignUpRequest signUpRequest) {
         String signToken = jwtProvider.resolveSignToken(signUpRequest.signToken());
@@ -109,6 +115,7 @@ public class AuthService {
                 StatusCode.SIGNUP_COMPLETE.getMessage()
         );
     }
+
 
     private void checkDuplicationNickName(String nickname) {
         userService.validateDuplicateNickname(nickname);
@@ -150,7 +157,7 @@ public class AuthService {
     // TODO Interceptor, Security .hasAuthority 등 고민. 컨트롤러 내부 로직 타기 전에 처리하고 싶다.
     public void checkIsBannedUser(User user) {  // 작성 권한 체크: BANNED 유저는 작성, 수정, 삭제 할 수 없음
         if (user.getUserStatus().equals(UserStatus.BANNED)) {
-            throw new AuthException(StatusCode.BANNED_USER);
+            throw new UserException(StatusCode.BANNED_USER);
         }
     }
 
@@ -175,10 +182,11 @@ public class AuthService {
         if (provider.equalsIgnoreCase("Kakao")) {
             return kakaoService.getKakaoId(socialLoginRequest.oauthAccessToken());
         } else {
-            throw new AuthException(StatusCode.SOCIAL_TYPE_ERROR);
+            throw new UserException(StatusCode.SOCIAL_TYPE_ERROR);
         }
     }
 
+    @Transactional
     public JwtDto reissue(ReissueRequest reissueRequest) {
         return jwtProvider.reissue(reissueRequest.refreshToken());
     }
@@ -188,11 +196,20 @@ public class AuthService {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserException(StatusCode.NOT_FOUND_USER));
 
         RefreshToken refreshToken = refreshTokenRepository.findByUser(user)
-                .orElseThrow(() -> new AuthException(StatusCode.NOT_FOUND_REFRESH_TOKEN));
+                .orElseThrow(() -> new UserException(StatusCode.NOT_FOUND_REFRESH_TOKEN));
         refreshTokenRepository.delete(refreshToken);
         refreshTokenRepository.flush();
 
         return LogoutResponse.of(refreshTokenRepository.existsByUser(user));
     }
 
+    @Transactional
+    public AuthMessage loginAdmin(AdminLoginRequest adminLoginRequest) {
+        String email = adminLoginRequest.email();
+        User admin = userRepository.findBySocialEmail(email).orElseThrow(() -> new UserException(StatusCode.NOT_FOUND_USER));
+
+        if (!admin.getRole().equals(Role.ROLE_ADMIN)) throw new UserException(StatusCode.ROLE_ACCESS_ERROR);
+        JwtDto jwtDto = adminJwt(adminLoginRequest.changeLoginRequest());
+        return new AuthMessage(jwtDto,StatusCode.LOGIN.getMessage());
+    }
 }

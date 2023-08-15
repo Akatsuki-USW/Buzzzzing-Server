@@ -196,6 +196,11 @@ public class SwaggerConstants {
     public static final String AUTH_SIGNUP = "회원가입";
     public static final String AUTH_REISSUE = "토큰 재발행";
     public static final String AUTH_LOGOUT = "로그아웃";
+    public static final String ADMIN_LOGIN = "관리자 로그인";
+    public static final String ADMIN_LOGIN_DESCRIPTION = """
+            Admin 로그인은 email, password로 이루어져있고, AccessToken만 발급
+            """;
+
 
     /**
      * User
@@ -243,8 +248,15 @@ public class SwaggerConstants {
     public static final String TAG_NOTIFICATION_DESCRIPTION = "Notification API";
     public static final String NOTIFICATION_ME = "알림 목록 조회";
     public static final String NOTIFICATION_ME_DESCRIPTION = """
-            - redirectTargetId : 해당 알림을 클릭했을 때 넘어가야할 대상 id
-            - targetEntity : 해당 알림을 클릭했을 때 넘어가야할 대상 (아마도 우린 Spot밖에 없을듯 확장성을 위해 추가함)
+            `redirectTargetId` : 알림 클릭시 이동해야하는 대상의 PK
+                        
+            `targetEntity` : 알림 클릭 시 조회해야하는 대상
+                        
+            - Spot - 게시글로 이동 (우린 이것만 씀)
+                        
+            `redirectTargetId`로 내려오는 값이 `targetEntity`의 PK입니다.
+                        
+            - ex. `targetEntity`: Feed, `redirectTargetId`:1 → 1번 PK의 게시글
                         
             정렬은 최근에 받은 순으로 했고, 최대 30개로 제한함
             """;

@@ -47,6 +47,15 @@ public class AuthDto {
             return new UsernamePasswordAuthenticationToken(socialEmail, password);
         }
     }
+
+    public record AdminLoginRequest(String email, String password) {
+        public LoginRequest changeLoginRequest() {
+            return LoginRequest.builder()
+                    .socialEmail(email)
+                    .password(password)
+                    .build();
+        }
+    }
     public record SignUpRequest(
             @NotBlank
             String signToken,
