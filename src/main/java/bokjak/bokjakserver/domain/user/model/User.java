@@ -103,6 +103,7 @@ public class User extends BaseEntity {
         this.socialEmail = null;
         this.socialType = null;
         this.profileImageUrl = null;
+        this.fcmToken = null;
     }
 
     public void updateUserStatus(UserStatus userStatus) {
@@ -191,5 +192,8 @@ public class User extends BaseEntity {
 
     public void removeSpotBookmark(SpotBookmark spotBookmark) {
         spotBookmarkList.remove(spotBookmark);
+    }
+    public void removeFcmToken() {
+        this.fcmToken = null;
     }
 }
