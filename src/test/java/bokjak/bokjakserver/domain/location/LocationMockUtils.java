@@ -8,7 +8,7 @@ public class LocationMockUtils {
         LocationCategory category = LocationCategory.builder()
                 .id(2L)
                 .name("놀이공원")
-                .iconImageUrl("https://buz-s3.s3.ap-southeast-2.amazonaws.com/constant/amusement.png")
+                .iconImageUrl("https://s3-buz.s3.ap-northeast-2.amazonaws.com/constant/amusement.png")
                 .build();
 
         return Location.builder()

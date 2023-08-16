@@ -75,11 +75,11 @@ public class SpotDummy {
     private void createSpotImages() {
         List<Spot> allSpot = spotRepository.findAll();
         ArrayList<String> urls = new ArrayList<>();
-        urls.add("https://buz-s3.s3.ap-southeast-2.amazonaws.com/etc/daniel.jpg");
-        urls.add("https://buz-s3.s3.ap-southeast-2.amazonaws.com/etc/hani_omg.png");
-        urls.add("https://buz-s3.s3.ap-southeast-2.amazonaws.com/etc/hyein.jpg");
-        urls.add("https://buz-s3.s3.ap-southeast-2.amazonaws.com/etc/hyerin.png");
-        urls.add("https://buz-s3.s3.ap-southeast-2.amazonaws.com/etc/minji.png");
+        urls.add("https://s3-buz.s3.ap-northeast-2.amazonaws.com/etc/daniel.jpg");
+        urls.add("https://s3-buz.s3.ap-northeast-2.amazonaws.com/etc/hani_omg.png");
+        urls.add("https://s3-buz.s3.ap-northeast-2.amazonaws.com/etc/hyein.jpg");
+        urls.add("https://s3-buz.s3.ap-northeast-2.amazonaws.com/etc/hyerin.png");
+        urls.add("https://s3-buz.s3.ap-northeast-2.amazonaws.com/etc/minji.png");
 
         for (Spot spot : allSpot) {// 스팟마다 0~5개 랜덤으로
             for (int i = 0; i < (int) (Math.random() * 100) % 6; i++) {
