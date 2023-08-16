@@ -7,10 +7,9 @@ import bokjak.bokjakserver.domain.spot.model.Spot;
 import bokjak.bokjakserver.domain.user.model.User;
 import lombok.Builder;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-import static bokjak.bokjakserver.util.CustomDateUtils.customDateFormat;
+import static bokjak.bokjakserver.util.CustomDateUtils.customDateFormatYMDHMS;
 
 public class NotificationDto {
     public record NotifyParams(
@@ -104,7 +103,7 @@ public class NotificationDto {
                     .redirectTargetId(notification.getRedirectTargetId())
                     .title(notification.getTitle())
                     .body(notification.getContent())
-                    .createdAt(customDateFormat(notification.getCreatedAt()))
+                    .createdAt(customDateFormatYMDHMS(notification.getCreatedAt()))
                     .isRead(notification.isRead())
                     .build();
         }

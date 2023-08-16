@@ -5,12 +5,12 @@ import bokjak.bokjakserver.domain.location.model.Location;
 import bokjak.bokjakserver.domain.spot.model.Spot;
 import bokjak.bokjakserver.domain.spot.model.SpotImage;
 import bokjak.bokjakserver.domain.user.model.User;
+import bokjak.bokjakserver.util.CustomDateUtils;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static bokjak.bokjakserver.common.constant.ConstraintConstants.*;
@@ -96,8 +96,8 @@ public class SpotDto {
             String address,
             String content,
             List<String> imageUrls,
-            LocalDateTime createdAt,
-            LocalDateTime updatedAt,
+            String createdAt,
+            String updatedAt,
             Long locationId,
             String locationName,
             Long spotCategoryId,
@@ -118,8 +118,8 @@ public class SpotDto {
                     .title(spot.getTitle())
                     .address(spot.getAddress())
                     .content(spot.getContent())
-                    .createdAt(spot.getCreatedAt())
-                    .updatedAt(spot.getUpdatedAt())
+                    .createdAt(CustomDateUtils.customDateFormatYMDHM(spot.getCreatedAt()))
+                    .updatedAt(CustomDateUtils.customDateFormatYMDHM(spot.getUpdatedAt()))
                     .locationId(spot.getLocation().getId())
                     .locationName(spot.getLocation().getName())
                     .spotCategoryId(spot.getSpotCategory().getId())
