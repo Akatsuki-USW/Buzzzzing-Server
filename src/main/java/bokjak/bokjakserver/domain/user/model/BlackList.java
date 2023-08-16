@@ -1,5 +1,6 @@
 package bokjak.bokjakserver.domain.user.model;
 
+import bokjak.bokjakserver.common.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @Getter
-public class BlackList {
+public class BlackList extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
