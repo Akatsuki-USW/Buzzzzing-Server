@@ -18,8 +18,10 @@ public class CongestionDto {
         public static DailyCongestionStatisticResponse of(
                 DailyCongestionStatistic dailyCongestionStatistic
         ) {
-            List<DailyCongestionRecord> records = dailyCongestionStatistic.getContent().get(GlobalConstants.CONTENT_DATA)
-                    .stream().map(DailyCongestionRecord::of).toList();
+            List<DailyCongestionRecord> records = dailyCongestionStatistic.getContent().get(GlobalConstants.CONTENT_DATA).stream()
+                    .filter(it->it.get(GlobalConstants.CONTENT_HOUR) >= GlobalConstants.CONGESTION_STATISTIC_START_TIME) // 9시 이후 데이터만 응답
+                    .map(DailyCongestionRecord::of)
+                    .toList();
 
             return DailyCongestionStatisticResponse.builder()
                     .id(dailyCongestionStatistic.getId())
