@@ -78,7 +78,7 @@ public class SleepingUserService {
         for (SleepingUser deleteUser : deleteUsers) {
             User user = userRepository.findById(deleteUser.getOriginalId()).orElseThrow(() -> new UserException(StatusCode.NOT_FOUND_USER));
             user.deletedUser();
-            deleteUser.deleteUser();
+            sleepingUserRepository.delete(deleteUser);
         }
     }
 

@@ -32,18 +32,4 @@ public class SleepingUser extends BaseEntity {
     private String nickname;
     private LocalDateTime lastLoginDate;
 
-    public void deleteUser() {
-        this.originalId = null;
-        this.role = null;
-        this.userStatus = null;
-        this.email = null;
-        this.socialEmail = null;
-        this.password = null;
-        this.socialType = null;
-        this.profileImageUrl = null;
-        this.nickname = null;
-        this.lastLoginDate = null;
-    }
-
-
 }
