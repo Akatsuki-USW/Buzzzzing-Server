@@ -1,5 +1,6 @@
 package bokjak.bokjakserver.domain.spot.dto;
 
+import bokjak.bokjakserver.common.constant.GlobalConstants;
 import bokjak.bokjakserver.domain.category.model.SpotCategory;
 import bokjak.bokjakserver.domain.location.model.Location;
 import bokjak.bokjakserver.domain.spot.model.Spot;
@@ -118,8 +119,8 @@ public class SpotDto {
                     .title(spot.getTitle())
                     .address(spot.getAddress())
                     .content(spot.getContent())
-                    .createdAt(CustomDateUtils.customDateFormatYMDHM(spot.getCreatedAt()))
-                    .updatedAt(CustomDateUtils.customDateFormatYMDHM(spot.getUpdatedAt()))
+                    .createdAt(CustomDateUtils.customDateFormat(spot.getCreatedAt(), GlobalConstants.DATE_FORMAT_YYYY_MM_DD_HH_MM))
+                    .updatedAt(CustomDateUtils.customDateFormat(spot.getUpdatedAt(), GlobalConstants.DATE_FORMAT_YYYY_MM_DD_HH_MM))
                     .locationId(spot.getLocation().getId())
                     .locationName(spot.getLocation().getName())
                     .spotCategoryId(spot.getSpotCategory().getId())

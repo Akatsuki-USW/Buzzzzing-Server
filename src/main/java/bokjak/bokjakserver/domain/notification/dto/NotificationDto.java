@@ -1,5 +1,6 @@
 package bokjak.bokjakserver.domain.notification.dto;
 
+import bokjak.bokjakserver.common.constant.GlobalConstants;
 import bokjak.bokjakserver.domain.comment.model.Comment;
 import bokjak.bokjakserver.domain.notification.model.Notification;
 import bokjak.bokjakserver.domain.notification.model.NotificationType;
@@ -9,7 +10,7 @@ import lombok.Builder;
 
 import java.util.List;
 
-import static bokjak.bokjakserver.util.CustomDateUtils.customDateFormatYMDHMS;
+import static bokjak.bokjakserver.util.CustomDateUtils.customDateFormat;
 
 public class NotificationDto {
     public record NotifyParams(
@@ -103,7 +104,7 @@ public class NotificationDto {
                     .redirectTargetId(notification.getRedirectTargetId())
                     .title(notification.getTitle())
                     .body(notification.getContent())
-                    .createdAt(customDateFormatYMDHMS(notification.getCreatedAt()))
+                    .createdAt(customDateFormat(notification.getCreatedAt(), GlobalConstants.DATE_FORMAT_YYYY_MM_DD_HH_MM_SS))
                     .isRead(notification.isRead())
                     .build();
         }

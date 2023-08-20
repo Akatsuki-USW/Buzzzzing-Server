@@ -31,15 +31,8 @@ public class CustomDateUtils {
         ).toLocalDateTime();
     }
 
-    public static String customDateFormatYMDHMS(LocalDateTime localDateTime) {
-        return localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    public static String customDateFormat(LocalDateTime localDateTime, String pattern) {
+        return localDateTime.format(DateTimeFormatter.ofPattern(pattern));
     }
 
-    public static String customDateFormatYMDHM(LocalDateTime localDateTime) {
-        return localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-    }
-
-    public static String customDateFormatOnlyDate(LocalDateTime localDateTime) {
-        return localDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-    }
 }

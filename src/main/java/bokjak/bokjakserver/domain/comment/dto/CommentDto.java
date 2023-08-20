@@ -1,5 +1,6 @@
 package bokjak.bokjakserver.domain.comment.dto;
 
+import bokjak.bokjakserver.common.constant.GlobalConstants;
 import bokjak.bokjakserver.domain.comment.model.Comment;
 import bokjak.bokjakserver.domain.spot.model.Spot;
 import bokjak.bokjakserver.domain.user.model.User;
@@ -67,8 +68,8 @@ public class CommentDto {
                             .childCount(comment.isParent() ? comment.getChildList().size() : 0) // 대댓글의 경우 항상 0
                             .id(comment.getId())
                             .content(comment.getContent())
-                            .createdAt(CustomDateUtils.customDateFormatYMDHM(comment.getCreatedAt()))
-                            .updatedAt(CustomDateUtils.customDateFormatYMDHM(comment.getUpdatedAt()))
+                            .createdAt(CustomDateUtils.customDateFormat(comment.getCreatedAt(), GlobalConstants.DATE_FORMAT_YYYY_MM_DD_HH_MM))
+                            .updatedAt(CustomDateUtils.customDateFormat(comment.getUpdatedAt(), GlobalConstants.DATE_FORMAT_YYYY_MM_DD_HH_MM))
                             .userId(author.getId())
                             .userNickname(author.getNickname())
                             .userProfileImageUrl(author.getProfileImageUrl())
