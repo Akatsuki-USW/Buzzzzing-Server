@@ -32,6 +32,4 @@ public class SleepingUser extends BaseEntity {
     private String nickname;
     private LocalDateTime lastLoginDate;
 
-
-
 }

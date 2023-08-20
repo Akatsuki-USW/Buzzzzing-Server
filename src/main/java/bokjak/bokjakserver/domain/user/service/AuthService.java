@@ -12,6 +12,7 @@ import bokjak.bokjakserver.domain.user.dto.AuthDto.*;
 import bokjak.bokjakserver.domain.user.exeption.AuthException;
 import bokjak.bokjakserver.domain.user.exeption.UserException;
 import bokjak.bokjakserver.domain.user.model.*;
+import bokjak.bokjakserver.domain.user.repository.BlackListRepository;
 import bokjak.bokjakserver.domain.user.repository.RevokeUserRepository;
 import bokjak.bokjakserver.domain.user.repository.SleepingUserRepository;
 import bokjak.bokjakserver.domain.user.repository.UserRepository;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static bokjak.bokjakserver.config.security.SecurityUtils.getCurrentUserSocialEmail;
@@ -47,6 +49,7 @@ public class AuthService {
     private final SleepingUserRepository sleepingUserRepository;
     private final RevokeUserRepository revokeUserRepository;
     private final CustomEncryptUtil customEncryptUtil;
+    private final BlackListRepository blackListRepository;
 
     @Transactional(noRollbackFor = {AuthException.class})
     public AuthMessage loginAccess(SocialLoginRequest socialLoginRequest) {
@@ -56,6 +59,7 @@ public class AuthService {
         checkIsSleepingUser(socialEmail);
         Optional<User> findUser = userRepository.findBySocialEmail(socialEmail);
         checkIsRevokeUser(socialEmail);
+        checkIsBlackListAndRevokeUser(socialEmail);
         AuthMessage loginMessage;
         if(findUser.isPresent()) {
             User user = findUser.get();
@@ -75,6 +79,22 @@ public class AuthService {
             throw new AuthException(StatusCode.NEED_TO_SIGNUP, signTokenResponse);
         }
         return loginMessage;
+    }
+
+    @Transactional
+    public void checkIsBlackListAndRevokeUser(String socialEmail) {
+        List<BlackList> blackLists = blackListRepository.findAll();
+        List<BlackList> checkBlackList = blackLists.stream()
+                .filter(b -> passwordEncoder.matches(socialEmail, b.getSocialEmail()))
+                .toList();
+        if (checkBlackList.isEmpty()) return;
+
+        else if (checkBlackList.get(0).getBanEndedAt().isBefore(LocalDateTime.now())) {
+            blackListRepository.delete(checkBlackList.get(0));
+            return;
+        }
+
+        throw new UserException(StatusCode.BLACKLIST_BANNED_USER);
     }
 
     public JwtDto login(LoginRequest loginRequest) {
@@ -194,6 +214,7 @@ public class AuthService {
     @Transactional
     public LogoutResponse logout(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UserException(StatusCode.NOT_FOUND_USER));
+        user.removeFcmToken();
 
         RefreshToken refreshToken = refreshTokenRepository.findByUser(user)
                 .orElseThrow(() -> new UserException(StatusCode.NOT_FOUND_REFRESH_TOKEN));
