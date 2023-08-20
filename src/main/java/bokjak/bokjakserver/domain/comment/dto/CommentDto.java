@@ -1,13 +1,13 @@
 package bokjak.bokjakserver.domain.comment.dto;
 
+import bokjak.bokjakserver.common.constant.GlobalConstants;
 import bokjak.bokjakserver.domain.comment.model.Comment;
 import bokjak.bokjakserver.domain.spot.model.Spot;
 import bokjak.bokjakserver.domain.user.model.User;
+import bokjak.bokjakserver.util.CustomDateUtils;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
-
-import java.time.LocalDateTime;
 
 import static bokjak.bokjakserver.common.constant.ConstraintConstants.COMMENT_CONTENT_MAX_LENGTH;
 
@@ -51,8 +51,8 @@ public class CommentDto {
             int childCount,
             Long id,
             String content,
-            LocalDateTime createdAt,
-            LocalDateTime updatedAt,
+            String createdAt,
+            String updatedAt,
             Long userId,
             String userNickname,
             String userProfileImageUrl,
@@ -68,8 +68,8 @@ public class CommentDto {
                             .childCount(comment.isParent() ? comment.getChildList().size() : 0) // 대댓글의 경우 항상 0
                             .id(comment.getId())
                             .content(comment.getContent())
-                            .createdAt(comment.getCreatedAt())
-                            .updatedAt(comment.getUpdatedAt())
+                            .createdAt(CustomDateUtils.customDateFormat(comment.getCreatedAt(), GlobalConstants.DATE_FORMAT_YYYY_MM_DD_HH_MM))
+                            .updatedAt(CustomDateUtils.customDateFormat(comment.getUpdatedAt(), GlobalConstants.DATE_FORMAT_YYYY_MM_DD_HH_MM))
                             .userId(author.getId())
                             .userNickname(author.getNickname())
                             .userProfileImageUrl(author.getProfileImageUrl())
