@@ -6,7 +6,6 @@ import bokjak.bokjakserver.config.jwt.JwtDto;
 import bokjak.bokjakserver.config.security.PrincipalDetails;
 import bokjak.bokjakserver.domain.user.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -30,7 +29,7 @@ public class AuthController {
 
     @Operation(summary = AUTH_LOGIN, description = AUTH_LOGIN_DESCRIPTION)
     @PostMapping("/login")
-    public ApiResponse<?> login(@RequestBody SocialLoginRequest socialLoginRequest) {
+    public ApiResponse<?> login(@RequestBody @Valid SocialLoginRequest socialLoginRequest) {
         AuthMessage authMessage = authService.loginAccess(socialLoginRequest);
         return success(authMessage.detailData());
     }
@@ -57,7 +56,7 @@ public class AuthController {
 
     @PostMapping("/login/admin")
     @Operation(summary = ADMIN_LOGIN, description = ADMIN_LOGIN_DESCRIPTION)
-    public ApiResponse<?> adminLogin(@RequestBody AdminLoginRequest adminLoginRequest) {
+    public ApiResponse<?> adminLogin(@RequestBody @Valid AdminLoginRequest adminLoginRequest) {
         AuthMessage authMessage = authService.loginAdmin(adminLoginRequest);
         return success(authMessage.detailData());
     }
