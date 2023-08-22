@@ -15,11 +15,9 @@ public class ReportDto {
             @NotEmpty
             String reportTarget,
             @Schema(example = "333")
-            @NotEmpty
             @Positive
             Long reportTargetId,
             @Schema(example = "12")
-            @NotEmpty
             @Positive
             Long reportedUserId,
             @Schema(example = "부적절한 언어를 사용해요")
