@@ -8,11 +8,14 @@ import bokjak.bokjakserver.domain.notification.exception.NotificationException;
 import bokjak.bokjakserver.domain.notification.model.Notification;
 import bokjak.bokjakserver.domain.notification.repository.NotificationRepository;
 import bokjak.bokjakserver.domain.user.model.User;
-import bokjak.bokjakserver.domain.user.repository.UserRepository;
+import bokjak.bokjakserver.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -21,13 +24,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class NotificationService {
 
     private final FcmService fcmService;
-    private final UserRepository userRepository;
     private final NotificationRepository notificationRepository;
+    private final UserService userService;
 
     @Transactional
     public void pushMessage(NotifyParams params) {
-        User receiver = userRepository.findById(params.receiver().getId())
-                .orElseThrow(() -> new NotificationException(StatusCode.NOT_FOUND_USER));
+        User receiver = userService.getUser(params.receiver().getId());
 
         fcmService.sendPushMessage(receiver.getFcmToken(), params);
         Notification notification = Notification.builder()
@@ -45,28 +47,24 @@ public class NotificationService {
     }
 
     public NotificationListResponse getMyNotifications(Long userId) {
-        User loginUser = userRepository.findById(userId)
-                .orElseThrow(() -> new NotificationException(StatusCode.NOT_FOUND_USER));
+        userService.getUser(userId);
 
-        return NotificationListResponse.of(loginUser.getNotificationList().stream()
+        List<Notification> limitCountAndSortByRecent = notificationRepository.findLimitCountAndSortByRecent(userId);
+        return NotificationListResponse.of(limitCountAndSortByRecent.stream()
                 .map(NotificationResponse::of)
-                .sorted((n1,n2) -> n2.createdAt().compareTo(n1.createdAt()))
-                .limit(30)
-                .toList()
-        );
+                .toList());
     }
 
     @Transactional
     public NotificationResponse readNotification(Long notificationId, Long userId) {
-        User loginUser = userRepository.findById(userId).orElseThrow(
-                () -> new NotificationException(StatusCode.NOT_FOUND_USER)
-        );
+        userService.getUser(userId);
 
-        Notification notification = loginUser.getNotificationList().stream().filter(n -> n.getId().equals(notificationId))
-                .findFirst()
-                .orElseThrow(() -> new NotificationException(StatusCode.NOT_FOUND_NOTIFICATION));
-        notification.read();
-        return NotificationResponse.of(notification);
+        Optional<Notification> notificationOptional = notificationRepository.findByNotificationIdAndUserId(notificationId, userId);
+        if (notificationOptional.isEmpty()) throw new NotificationException(StatusCode.NOT_FOUND_NOTIFICATION);
+
+        notificationOptional.get().read();
+
+        return NotificationResponse.of(notificationOptional.get());
     }
 
 }
