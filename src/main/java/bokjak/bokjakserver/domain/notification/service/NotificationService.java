@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -59,12 +58,12 @@ public class NotificationService {
     public NotificationResponse readNotification(Long notificationId, Long userId) {
         userService.getUser(userId);
 
-        Optional<Notification> notificationOptional = notificationRepository.findByNotificationIdAndUserId(notificationId, userId);
-        if (notificationOptional.isEmpty()) throw new NotificationException(StatusCode.NOT_FOUND_NOTIFICATION);
+        Notification notification = notificationRepository.findByNotificationIdAndUserId(notificationId, userId)
+                .orElseThrow(() -> new NotificationException(StatusCode.NOT_FOUND_NOTIFICATION));
 
-        notificationOptional.get().read();
+        notification.read();
 
-        return NotificationResponse.of(notificationOptional.get());
+        return NotificationResponse.of(notification);
     }
 
 }
