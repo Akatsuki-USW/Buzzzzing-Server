@@ -65,7 +65,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
 
     @Override
     public List<User> findAllByparentCommentAndDistinctExceptParentAuthor(Long parentId, Long parentAuthorId) {
-        JPAQuery<User> query = queryFactory.select(user).distinct()
+        JPAQuery<User> query = queryFactory.select(user)
                 .from(user)
                 .leftJoin(user.commentList, comment).fetchJoin()
                 .where(comment.parent.id.eq(parentId)
