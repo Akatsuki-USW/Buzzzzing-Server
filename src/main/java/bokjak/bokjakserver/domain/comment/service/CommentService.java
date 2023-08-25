@@ -95,20 +95,14 @@ public class CommentService {
             notificationService.pushMessage(NotifyParams.ofCreateSpotCommentComment(parent,spot,comment));
         }
         else {
-            List<Comment> childCommentList = commentRepository.findAllByParent(parent);
-            List<Long> userIdList = childCommentList.stream()
-                    .filter(c -> !checkIsSameUser(c.getUser(),parent.getUser()))
-                    .map(c -> c.getUser().getId())
-                    .distinct()
-                    .toList();
+            List<User> userList = commentRepository.
+                    findAllByparentCommentAndDistinctExceptParentAuthor(parentId, parent.getUser().getId());
 
-            userIdList.forEach(c -> {
-                User notifyToUser = userRepository.findById(c).orElseThrow(() -> new SpotException(StatusCode.NOT_FOUND_USER));
+            userList.forEach(u -> {
                 notificationService.pushMessage(NotifyParams.ofCreateSpotCommentComment(
-                        notifyToUser,spot,comment));
+                        u,spot,comment));
                     }
             );
-
         }
         return CommentCardResponse.of(comment, currentUserId);
     }
