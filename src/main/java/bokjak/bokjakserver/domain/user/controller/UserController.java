@@ -5,12 +5,12 @@ import bokjak.bokjakserver.common.constant.SwaggerConstants;
 import bokjak.bokjakserver.common.dto.ApiResponse;
 import bokjak.bokjakserver.config.security.PrincipalDetails;
 import bokjak.bokjakserver.domain.user.dto.AuthDto.AuthMessage;
-import bokjak.bokjakserver.domain.user.dto.UserDto;
 import bokjak.bokjakserver.domain.user.dto.UserDto.*;
 import bokjak.bokjakserver.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +42,7 @@ public class UserController {
     @Operation(summary = USER_HIDE)
     @SecurityRequirement(name = SwaggerConstants.SECURITY_SCHEME_NAME)
     @PostMapping("/hide")
-    public ApiResponse<HideResponse> hideUser(@RequestBody HideRequest hideRequest,
+    public ApiResponse<HideResponse> hideUser(@RequestBody @Valid HideRequest hideRequest,
                                               @AuthenticationPrincipal PrincipalDetails principalDetails) {
         return success(userService.hideUser(hideRequest, principalDetails.getUserId()));
     }
@@ -50,7 +50,7 @@ public class UserController {
     @Operation(summary = USER_UPDATE_PROFILE, description = USER_UPDATE_PROFILE_DESCRIPTION)
     @SecurityRequirement(name = SwaggerConstants.SECURITY_SCHEME_NAME)
     @PostMapping("/me/profile")
-    public ApiResponse<UserInfoResponse> updateUserInfo(@RequestBody UpdateUserInfoRequest updateUserInfoRequest,
+    public ApiResponse<UserInfoResponse> updateUserInfo(@RequestBody @Valid UpdateUserInfoRequest updateUserInfoRequest,
                                                         @AuthenticationPrincipal PrincipalDetails principalDetails) {
         return success(userService.updateUserInfo(updateUserInfoRequest, principalDetails.getUserId()));
     }

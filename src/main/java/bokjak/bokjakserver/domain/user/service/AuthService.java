@@ -30,7 +30,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static bokjak.bokjakserver.config.security.SecurityUtils.getCurrentUserSocialEmail;
 
 @Slf4j
 @Service
@@ -84,13 +83,13 @@ public class AuthService {
     @Transactional
     public void checkIsBlackListAndRevokeUser(String socialEmail) {
         List<BlackList> blackLists = blackListRepository.findAll();
-        List<BlackList> checkBlackList = blackLists.stream()
+        Optional<BlackList> blackList = blackLists.stream()
                 .filter(b -> passwordEncoder.matches(socialEmail, b.getSocialEmail()))
-                .toList();
-        if (checkBlackList.isEmpty()) return;
+                .findAny();
+        if (blackList.isEmpty()) return;
 
-        else if (checkBlackList.get(0).getBanEndedAt().isBefore(LocalDateTime.now())) {
-            blackListRepository.delete(checkBlackList.get(0));
+        else if (blackList.get().getBanEndedAt().isBefore(LocalDateTime.now())) {
+            blackListRepository.delete(blackList.get());
             return;
         }
 

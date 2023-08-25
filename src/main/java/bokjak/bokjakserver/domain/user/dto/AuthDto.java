@@ -10,6 +10,7 @@ import bokjak.bokjakserver.domain.user.model.UserStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -48,7 +49,11 @@ public class AuthDto {
         }
     }
 
-    public record AdminLoginRequest(String email, String password) {
+    public record AdminLoginRequest(
+            @Email
+            String email,
+            @NotEmpty
+            String password) {
         public LoginRequest changeLoginRequest() {
             return LoginRequest.builder()
                     .socialEmail(email)
