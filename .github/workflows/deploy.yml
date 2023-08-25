@@ -10,7 +10,7 @@ name: Java Gradle CI/CD Pipeline using Docker Hub
 ## trigger : 해당 브랜치에 push할 때, 해당 브랜치를 base로 한 PR이 merge될 때
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "master" ]
 
 permissions:
   contents: read
@@ -43,9 +43,9 @@ jobs:
       ## yml 파일 생성
       - name: Set up yml file
         env:
-          YAML_SECRET: ${{ secrets.APPLICATION_DEV_YML }}
+          YAML_SECRET: ${{ secrets.APPLICATION_PROD_YML }}
           YAML_DIR: src/main/resources
-          YAML_FILE_NAME: application-dev.yml
+          YAML_FILE_NAME: application-prod.yml
         run: echo $YAML_SECRET | base64 --decode > $YAML_DIR/$YAML_FILE_NAME
         
       ## FCM 설정 파일 셋업
