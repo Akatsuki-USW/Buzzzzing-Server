@@ -29,16 +29,16 @@ public class UserDummy {
 
     private void createUsers() {
         ArrayList<String> imageUrls = new ArrayList<>();
-        imageUrls.add("https://buz-s3.s3.ap-southeast-2.amazonaws.com/user/profile/astro_pepe.jpeg");
-        imageUrls.add("https://buz-s3.s3.ap-southeast-2.amazonaws.com/user/profile/classic_pepe.jpg");
-        imageUrls.add("https://buz-s3.s3.ap-southeast-2.amazonaws.com/user/profile/crying_pepe.jpeg");
-        imageUrls.add("https://buz-s3.s3.ap-southeast-2.amazonaws.com/user/profile/Feels_good_pepe.jpg");
-        imageUrls.add("https://buz-s3.s3.ap-southeast-2.amazonaws.com/user/profile/gatsby_pepe.jpg");
-        imageUrls.add("https://buz-s3.s3.ap-southeast-2.amazonaws.com/user/profile/health_pepe.jpeg");
-        imageUrls.add("https://buz-s3.s3.ap-southeast-2.amazonaws.com/user/profile/heyatch_pepe.png");
-        imageUrls.add("https://buz-s3.s3.ap-southeast-2.amazonaws.com/user/profile/laughing_pepe.jpg");
-        imageUrls.add("https://buz-s3.s3.ap-southeast-2.amazonaws.com/user/profile/thinking_pepe.jpg");
-        imageUrls.add("https://buz-s3.s3.ap-southeast-2.amazonaws.com/user/profile/punching_pepe.jpg");
+        imageUrls.add("https://s3-buz.s3.ap-northeast-2.amazonaws.com/user/profile/astro_pepe.jpeg");
+        imageUrls.add("https://s3-buz.s3.ap-northeast-2.amazonaws.com/user/profile/classic_pepe.jpg");
+        imageUrls.add("https://s3-buz.s3.ap-northeast-2.amazonaws.com/user/profile/crying_pepe.jpeg");
+        imageUrls.add("https://s3-buz.s3.ap-northeast-2.amazonaws.com/user/profile/Feels_good_pepe.jpg");
+        imageUrls.add("https://s3-buz.s3.ap-northeast-2.amazonaws.com/user/profile/gatsby_pepe.jpg");
+        imageUrls.add("https://s3-buz.s3.ap-northeast-2.amazonaws.com/user/profile/health_pepe.jpeg");
+        imageUrls.add("https://s3-buz.s3.ap-northeast-2.amazonaws.com/user/profile/heyatch_pepe.png");
+        imageUrls.add("https://s3-buz.s3.ap-northeast-2.amazonaws.com/user/profile/laughing_pepe.jpg");
+        imageUrls.add("https://s3-buz.s3.ap-northeast-2.amazonaws.com/user/profile/thinking_pepe.jpg");
+        imageUrls.add("https://s3-buz.s3.ap-northeast-2.amazonaws.com/user/profile/punching_pepe.jpg");
 
         ArrayList<String> nicknames = new ArrayList<>();
         nicknames.add("astro_pepe");
