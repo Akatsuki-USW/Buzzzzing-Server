@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+    <conversionRule conversionWord="wex"
+                    converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>
+    <conversionRule conversionWord="wEx"
+                    converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/>
+
+    <property name="LOG_PATTERN"
+              value="${LOG_PATTERN:-%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd HH:mm:ss}}:%-4relative) %highlight(%-5level) %clr(${PID:- }){magenta} %green(%thread) %boldWhite([%cyan(%C).%M:%yellow(%L)]) %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
+    <property name="AWS_LOG_PATTERN"
+              value="%date [%level] [%thread] [%file:%line] - %msg%n"/>
+
+    <springProperty name="AWS_REGION" source="cloud.aws.region.static"/>
+    <springProperty name="AWS_ACCESS_KEY" source="cloud.aws.credentials.access-key"/>
+    <springProperty name="AWS_SECRET_KEY" source="cloud.aws.credentials.secret-key"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>${LOG_PATTERN}</Pattern>
+        </layout>
+    </appender>
+    <appender name="AWS_CLOUD_WATCH_LOG" class="ca.pjer.logback.AwsLogsAppender">
+        <layout>
+            <pattern>${AWS_LOG_PATTERN}</pattern>
+        </layout>
+        <logGroupName>bokjak-log</logGroupName>
+        <logStreamUuidPrefix>bokjak-log-</logStreamUuidPrefix>
+        <logRegion>${AWS_REGION}</logRegion>
+        <maxBatchLogEvents>50</maxBatchLogEvents>
+        <maxFlushTimeMillis>30000</maxFlushTimeMillis>
+        <maxBlockTimeMillis>5000</maxBlockTimeMillis>
+        <retentionTimeDays>0</retentionTimeDays>
+        <accessKeyId>${AWS_ACCESS_KEY}</accessKeyId>
+        <secretAccessKey>${AWS_SECRET_KEY}</secretAccessKey>
+    </appender>
+    
+    <springProfile name="!prod">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+    <springProfile name="prod">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="AWS_CLOUD_WATCH_LOG"/>
+        </root>
+    </springProfile>
+</configuration>
