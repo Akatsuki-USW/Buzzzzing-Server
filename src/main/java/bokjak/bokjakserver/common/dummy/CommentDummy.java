@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,7 +18,7 @@ import java.util.List;
 @Component("commentDummy")
 @DependsOn("spotDummy")
 @RequiredArgsConstructor
-@Transactional
+@BuzzingDummy
 public class CommentDummy {
     private final UserRepository userRepository;
     private final SpotRepository spotRepository;
@@ -28,10 +27,10 @@ public class CommentDummy {
     @PostConstruct
     public void init() {
         if (commentRepository.count() > 0) {
-            log.info("[6] 댓글 데이터가 이미 존재");
+            log.info("[commentDummy] 댓글 데이터가 이미 존재");
         } else {
             createComments();
-            log.info("[6] 댓글 더미 생성 완료");
+            log.info("[commentDummy] 댓글 더미 생성 완료");
         }
     }
 

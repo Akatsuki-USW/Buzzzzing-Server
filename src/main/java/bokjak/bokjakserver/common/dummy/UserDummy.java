@@ -6,24 +6,23 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 
 @Slf4j
 @Component("userDummy")
 @RequiredArgsConstructor
-@Transactional
+@BuzzingDummy
 public class UserDummy {
     private final UserRepository userRepository;
 
     @PostConstruct
     public void init() {
         if (userRepository.count() > 0) {
-            log.info("[1] 더미 유저가 이미 존재합니다.");
-        }else {
+            log.info("[userDummy] 더미 유저가 이미 존재합니다.");
+        } else {
             createUsers();
-            log.info("[1] 더미 유저 생성완료");
+            log.info("[userDummy] 더미 유저 생성완료");
         }
     }
 
@@ -55,7 +54,7 @@ public class UserDummy {
         for (int i = 0; i < 10; i++) {
             SignUpRequest dummyUserForm = SignUpRequest.builder()
                     .build();
-            userRepository.save(dummyUserForm.toDummy(nicknames.get(i)+"@naver.com", nicknames.get(i), i+"@KAKAO", imageUrls.get(i)));
+            userRepository.save(dummyUserForm.toDummy(nicknames.get(i) + "@naver.com", nicknames.get(i), i + "@KAKAO", imageUrls.get(i)));
         }
     }
 

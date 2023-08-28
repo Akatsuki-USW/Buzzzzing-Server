@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +23,7 @@ import java.util.List;
 @Component("spotDummy")
 @DependsOn({"userDummy", "congestionDummy"})
 @RequiredArgsConstructor
-@Transactional
+@BuzzingDummy
 public class SpotDummy {
     private final LocationRepository locationRepository;
     private final SpotCategoryRepository spotCategoryRepository;
@@ -35,16 +34,16 @@ public class SpotDummy {
     @PostConstruct
     public void init() {
         if (spotRepository.count() > 0) {
-            log.info("[5] 스팟 데이터가 이미 존재");
+            log.info("[spotDummy] 스팟 데이터가 이미 존재");
         } else {
             createSpots();
-            log.info("[5] 스팟 더미 생성 완료");
+            log.info("[spotDummy] 스팟 더미 생성 완료");
         }
         if (spotImageRepository.count() > 0) {
-            log.info("[5-1] 스팟 이미지 데이터가 이미 존재");
+            log.info("[spotDummy-1] 스팟 이미지 데이터가 이미 존재");
         } else {
             createSpotImages();
-            log.info("[5-1] 스팟 더미 생성 완료");
+            log.info("[spotDummy-1] 스팟 더미 생성 완료");
         }
     }
 
