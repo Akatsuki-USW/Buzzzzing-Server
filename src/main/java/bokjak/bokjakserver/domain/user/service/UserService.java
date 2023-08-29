@@ -1,7 +1,7 @@
 package bokjak.bokjakserver.domain.user.service;
 
 import bokjak.bokjakserver.common.exception.StatusCode;
-import bokjak.bokjakserver.config.jwt.RefreshTokenRepository;
+import bokjak.bokjakserver.config.redis.RedisService;
 import bokjak.bokjakserver.domain.user.dto.AuthDto.AuthMessage;
 import bokjak.bokjakserver.domain.user.exeption.UserException;
 import bokjak.bokjakserver.domain.user.model.*;
@@ -29,12 +29,16 @@ public class UserService {
     private final UserRepository userRepository;
     private final KakaoService kakaoService;
     private final RevokeUserRepository revokeUserRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
     private final CustomEncryptUtil customEncryptUtil;
     private final UserBlockUserRepository userBlockUserRepository;
+    private final RedisService redisService;
 
     public User getCurrentUser() {
         return userRepository.findBySocialEmail(getCurrentUserSocialEmail()).orElseThrow(() -> new UserException(StatusCode.NOT_FOUND_USER));
+    }
+
+    public User getUserBySocialEmail(String socialEmail) {
+        return userRepository.findBySocialEmail(socialEmail).orElseThrow(() -> new UserException(StatusCode.NOT_FOUND_USER));
     }
 
     public UserInfoResponse getUserInfo(Long userId) {
@@ -112,7 +116,7 @@ public class UserService {
                     .socialEmail(customEncryptUtil.hash(user.getSocialEmail()))
                     .revokedAt(LocalDateTime.now()).build();
             revokeUserRepository.save(revokeUser);
-            refreshTokenRepository.deleteByUser(user);
+            redisService.deleteValues(user.getSocialEmail());
             /**
              * 삭제할 곳 추가 ex)feed, comment 등
              */
