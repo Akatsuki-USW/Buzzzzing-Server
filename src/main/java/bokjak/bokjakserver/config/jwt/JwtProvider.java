@@ -1,12 +1,13 @@
 package bokjak.bokjakserver.config.jwt;
 
 import bokjak.bokjakserver.common.exception.StatusCode;
+import bokjak.bokjakserver.config.redis.RedisService;
 import bokjak.bokjakserver.config.security.PrincipalDetailService;
-import bokjak.bokjakserver.domain.user.dto.AuthDto;
 import bokjak.bokjakserver.domain.user.dto.AuthDto.SigningUser;
 import bokjak.bokjakserver.domain.user.exeption.AuthException;
 import bokjak.bokjakserver.domain.user.model.Role;
 import bokjak.bokjakserver.domain.user.model.User;
+import bokjak.bokjakserver.domain.user.service.UserService;
 import bokjak.bokjakserver.util.CustomEncryptUtil;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -22,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Key;
 import java.util.Date;
-import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @Slf4j
@@ -32,16 +33,18 @@ public class JwtProvider {
     private final PrincipalDetailService principalDetailService;
     private final Key privatekey;
     private final CustomEncryptUtil customEncryptUtil;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final RedisService redisService;
+    private final UserService userService;
 
     public JwtProvider(@Value("${jwt.secret-key}") String secretKey,
                        PrincipalDetailService principalDetailService,
                        CustomEncryptUtil customEncryptUtil,
-                       RefreshTokenRepository refreshTokenRepository){
+                       RedisService redisService, UserService userService){
         this.privatekey= Keys.hmacShaKeyFor(secretKey.getBytes());      //인코딩된 byte array
         this.principalDetailService = principalDetailService;
         this.customEncryptUtil = customEncryptUtil;
-        this.refreshTokenRepository = refreshTokenRepository;
+        this.redisService = redisService;
+        this.userService = userService;
     }
 
     @Value("${jwt.access-duration}")
@@ -150,12 +153,8 @@ public class JwtProvider {
     public JwtDto issue(User user) {
         String access = createAccessToken(user);
         String refresh = createRefreshToken(user);
-        Optional<RefreshToken> findToken = refreshTokenRepository.findByUser(user);
-        if (findToken.isEmpty()) {
-            refreshTokenRepository.save(new RefreshToken(null,user,refresh));
-        } else {
-            findToken.get().replace(refresh);
-        }
+
+        redisService.setValues(user.getSocialEmail(), refresh, refreshDuration, TimeUnit.MILLISECONDS);
         return new JwtDto(access,refresh);
     }
 
@@ -164,10 +163,8 @@ public class JwtProvider {
         return new JwtDto(accessToken,"");
     }
 
-    /**
-     * Refresh Token으로 Access Token 재발급 (Access, Refresh 둘 다 재발급) RTR방식
-     */
     public JwtDto reissue(String refreshToken) {
+
         try {
             Claims body = Jwts.parserBuilder()
                     .setSigningKey(privatekey)
@@ -176,24 +173,20 @@ public class JwtProvider {
                     .getBody();
             if (body.get("tokenType") == null || !body.get("tokenType").equals("refresh"))
                 throw new AuthException(StatusCode.IS_NOT_REFRESH);
+            String socialEmail = customEncryptUtil.decrypt(body.getSubject());
+            String valueToken = redisService.getValues(socialEmail);
+            if (!valueToken.equals(refreshToken)) throw new AuthException(StatusCode.IS_NOT_CORRECT_REFRESH);
+
+            User user = userService.getUserBySocialEmail(socialEmail);
+            String newAccessToken = createAccessToken(user);
+            String newRefreshToken = createRefreshToken(user);
+
+            redisService.setValues(socialEmail, newRefreshToken, refreshDuration, TimeUnit.MILLISECONDS);
+            return new JwtDto(newAccessToken,newRefreshToken);
         } catch (ExpiredJwtException e) {
             throw new AuthException(StatusCode.EXPIRED_REFRESH);
         }
-        RefreshToken findRefreshToken = refreshTokenRepository
-                .findByRefreshToken(refreshToken)
-                .orElseThrow(() -> new AuthException(StatusCode.NOT_FOUND_REFRESH_TOKEN));
 
-        User user = findRefreshToken.getUser();
-        /**
-         * todo
-         * checkUserStatus(user);
-         */
 
-        String newAccessToken = createAccessToken(user);
-        String newRefreshToken = createRefreshToken(user);
-
-        //기존 refresh 토큰 값 변경
-        findRefreshToken.replace(newRefreshToken);
-        return new JwtDto(newAccessToken, newRefreshToken);
     }
 }
