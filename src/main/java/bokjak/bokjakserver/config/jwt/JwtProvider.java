@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Key;
 import java.util.Date;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -99,6 +98,7 @@ public class JwtProvider {
                 .setSubject(customEncryptUtil.encrypt(user.getSocialEmail()))
                 .setIssuedAt(now)
                 .claim("tokenType", "refresh")
+                .setExpiration(new Date(now.getTime()+refreshDuration))
                 .signWith(privatekey)
                 .compact();
     }
@@ -165,24 +165,28 @@ public class JwtProvider {
 
     public JwtDto reissue(String refreshToken) {
 
-        Claims body = Jwts.parserBuilder()
-                .setSigningKey(privatekey)
-                .build()
-                .parseClaimsJws(refreshToken)
-                .getBody();
-        if (body.get("tokenType") == null || !body.get("tokenType").equals("refresh"))
-            throw new AuthException(StatusCode.IS_NOT_REFRESH);
-        String socialEmail = customEncryptUtil.decrypt(body.getSubject());
-        String valueToken = redisService.getValues(socialEmail);
-        if (Objects.isNull(valueToken)) throw new AuthException(StatusCode.EXPIRED_REFRESH);
-        if (!valueToken.equals(refreshToken)) throw new AuthException(StatusCode.IS_NOT_CORRECT_REFRESH);
+        try {
+            Claims body = Jwts.parserBuilder()
+                    .setSigningKey(privatekey)
+                    .build()
+                    .parseClaimsJws(refreshToken)
+                    .getBody();
+            if (body.get("tokenType") == null || !body.get("tokenType").equals("refresh"))
+                throw new AuthException(StatusCode.IS_NOT_REFRESH);
+            String socialEmail = customEncryptUtil.decrypt(body.getSubject());
+            String valueToken = redisService.getValues(socialEmail);
+            if (!valueToken.equals(refreshToken)) throw new AuthException(StatusCode.IS_NOT_CORRECT_REFRESH);
 
-        User user = userService.getUserBySocialEmail(socialEmail);
-        String newAccessToken = createAccessToken(user);
-        String newRefreshToken = createRefreshToken(user);
+            User user = userService.getUserBySocialEmail(socialEmail);
+            String newAccessToken = createAccessToken(user);
+            String newRefreshToken = createRefreshToken(user);
 
-        redisService.setValues(socialEmail, newRefreshToken, refreshDuration, TimeUnit.MILLISECONDS);
-        return new JwtDto(newAccessToken,newRefreshToken);
+            redisService.setValues(socialEmail, newRefreshToken, refreshDuration, TimeUnit.MILLISECONDS);
+            return new JwtDto(newAccessToken,newRefreshToken);
+        } catch (ExpiredJwtException e) {
+            throw new AuthException(StatusCode.EXPIRED_REFRESH);
+        }
+
 
     }
 }
