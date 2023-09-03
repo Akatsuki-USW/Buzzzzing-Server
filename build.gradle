@@ -67,6 +67,9 @@ dependencies {
 
 	// CloudWatch logs
 	implementation("ca.pjer:logback-awslogs-appender:1.6.0")
+
+	// redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 }
 
 tasks.named('test') {

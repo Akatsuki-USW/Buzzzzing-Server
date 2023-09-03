@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +23,7 @@ import java.util.List;
 @Component("spotDummy")
 @DependsOn({"userDummy", "congestionDummy"})
 @RequiredArgsConstructor
-@Transactional
+@BuzzingDummy
 public class SpotDummy {
     private final LocationRepository locationRepository;
     private final SpotCategoryRepository spotCategoryRepository;
@@ -35,16 +34,16 @@ public class SpotDummy {
     @PostConstruct
     public void init() {
         if (spotRepository.count() > 0) {
-            log.info("[5] 스팟 데이터가 이미 존재");
+            log.info("[spotDummy] 스팟 데이터가 이미 존재");
         } else {
             createSpots();
-            log.info("[5] 스팟 더미 생성 완료");
+            log.info("[spotDummy] 스팟 더미 생성 완료");
         }
         if (spotImageRepository.count() > 0) {
-            log.info("[5-1] 스팟 이미지 데이터가 이미 존재");
+            log.info("[spotDummy-1] 스팟 이미지 데이터가 이미 존재");
         } else {
             createSpotImages();
-            log.info("[5-1] 스팟 더미 생성 완료");
+            log.info("[spotDummy-1] 스팟 더미 생성 완료");
         }
     }
 
@@ -75,11 +74,11 @@ public class SpotDummy {
     private void createSpotImages() {
         List<Spot> allSpot = spotRepository.findAll();
         ArrayList<String> urls = new ArrayList<>();
-        urls.add("https://buz-s3.s3.ap-southeast-2.amazonaws.com/etc/daniel.jpg");
-        urls.add("https://buz-s3.s3.ap-southeast-2.amazonaws.com/etc/hani_omg.png");
-        urls.add("https://buz-s3.s3.ap-southeast-2.amazonaws.com/etc/hyein.jpg");
-        urls.add("https://buz-s3.s3.ap-southeast-2.amazonaws.com/etc/hyerin.png");
-        urls.add("https://buz-s3.s3.ap-southeast-2.amazonaws.com/etc/minji.png");
+        urls.add("https://s3-buz.s3.ap-northeast-2.amazonaws.com/etc/daniel.jpg");
+        urls.add("https://s3-buz.s3.ap-northeast-2.amazonaws.com/etc/hani_omg.png");
+        urls.add("https://s3-buz.s3.ap-northeast-2.amazonaws.com/etc/hyein.jpg");
+        urls.add("https://s3-buz.s3.ap-northeast-2.amazonaws.com/etc/hyerin.png");
+        urls.add("https://s3-buz.s3.ap-northeast-2.amazonaws.com/etc/minji.png");
 
         for (Spot spot : allSpot) {// 스팟마다 0~5개 랜덤으로
             for (int i = 0; i < (int) (Math.random() * 100) % 6; i++) {

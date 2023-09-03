@@ -54,6 +54,7 @@ public enum StatusCode {
     REVOKE_ERROR(404,1070,"revoke error"),
     IS_NOT_REFRESH(400, 1070, "this token is not refresh token."),
     EXPIRED_REFRESH(400,1080,"expired refresh token"),
+    IS_NOT_CORRECT_REFRESH(400,1090,"this token is not correct refresh token"),
 
     // 권한
     NOT_AUTHOR(403, 1200, "not an author of this content."),

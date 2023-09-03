@@ -1,11 +1,10 @@
 package bokjak.bokjakserver.domain.user.service;
 
 import bokjak.bokjakserver.common.exception.StatusCode;
-import bokjak.bokjakserver.config.jwt.RefreshTokenRepository;
+import bokjak.bokjakserver.config.redis.RedisService;
 import bokjak.bokjakserver.config.security.PrincipalDetails;
 import bokjak.bokjakserver.domain.user.UserTemplate;
 import bokjak.bokjakserver.domain.user.dto.AuthDto.AuthMessage;
-import bokjak.bokjakserver.domain.user.dto.UserDto;
 import bokjak.bokjakserver.domain.user.dto.UserDto.NicknameResponse;
 import bokjak.bokjakserver.domain.user.dto.UserDto.UserInfoResponse;
 import bokjak.bokjakserver.domain.user.exeption.UserException;
@@ -33,7 +32,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
+
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -51,7 +50,7 @@ class UserServiceTest {
     @Mock
     UserBlockUserRepository userBlockUserRepository;
     @Mock
-    RefreshTokenRepository refreshTokenRepository;
+    RedisService redisService;
 
 
     static User user = UserTemplate.makeDummyUserA();

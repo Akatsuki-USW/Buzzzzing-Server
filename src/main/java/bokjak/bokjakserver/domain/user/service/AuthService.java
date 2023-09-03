@@ -3,8 +3,7 @@ package bokjak.bokjakserver.domain.user.service;
 import bokjak.bokjakserver.common.exception.StatusCode;
 import bokjak.bokjakserver.config.jwt.JwtDto;
 import bokjak.bokjakserver.config.jwt.JwtProvider;
-import bokjak.bokjakserver.config.jwt.RefreshToken;
-import bokjak.bokjakserver.config.jwt.RefreshTokenRepository;
+import bokjak.bokjakserver.config.redis.RedisService;
 import bokjak.bokjakserver.config.security.PrincipalDetails;
 import bokjak.bokjakserver.domain.ban.model.Ban;
 import bokjak.bokjakserver.domain.ban.repository.BanRepository;
@@ -28,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 
@@ -37,7 +37,6 @@ import java.util.Optional;
 @Transactional(readOnly = true)
 public class AuthService {
     
-    private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProvider jwtProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PasswordEncoder passwordEncoder;
@@ -49,6 +48,7 @@ public class AuthService {
     private final RevokeUserRepository revokeUserRepository;
     private final CustomEncryptUtil customEncryptUtil;
     private final BlackListRepository blackListRepository;
+    private final RedisService redisService;
 
     @Transactional(noRollbackFor = {AuthException.class})
     public AuthMessage loginAccess(SocialLoginRequest socialLoginRequest) {
@@ -212,15 +212,18 @@ public class AuthService {
 
     @Transactional
     public LogoutResponse logout(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new UserException(StatusCode.NOT_FOUND_USER));
+        User user = userService.getUser(userId);
+
         user.removeFcmToken();
+        redisService.deleteValues(user.getSocialEmail());
+        String values = redisService.getValues(user.getSocialEmail());
+        boolean exist = checkIsExistRefresh(values);
 
-        RefreshToken refreshToken = refreshTokenRepository.findByUser(user)
-                .orElseThrow(() -> new UserException(StatusCode.NOT_FOUND_REFRESH_TOKEN));
-        refreshTokenRepository.delete(refreshToken);
-        refreshTokenRepository.flush();
+        return LogoutResponse.of(exist);
+    }
 
-        return LogoutResponse.of(refreshTokenRepository.existsByUser(user));
+    private boolean checkIsExistRefresh(String values) {
+        return !Objects.isNull(values);
     }
 
     @Transactional

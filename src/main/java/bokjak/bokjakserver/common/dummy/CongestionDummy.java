@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ import java.util.Map;
 @Component("congestionDummy")
 @DependsOn("userDummy")
 @RequiredArgsConstructor
-@Transactional
+@BuzzingDummy
 public class CongestionDummy {
     // 개발용. 배포 이후엔 Django 혼잡도 서버에 의존
     private final CongestionRepository congestionRepository;
@@ -35,11 +34,11 @@ public class CongestionDummy {
     @PostConstruct
     public void init() {
         if (congestionRepository.count() > 0) {
-            log.info("[4] 혼잡도 데이터가 이미 존재");
+            log.info("[congestionDummy] 혼잡도 데이터가 이미 존재");
         } else {
             createCongestions();
             createCongestionStatistics();
-            log.info("[4] 혼잡도 더미 생성 완료");
+            log.info("[congestionDummy] 혼잡도 더미 생성 완료");
         }
     }
 

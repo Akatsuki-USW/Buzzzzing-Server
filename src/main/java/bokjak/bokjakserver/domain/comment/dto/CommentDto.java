@@ -5,6 +5,7 @@ import bokjak.bokjakserver.domain.comment.model.Comment;
 import bokjak.bokjakserver.domain.spot.model.Spot;
 import bokjak.bokjakserver.domain.user.model.User;
 import bokjak.bokjakserver.util.CustomDateUtils;
+import bokjak.bokjakserver.util.web.PreventNullResponseUtils;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
@@ -71,8 +72,8 @@ public class CommentDto {
                             .createdAt(CustomDateUtils.customDateFormat(comment.getCreatedAt(), GlobalConstants.DATE_FORMAT_YYYY_MM_DD_HH_MM))
                             .updatedAt(CustomDateUtils.customDateFormat(comment.getUpdatedAt(), GlobalConstants.DATE_FORMAT_YYYY_MM_DD_HH_MM))
                             .userId(author.getId())
-                            .userNickname(author.getNickname())
-                            .userProfileImageUrl(author.getProfileImageUrl())
+                            .userNickname(PreventNullResponseUtils.resolveUserNicknameFromNullable(author.getNickname()))
+                            .userProfileImageUrl(PreventNullResponseUtils.resolveUserProfileImageUrlFromNullable(author.getProfileImageUrl()))
                             .isAuthor(author.getId().equals(userId))
                             .build();
                 } else {
