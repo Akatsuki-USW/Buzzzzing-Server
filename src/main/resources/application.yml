@@ -15,9 +15,7 @@ spring:
     basename: errors
 
 logging.level:
-  org.hibernate:
-    SQL: debug # SQL logger를 통해서 찍어야 함.
-    type : trace
+  org.springframework.core.LocalVariableTableParameterNameDiscoverer: error # https://github.com/spring-projects/spring-framework/issues/29612
 
 server:
   error:
