@@ -1,14 +1,19 @@
 package bokjak.bokjakserver.domain.spot.model;
 
 
+import bokjak.bokjakserver.common.constant.ConstraintConstants;
+import bokjak.bokjakserver.common.model.BaseEntity;
 import bokjak.bokjakserver.domain.bookmark.model.SpotBookmark;
 import bokjak.bokjakserver.domain.category.model.SpotCategory;
 import bokjak.bokjakserver.domain.comment.model.Comment;
 import bokjak.bokjakserver.domain.location.model.Location;
 import bokjak.bokjakserver.domain.user.model.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -16,37 +21,70 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Spot {
+public class Spot extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "spot_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "location_id", nullable = false)
-    private Location location;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "spot_category_id", nullable = false)
-    private SpotCategory spotCategory;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-    @Column(length = 50)
+    @NotNull
+    @Size(max = ConstraintConstants.SPOT_TITLE_MAX_LENGTH)
     private String title;
-    @Column(length = 50)
-    private String spot_name;
+
+    @Size(max = ConstraintConstants.SPOT_ADDRESS_MAX_LENGTH)
     private String address;
-    private String roadNameAddress;
-    @Column(length = 1500)
+
+    private String roadNameAddress; // deprecated : 클라이언트측에서 도로명 입력 안 함
+
+    @NotNull
+    @Size(max = ConstraintConstants.SPOT_CONTENT_MAX_LENGTH)
     private String content;
-    @Column(length = 500)
-    private String thumbnailImageUrl;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @NotNull
+    @JoinColumn(name = "location_id")
+    private Location location;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @NotNull
+    @JoinColumn(name = "spot_category_id")
+    private SpotCategory spotCategory;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @NotNull
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @OneToMany(mappedBy = "spot", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SpotBookmark> spotBookmarkList;
+    @Builder.Default
+    private List<SpotBookmark> spotBookmarkList = new ArrayList<>();
+
     @OneToMany(mappedBy = "spot", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> commentList;
+    @Builder.Default
+    private List<Comment> commentList = new ArrayList<>();
+
     @OneToMany(mappedBy = "spot", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SpotImage> spotImageList;
+    @Builder.Default
+    private List<SpotImage> spotImageList = new ArrayList<>();
+
+    /* 연관관계 메서드 */
+    public void addSpotImage(SpotImage spotImage) {
+        spotImageList.add(spotImage);
+    }
+
+    public void addSpotImages(List<SpotImage> spotImages) {
+        spotImageList.addAll(spotImages);
+    }
+
+    public void update(Location location, SpotCategory spotCategory, String title, String address, String content, List<SpotImage> spotImages) {
+        this.location = location;
+        this.spotCategory = spotCategory;
+        this.title = title;
+        this.address = address;
+        this.content = content;
+        this.spotImageList.clear();
+        this.spotImageList.addAll(spotImages);
+    }
+
 }

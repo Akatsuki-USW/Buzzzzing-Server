@@ -7,8 +7,13 @@ build/
 
 ## 커스텀
 
-*.properties
-*.yml
+# 로컬 환경 설정 정보
+application-local.yml
+application-dev.yml
+application-prod.yml
+/src/main/generated/
+memo.md
+/src/main/resources/buzzzzing-firebase-private-key.json
 
 ### STS ###
 .apt_generated

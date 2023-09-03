@@ -19,17 +19,18 @@ public class Report extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reporter_user_id", nullable = false)
-    private User reporterUserId;
+    @JoinColumn(name = "reporter_user_id")
+    private User reporter;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reported_user_id", nullable = false)
-    private User reportedUserId;
+    @JoinColumn(name = "reported_user_id")
+    private User reportedUser;
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ban_id", nullable = true)
+    @JoinColumn(name = "ban_id")
     private Ban banId;
     @Enumerated(EnumType.STRING)
-    private ReportedTarget reportedTarget;
+    private ReportTarget reportTarget;
     private Long targetId;
     @Column(length = 300)
     private String content;
+    private Boolean isChecked;
 }

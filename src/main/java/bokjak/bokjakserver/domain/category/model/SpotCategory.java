@@ -1,15 +1,19 @@
 package bokjak.bokjakserver.domain.category.model;
 
+import bokjak.bokjakserver.common.constant.ConstraintConstants;
 import bokjak.bokjakserver.domain.spot.model.Spot;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
 @Builder
 @AllArgsConstructor
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SpotCategory {
 
@@ -18,8 +22,11 @@ public class SpotCategory {
     @Column(name = "spot_category_id")
     private Long id;
 
+    @NotNull
+    @Size(max = ConstraintConstants.SPOT_CATEGORY_NAME_MAX_LENGTH)
     private String name;
 
     @OneToMany(mappedBy = "spotCategory", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Spot> spotList;
+    @Builder.Default
+    private List<Spot> spotList = new ArrayList<>();
 }

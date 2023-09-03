@@ -1,16 +1,20 @@
 package bokjak.bokjakserver.domain.category.model;
 
+import bokjak.bokjakserver.common.constant.ConstraintConstants;
 import bokjak.bokjakserver.domain.location.model.Location;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.validator.constraints.URL;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table
+@Getter
 @Builder
 @AllArgsConstructor
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LocationCategory {
 
@@ -19,10 +23,15 @@ public class LocationCategory {
     @Column(name = "location_category_id")
     private Long id;
 
+    @NotNull
+    @Size(max = ConstraintConstants.LOCATION_CATEGORY_NAME_MAX_LENGTH)
     private String name;
+
+    @URL
     private String iconImageUrl;
 
     @OneToMany(mappedBy = "locationCategory", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Location> locationList;
+    @Builder.Default
+    private List<Location> locationList = new ArrayList<>();
 
 }
