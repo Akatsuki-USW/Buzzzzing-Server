@@ -2,6 +2,9 @@
 
 ![복쟉배경](https://github.com/Akatsuki-USW/Buzzzzing-Server/assets/72124326/42828c59-0ebe-421b-bd3d-cda88760fbce)
 
+[📱 Google Play 앱 스토어 링크](https://play.google.com/store/apps/details?id=com.onewx2m.buzzzzing)
+
+
 주요 장소별 인구 혼잡 현황을 쉽게 알 수 있다면 어떨까?
 
 복쟉복쟉 서비스는 서울시, SK의 실시간 혼잡도 API를 기반으로 장소별로 현재 인구 혼잡도 현황과 미래 인구 혼잡도 예측치를 제공하고, 유저의 세부 장소 추천 및 커뮤니티 공간을 마련합니다. 
