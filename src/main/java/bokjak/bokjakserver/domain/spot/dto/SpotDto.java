@@ -7,6 +7,7 @@ import bokjak.bokjakserver.domain.spot.model.Spot;
 import bokjak.bokjakserver.domain.spot.model.SpotImage;
 import bokjak.bokjakserver.domain.user.model.User;
 import bokjak.bokjakserver.util.CustomDateUtils;
+import bokjak.bokjakserver.util.web.PreventNullResponseUtils;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -82,8 +83,8 @@ public class SpotDto {
                     .thumbnailImageUrl(spot.getSpotImageList().isEmpty() ? null
                             : spot.getSpotImageList().get(0).getImageUrl())
                     .userId(spot.getUser().getId())
-                    .userNickname(spot.getUser().getNickname())
-                    .userProfileImageUrl(spot.getUser().getProfileImageUrl())
+                    .userNickname(PreventNullResponseUtils.resolveUserNicknameFromNullable(spot.getUser().getNickname()))
+                    .userProfileImageUrl(PreventNullResponseUtils.resolveUserProfileImageUrlFromNullable(spot.getUser().getProfileImageUrl()))
                     .isBookmarked(isBookmarked)
                     .build();
         }
@@ -127,8 +128,8 @@ public class SpotDto {
                     .spotCategoryName(spot.getSpotCategory().getName())
                     .imageUrls(spot.getSpotImageList().stream().map(SpotImage::getImageUrl).toList())
                     .userId(spot.getUser().getId())
-                    .userNickname(spot.getUser().getNickname())
-                    .userProfileImageUrl(spot.getUser().getProfileImageUrl())
+                    .userNickname(PreventNullResponseUtils.resolveUserNicknameFromNullable(spot.getUser().getNickname()))
+                    .userProfileImageUrl(PreventNullResponseUtils.resolveUserProfileImageUrlFromNullable(spot.getUser().getProfileImageUrl()))
                     .isBookmarked(isBookmarked)
                     .isAuthor(isAuthor)
                     .build();
