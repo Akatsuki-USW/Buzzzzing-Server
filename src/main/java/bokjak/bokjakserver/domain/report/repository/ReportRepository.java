@@ -9,7 +9,6 @@ import java.util.List;
 
 public interface ReportRepository extends JpaRepository<Report, Long> {
 
-    boolean existsByReporterAndReportedUserAndReportTargetAndTargetIdAndIsCheckedNull(User reporterUser, User reportedUser, ReportTarget reportTarget, Long TargetId);
-    List<Report> findAllByIsCheckedFalse();
+    boolean existsByReporterAndReportedUserAndReportTargetAndTargetIdAndIsCheckedFalse(User reporterUser, User reportedUser, ReportTarget reportTarget, Long TargetId);
 
 }
