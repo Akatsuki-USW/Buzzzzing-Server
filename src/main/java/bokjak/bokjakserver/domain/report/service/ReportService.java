@@ -38,7 +38,7 @@ public class ReportService {
         checkIsReport(reportedUser);
         Report report = reportRequest.toEntity(reporter, reportedUser);
         checkExistSpotOrComment(report.getReportTarget(), report.getTargetId(), reportedUser);
-        boolean exists = reportRepository.existsByReporterAndReportedUserAndReportTargetAndTargetId(
+        boolean exists = reportRepository.existsByReporterAndReportedUserAndReportTargetAndTargetIdAndIsCheckedNull(
                 reporter, reportedUser, report.getReportTarget(), report.getTargetId());
         if (exists) throw new ReportException(StatusCode.REPORT_DUPLICATION);
 
