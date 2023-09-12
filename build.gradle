@@ -70,6 +70,9 @@ dependencies {
 
 	// redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	// IOUtils
+	implementation 'commons-io:commons-io:2.7'
 }
 
 tasks.named('test') {
