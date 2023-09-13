@@ -28,7 +28,7 @@ import static bokjak.bokjakserver.common.exception.StatusCode.*;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(BuzException.class)
-    public ResponseEntity<?> handle(BuzException ex) {
+    public ResponseEntity<?> handleBuzException(BuzException ex) {
         log.warn("{}({}) - {}", ex.getClass().getSimpleName(), ex.statusCode.getStatusCode(), ex.getMessage());
         return ResponseEntity
                 .status(ex.statusCode.getHttpCode())
@@ -36,12 +36,11 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AuthException.class)  //분리 이유: SignToken
-    public ResponseEntity<?> handle(AuthException ex) {
+    public ResponseEntity<?> handleAuthException(AuthException ex) {
         log.warn("{}({}) - {}", ex.getClass().getSimpleName(), ex.statusCode.getStatusCode(), ex.getMessage());
         return ResponseEntity
                 .status(ex.statusCode.getHttpCode())
                 .body(ApiResponse.error(ex.statusCode.getStatusCode(), ex.data, ex.statusCode.getMessage()));
-
     }
 
     /**
@@ -51,7 +50,7 @@ public class GlobalExceptionHandler {
     // AWS S3 버킷 정책에 맞지 않는 요청
     @ExceptionHandler(AwsS3Exception.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    protected ApiResponse<?> handleAwsS3Error(final AwsS3Exception ex) {
+    protected ApiResponse<?> handleAwsS3Exception(final AwsS3Exception ex) {
         log.warn("{} - {}", ex.getClass().getSimpleName(), ex.getMessage());
         return error(ex.getAwsS3ErrorCode().getStatusCode(), ex.getMessage());
     }
