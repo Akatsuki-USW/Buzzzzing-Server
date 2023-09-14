@@ -40,12 +40,8 @@ public class TestController {
 
     @GetMapping("/send/email")
     public String testSendEmailMySelf() {
-        long beforeTime = System.currentTimeMillis();
         User currentUser = userService.getCurrentUser();
         sleepingUserService.sendMail(currentUser.getEmail());
-        long afterTime = System.currentTimeMillis();
-        long diffTime = afterTime-beforeTime;
-        System.out.println("실행 시간: " + diffTime);
         return "good";
     }
 }
