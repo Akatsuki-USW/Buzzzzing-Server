@@ -25,12 +25,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class ReadableRequestWrapper extends HttpServletRequestWrapper {
+public class ReadableRequestBodyWrapper extends HttpServletRequestWrapper {
     private final Charset encoding;
     private byte[] rawData;
     private final Map<String, String[]> params = new HashMap<>();
 
-    public ReadableRequestWrapper(HttpServletRequest request) {
+    public ReadableRequestBodyWrapper(HttpServletRequest request) {
         super(request);
         this.params.putAll(request.getParameterMap());  // 오리지널 요청의 파라미터들 저장
 
@@ -44,7 +44,7 @@ public class ReadableRequestWrapper extends HttpServletRequestWrapper {
 
             // body 파싱
             String collect = this.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-            if (StringUtils.isEmpty(collect)) { // body 가 없을경우 로깅 제외 TODO: 이 경우에도 로깅해야 하지 않나?
+            if (StringUtils.isEmpty(collect)) { // body 가 없을경우 종료
                 return;
             }
             if (request.getContentType() != null && request.getContentType().contains(

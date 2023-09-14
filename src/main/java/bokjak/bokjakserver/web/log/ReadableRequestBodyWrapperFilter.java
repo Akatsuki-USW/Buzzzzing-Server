@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 @WebFilter(urlPatterns = "/*")  // 대상: 전체 URI
-public class ReadableRequestWrapperFilter implements Filter {   // TODO: 4xx 응답을 캐치 못한다?
+public class ReadableRequestBodyWrapperFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) {
@@ -16,7 +16,7 @@ public class ReadableRequestWrapperFilter implements Filter {   // TODO: 4xx 응
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
-        ReadableRequestWrapper wrapper = new ReadableRequestWrapper((HttpServletRequest) request);
+        ReadableRequestBodyWrapper wrapper = new ReadableRequestBodyWrapper((HttpServletRequest) request);
         filterChain.doFilter(wrapper, response);    // 필터 체인에 Wrapper 추가
     }
 
