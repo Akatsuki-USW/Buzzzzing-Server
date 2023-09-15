@@ -1,28 +1,20 @@
 package bokjak.bokjakserver.web.log;
 
-import jakarta.servlet.*;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
 @WebFilter(urlPatterns = "/*")  // 대상: 전체 URI
-public class ReadableRequestBodyWrapperFilter implements Filter {
-
+public class ReadableRequestBodyWrapperFilter extends OncePerRequestFilter {
     @Override
-    public void init(FilterConfig filterConfig) {
-        // Do nothing
-    }
-
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
-        ReadableRequestBodyWrapper wrapper = new ReadableRequestBodyWrapper((HttpServletRequest) request);
-        filterChain.doFilter(wrapper, response);    // 필터 체인에 Wrapper 추가
-    }
-
-    @Override
-    public void destroy() {
-        // Do nothing
+    protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        filterChain.doFilter(new ReadableRequestBodyWrapper(request), response);    // 필터 체인에 커스텀 Wrapper 추가
     }
 
 }

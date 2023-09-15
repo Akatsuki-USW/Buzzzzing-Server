@@ -4,7 +4,11 @@ public class GlobalConstants {
     /**
      * Common
      */
-    public static final String[] APPOINTED_URIS = {
+    public static final String[] AUTH_WHITELIST = {
+            "/",
+            "/csrf",
+            "/error",
+
             "/auth/login/admin",
             "/auth/reissue",
             "/auth/login",
@@ -26,10 +30,7 @@ public class GlobalConstants {
             "/swagger-ui/#",
             "/webjars/**",
             "/swagger/**",
-            "/swagger-ui/**",
-            "/",
-            "/csrf",
-            "/error"
+            "/swagger-ui/**"
     };
 
     /**
