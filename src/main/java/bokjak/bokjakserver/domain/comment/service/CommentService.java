@@ -15,7 +15,6 @@ import bokjak.bokjakserver.domain.spot.exception.SpotException;
 import bokjak.bokjakserver.domain.spot.model.Spot;
 import bokjak.bokjakserver.domain.spot.repository.SpotRepository;
 import bokjak.bokjakserver.domain.user.model.User;
-import bokjak.bokjakserver.domain.user.repository.UserRepository;
 import bokjak.bokjakserver.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,7 +68,7 @@ public class CommentService {
         User spotAuthor = spot.getUser();
         boolean equals = checkIsSameUser(spotAuthor, commentAuthor);
         if (!equals) {
-            notificationService.pushMessage(NotifyParams.ofCreateSpotComment(spotAuthor,spot,comment));
+            notificationService.pushMessage(NotifyParams.ofCreateSpotComment(spotAuthor, spot, comment));
         }
 
         return CommentCardResponse.of(comment, currentUserId);
@@ -91,15 +90,14 @@ public class CommentService {
 
         boolean equals = checkIsSameUser(parent.getUser(), user);
         if (!equals) {
-            notificationService.pushMessage(NotifyParams.ofCreateSpotCommentComment(parent,spot,comment));
-        }
-        else {
+            notificationService.pushMessage(NotifyParams.ofCreateSpotCommentComment(parent, spot, comment));
+        } else {
             List<User> userList = commentRepository.
                     findAllByparentCommentAndDistinctExceptParentAuthor(parentId, parent.getUser().getId());
 
             userList.forEach(u -> {
-                notificationService.pushMessage(NotifyParams.ofCreateSpotCommentComment(
-                        u,spot,comment));
+                        notificationService.pushMessage(NotifyParams.ofCreateSpotCommentComment(
+                                u, spot, comment));
                     }
             );
         }
