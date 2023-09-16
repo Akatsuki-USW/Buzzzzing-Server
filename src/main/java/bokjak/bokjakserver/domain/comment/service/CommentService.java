@@ -15,7 +15,6 @@ import bokjak.bokjakserver.domain.spot.exception.SpotException;
 import bokjak.bokjakserver.domain.spot.model.Spot;
 import bokjak.bokjakserver.domain.spot.repository.SpotRepository;
 import bokjak.bokjakserver.domain.user.model.User;
-import bokjak.bokjakserver.domain.user.repository.UserRepository;
 import bokjak.bokjakserver.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +35,6 @@ public class CommentService {
     private final SpotRepository spotRepository;
     private final CommentRepository commentRepository;
     private final NotificationService notificationService;
-    private final UserRepository userRepository;
 
     // 스팟별 댓글 리스트 조회
     public PageResponse<CommentCardResponse> getParentComments(Long currentUserId, Pageable pageable, Long cursorId, Long spotId) {
@@ -70,7 +68,7 @@ public class CommentService {
         User spotAuthor = spot.getUser();
         boolean equals = checkIsSameUser(spotAuthor, commentAuthor);
         if (!equals) {
-            notificationService.pushMessage(NotifyParams.ofCreateSpotComment(spotAuthor,spot,comment));
+            notificationService.pushMessage(NotifyParams.ofCreateSpotComment(spotAuthor, spot, comment));
         }
 
         return CommentCardResponse.of(comment, currentUserId);
@@ -92,15 +90,14 @@ public class CommentService {
 
         boolean equals = checkIsSameUser(parent.getUser(), user);
         if (!equals) {
-            notificationService.pushMessage(NotifyParams.ofCreateSpotCommentComment(parent,spot,comment));
-        }
-        else {
+            notificationService.pushMessage(NotifyParams.ofCreateSpotCommentComment(parent, spot, comment));
+        } else {
             List<User> userList = commentRepository.
                     findAllByparentCommentAndDistinctExceptParentAuthor(parentId, parent.getUser().getId());
 
             userList.forEach(u -> {
-                notificationService.pushMessage(NotifyParams.ofCreateSpotCommentComment(
-                        u,spot,comment));
+                        notificationService.pushMessage(NotifyParams.ofCreateSpotCommentComment(
+                                u, spot, comment));
                     }
             );
         }
@@ -113,6 +110,7 @@ public class CommentService {
         User user = userService.getUser(currentUserId);
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentException(StatusCode.NOT_FOUND_COMMENT));
+        checkIsAuthor(user, comment);
 
         comment.update(updateSpotCommentRequest.content());
 
