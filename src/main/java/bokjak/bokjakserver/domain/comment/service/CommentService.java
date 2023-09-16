@@ -36,7 +36,6 @@ public class CommentService {
     private final SpotRepository spotRepository;
     private final CommentRepository commentRepository;
     private final NotificationService notificationService;
-    private final UserRepository userRepository;
 
     // 스팟별 댓글 리스트 조회
     public PageResponse<CommentCardResponse> getParentComments(Long currentUserId, Pageable pageable, Long cursorId, Long spotId) {
@@ -113,6 +112,7 @@ public class CommentService {
         User user = userService.getUser(currentUserId);
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentException(StatusCode.NOT_FOUND_COMMENT));
+        checkIsAuthor(user, comment);
 
         comment.update(updateSpotCommentRequest.content());
 
