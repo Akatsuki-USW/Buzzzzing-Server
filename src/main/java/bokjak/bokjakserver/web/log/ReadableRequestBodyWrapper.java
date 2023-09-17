@@ -48,7 +48,7 @@ public class ReadableRequestBodyWrapper extends HttpServletRequestWrapper {
                 return;
             }
             if (request.getContentType() != null && request.getContentType().contains(
-                    ContentType.MULTIPART_FORM_DATA.getMimeType())) { // 파일 업로드시 로깅 제외 TODO: 이 경우에도 로깅해야 하지 않나?
+                    ContentType.MULTIPART_FORM_DATA.getMimeType())) { // 파일 업로드시 로깅 제외
                 return;
             }
 
