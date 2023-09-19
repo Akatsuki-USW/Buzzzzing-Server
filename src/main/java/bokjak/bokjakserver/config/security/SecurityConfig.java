@@ -43,7 +43,10 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable()
+        http
+                .csrf().disable()
+                .formLogin().disable()
+                .httpBasic().disable()
                 .cors().configurationSource(corsConfigurationSource())
                 .and()
 
@@ -55,23 +58,21 @@ public class SecurityConfig {
                 //세션 사용 안함
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+
+                .authorizeHttpRequests()
+                .requestMatchers(GlobalConstants.AUTH_WHITELIST).permitAll()
+                .anyRequest().authenticated()
 
                 .and()
-                .formLogin().disable()
-                .httpBasic().disable()
-                .authorizeHttpRequests()
-                .requestMatchers(GlobalConstants.APPOINTED_URIS).permitAll()
-                .anyRequest().authenticated();
-
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtProvider);
-        return jwtAuthenticationFilter;
+        return new JwtAuthenticationFilter(jwtProvider);
     }
 
     @Bean
@@ -79,13 +80,13 @@ public class SecurityConfig {
 
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowCredentials(true);
-        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedOrigins(List.of("*"));
         configuration.setAllowedMethods(
                 Arrays.asList(HttpMethod.POST.name(), HttpMethod.GET.name(),
                         HttpMethod.PUT.name(), HttpMethod.DELETE.name(),
                         HttpMethod.OPTIONS.name())
         );
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowedHeaders(List.of("*"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
