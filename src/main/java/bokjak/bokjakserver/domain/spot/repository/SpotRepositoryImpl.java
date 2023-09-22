@@ -106,7 +106,7 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
                         .from(comment)
                         .where(comment.user.id.eq(userId))))
                 .where(ltCursorId(cursorId))    // 최신순
-                .orderBy(spot.id.desc())
+                .orderBy(comment.id.desc())
                 .limit(pageable.getPageSize());
 
         return PageableExecutionUtils.getPage(
@@ -133,6 +133,7 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
                 .join(spot.location, location).fetchJoin()
                 .join(spot.spotCategory, spotCategory).fetchJoin()
                 .leftJoin(spot.spotBookmarkList, spotBookmark).fetchJoin()
+                .join(spot.commentList, comment)
                 .leftJoin(spot.spotImageList, spotImage)
                 .where(spot.user.id.notIn(JPAExpressions.select(userBlockUser.blockedUser.id)  // 차단한 유저 제외
                         .from(userBlockUser)
