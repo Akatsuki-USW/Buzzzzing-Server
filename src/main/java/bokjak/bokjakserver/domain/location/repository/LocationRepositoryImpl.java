@@ -16,6 +16,7 @@ import org.springframework.data.support.PageableExecutionUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static bokjak.bokjakserver.domain.bookmark.model.QLocationBookmark.locationBookmark;
 import static bokjak.bokjakserver.domain.category.model.QLocationCategory.locationCategory;
@@ -66,8 +67,16 @@ public class LocationRepositoryImpl implements LocationRepositoryCustom {
         );
     }
 
+    @Override
+    public Optional<Location> getLocation(Long locationId) {
+        JPAQuery<Location> query = queryFactory.selectFrom(location)
+                .leftJoin(location.locationCategory, locationCategory).fetchJoin()
+                .leftJoin(location.locationBookmarkList, locationBookmark).fetchJoin()
+                .where(location.id.eq(locationId));
 
-    // TODO: 이건 같은 Prefix 쓰면 안 된다. 그냥 통계값만 보면 됨
+        return Optional.ofNullable(query.fetchOne());
+    }
+
     @Override
     public Page<Location> getTopOfWeeklyAverageCongestion(Pageable pageable, LocalDateTime start, LocalDateTime end) {
         JPAQuery<Location> query = selectLocationsPrefix()

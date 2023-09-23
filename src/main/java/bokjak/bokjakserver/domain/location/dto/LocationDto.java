@@ -92,7 +92,7 @@ public class LocationDto {
                     .categoryName(location.getLocationCategory().getName())
                     .bookMarkCount(location.getLocationBookmarkList().size())
                     .isBookmarked(isBookmarked)
-                    // TODO: congestion... -> location.getRealtimeCongestionLevel
+                    // TODO: congestion... -> location.getRealtimeCongestionLevel. V2로 해보자
                     .congestionSymbol(CongestionLevel.toEnum(congestion.getCongestionLevel()))
                     .congestionLevel(congestion.getCongestionLevel())
                     .congestionId(congestion.getId())
