@@ -35,8 +35,8 @@ public class LocationDto {
                     .categoryId(location.getLocationCategory().getId())
                     .categoryName(location.getLocationCategory().getName())
                     .categoryIconUrl(location.getLocationCategory().getIconImageUrl())
-                    .congestionSymbol(CongestionLevel.toEnum(location.getCongestionList().get(0).getCongestionLevel()))
-                    .congestionLevel(location.getCongestionList().get(0).getCongestionLevel())
+                    .congestionSymbol(CongestionLevel.toEnum(location.getRealtimeCongestionLevel()))
+                    .congestionLevel(location.getRealtimeCongestionLevel())
                     .bookMarkCount(location.getLocationBookmarkList().size())
                     .isBookmarked(isBookmarked)
                     .build();
@@ -92,6 +92,7 @@ public class LocationDto {
                     .categoryName(location.getLocationCategory().getName())
                     .bookMarkCount(location.getLocationBookmarkList().size())
                     .isBookmarked(isBookmarked)
+                    // TODO: congestion... -> location.getRealtimeCongestionLevel. V2로 해보자
                     .congestionSymbol(CongestionLevel.toEnum(congestion.getCongestionLevel()))
                     .congestionLevel(congestion.getCongestionLevel())
                     .congestionId(congestion.getId())

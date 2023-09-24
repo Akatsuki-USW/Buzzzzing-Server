@@ -66,6 +66,7 @@ public class LocationService {
                 cursorId,
                 keyword,
                 categoryIds,
+                // TODO: 커스텀 커서
                 CongestionLevel.toSortOrder(CongestionLevel.toEnum(congestionLevelSortOrder)),
                 CongestionLevel.toEnum(cursorCongestionLevel)
         );
@@ -74,7 +75,7 @@ public class LocationService {
     }
 
     // 로케이션 단순 리스트 조회
-    public PageResponse<LocationSimpleCardResponse> getLocations(Pageable pageable,Long cursorId) {
+    public PageResponse<LocationSimpleCardResponse> getLocations(Pageable pageable, Long cursorId) {
         Page<Location> locations = locationRepository.getLocations(pageable, cursorId);
 
         Page<LocationSimpleCardResponse> responsePage = locations.map(LocationSimpleCardResponse::of);
@@ -106,7 +107,8 @@ public class LocationService {
     public LocationDetailResponse getLocationDetail(Long locationId) {
         User currentUser = userService.getCurrentUser();
 
-        Location location = getLocation(locationId);
+        Location location = locationRepository.getLocation(locationId)
+                .orElseThrow(() -> new LocationException(StatusCode.NOT_FOUND_LOCATION));
         Congestion congestion = congestionRepository.findTopByLocationIdOrderByObservedAtDesc(locationId)
                 .orElseThrow(() -> new CongestionException(StatusCode.NOT_FOUND_CONGESTION));
         boolean isBookmarked = currentUser.getLocationBookmarkList().stream()
@@ -135,8 +137,9 @@ public class LocationService {
     // 북마크 등록 OR 수정
     @Transactional
     public BookmarkResponse bookmark(Long locationId, Long userId) {
-        User user = userService.getUser(userId);    // no session lazy 예외 핸들용 TODO 고민해보기
-        Location location = getLocation(locationId);
+        User user = userService.getUser(userId);
+        Location location = locationRepository.findById(locationId)
+                .orElseThrow(() -> new LocationException(StatusCode.NOT_FOUND_LOCATION));
 
         Optional<LocationBookmark> bookmark = user.getLocationBookmarkList().stream()
                 .filter(it -> it.getLocation().equals(location))
@@ -156,11 +159,6 @@ public class LocationService {
         }
 
         return BookmarkResponse.of(locationId, isBookmarked);
-    }
-
-    public Location getLocation(Long locationId) {
-        return locationRepository.findById(locationId)
-                .orElseThrow(() -> new LocationException(StatusCode.NOT_FOUND_LOCATION));
     }
 
     /* private 함수 */

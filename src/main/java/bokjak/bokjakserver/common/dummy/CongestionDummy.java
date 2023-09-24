@@ -21,7 +21,7 @@ import java.util.Map;
 
 @Slf4j
 @Component("congestionDummy")
-@DependsOn("userDummy")
+@DependsOn({"userDummy", "locationDummy"})
 @RequiredArgsConstructor
 @BuzzingDummy
 public class CongestionDummy {
