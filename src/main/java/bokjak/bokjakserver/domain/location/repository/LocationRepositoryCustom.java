@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface LocationRepositoryCustom {
     Page<Location> search(
@@ -21,6 +22,7 @@ public interface LocationRepositoryCustom {
 
     Page<Location> getLocations(Pageable pageable,Long cursorId);
 
+    Optional<Location> getLocation(Long locationId);
     Page<Location> getTopOfWeeklyAverageCongestion(Pageable pageable, LocalDateTime start, LocalDateTime end);
 
     Page<Location> getBookmarked(Pageable pageable, Long cursorId, Long userId);

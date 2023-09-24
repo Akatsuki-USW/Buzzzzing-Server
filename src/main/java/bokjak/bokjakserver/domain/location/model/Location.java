@@ -29,6 +29,8 @@ public class Location extends BaseEntity {
     @NotNull
     private String name;
 
+    @Column(name = "realtime_congestion_level")
+    private Integer realtimeCongestionLevel;
     private int apiId;  // 혼잡도 API(SK, 서울시)상의 장소 PK값
 
     @ManyToOne(fetch = FetchType.LAZY)
