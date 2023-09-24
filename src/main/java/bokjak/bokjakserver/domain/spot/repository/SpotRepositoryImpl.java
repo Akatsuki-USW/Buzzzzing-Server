@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static bokjak.bokjakserver.domain.bookmark.model.QSpotBookmark.spotBookmark;
@@ -100,13 +101,16 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
 
     @Override
     public Page<Spot> findAllCommentedByMeExceptBlockedAuthors(Pageable pageable, Long cursorId, Long userId) {
-        JPAQuery<Spot> query = selectSpotsExceptBlockedAuthorsPrefix(userId)
-                .where(spot.id.in(JPAExpressions    // 현재 유저가 작성한 댓글들의 부모 스팟들
-                        .select(comment.spot.id)
-                        .from(comment)
-                        .where(comment.user.id.eq(userId))))
-                .where(ltCursorId(cursorId))    // 최신순
-                .orderBy(spot.id.desc())
+        // TODO: 응답값에 각 Spot의 lastCommentId 추가, 요청에서 받기 -> 쿼리 1회 감소
+        Long latestCommentId = findLatestCommentIdBySpotId(cursorId);
+
+        // TODO: JOIN을 못해서 default_batch_size 쿼리가 나가고 있다. 개선해보자
+        JPAQuery<Spot> query = queryFactory
+                .select(comment.spot).from(comment)
+                .where(comment.user.id.eq(userId))  // 해당 유저의 댓글만 조회
+                .groupBy(comment.spot.id)
+                .having(ltMaxCommentId(latestCommentId))
+                .orderBy(comment.id.max().desc())
                 .limit(pageable.getPageSize());
 
         return PageableExecutionUtils.getPage(
@@ -114,6 +118,20 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
                 pageable,
                 findAllCommentedByMeExceptBlockedAuthorsCountQuery(userId)::fetchOne
         );
+    }
+
+    private Long findLatestCommentIdBySpotId(Long cursorId) {
+        if (Objects.isNull(cursorId)) {
+            return null;
+        } else {
+            Long latestCommentId = queryFactory.select(comment.id).from(comment)
+                    .where(comment.spot.id.eq(cursorId))
+                    .orderBy(comment.id.desc())
+                    .fetchFirst();
+            if (Objects.isNull(latestCommentId)) return null;
+
+            return latestCommentId;
+        }
     }
 
     @Override
@@ -222,6 +240,11 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
     private BooleanExpression ltCursorId(Long cursorId) {
         if (cursorId == null || cursorId == 0) return null;
         else return spot.id.lt(cursorId);
+    }
+
+    private BooleanExpression ltMaxCommentId(Long cursorId) {
+        if (cursorId == null || cursorId == 0) return null;
+        else return comment.id.max().lt(cursorId);
     }
 
     private BooleanExpression eqLocationId(Long locationId) {
