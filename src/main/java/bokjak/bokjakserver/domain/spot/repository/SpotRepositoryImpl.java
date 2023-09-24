@@ -40,7 +40,7 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
             Long locationId,
             List<Long> categoryIds
     ) {
-        JPAQuery<Spot> query = selectBigSpotsExceptBlockedAuthorsPrefix(userId)
+        JPAQuery<Spot> query = selectSpotsExceptBlockedAuthorsPrefix(userId)
                 .where(eqLocationId(locationId))// 특정 로케이션의
                 .where(inSpotCategoryId(categoryIds))
                 .where(ltCursorId(cursorId))    // 최신순
@@ -56,7 +56,7 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
 
     @Override
     public Page<Spot> findAllByCategoriesExceptBlockedAuthors(Long userId, Pageable pageable, Long cursorId, List<Long> categoryIds) {
-        JPAQuery<Spot> query = selectBigSpotsExceptBlockedAuthorsPrefix(userId)
+        JPAQuery<Spot> query = selectSpotsExceptBlockedAuthorsPrefix(userId)
                 .where(inSpotCategoryId(categoryIds))   // 특정 카테고리의
                 .where(ltCursorId(cursorId))    // 최신순
                 .orderBy(spot.id.desc())
@@ -71,7 +71,7 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
 
     @Override
     public Page<Spot> findAllBookmarked(Pageable pageable, Long cursorId, Long userId) {
-        JPAQuery<Spot> query = selectBigSpotsExceptBlockedAuthorsPrefix(userId)
+        JPAQuery<Spot> query = selectSpotsExceptBlockedAuthorsPrefix(userId)
                 .where(spotBookmark.user.id.eq(userId))// 현재 유저가 북마크한
                 .where(ltCursorId(cursorId))    // 최신순
                 .orderBy(spot.id.desc())
@@ -101,7 +101,7 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
 
     @Override
     public Page<Spot> findAllCommentedByMeExceptBlockedAuthors(Pageable pageable, Long cursorId, Long userId) {
-        // TODO: 응답값으로 각 Spot의 lastCommentId 주고, 받기 -> 쿼리 1회 감소
+        // TODO: 응답값에 각 Spot의 lastCommentId 추가, 요청에서 받기 -> 쿼리 1회 감소
         Long latestCommentId = findLatestCommentIdBySpotId(cursorId);
 
         // TODO: JOIN을 못해서 default_batch_size 쿼리가 나가고 있다. 개선해보자
@@ -147,37 +147,10 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
      **/
     private JPAQuery<Spot> selectSpotsExceptBlockedAuthorsPrefix(Long userId) {// 일반적인 리스트 조회
         return queryFactory.selectFrom(spot)
-                // 부모 엔티티는 모두 페치 조인. bookmark, comment, imageList의 조인 여부는 caller에게 위임
-                .join(spot.user, user).fetchJoin()
-                .join(spot.location, location).fetchJoin()
-                .join(spot.spotCategory, spotCategory).fetchJoin()
-                .where(spot.user.id.notIn(JPAExpressions.select(userBlockUser.blockedUser.id)  // 차단한 유저 제외
-                        .from(userBlockUser)
-                        .where(userBlockUser.blockerUser.id.eq(userId))
-                ));
-    }
-
-    private JPAQuery<Spot> selectBigSpotsExceptBlockedAuthorsPrefix(Long userId) {// 일반적인 리스트 조회
-        return queryFactory.selectFrom(spot)
                 .join(spot.user, user).fetchJoin()
                 .join(spot.location, location).fetchJoin()
                 .join(spot.spotCategory, spotCategory).fetchJoin()
                 .leftJoin(spot.spotBookmarkList, spotBookmark).fetchJoin()
-                .join(spot.commentList, comment)
-                .leftJoin(spot.spotImageList, spotImage)
-                .where(spot.user.id.notIn(JPAExpressions.select(userBlockUser.blockedUser.id)  // 차단한 유저 제외
-                        .from(userBlockUser)
-                        .where(userBlockUser.blockerUser.id.eq(userId))
-                ));
-    }
-
-    private JPAQuery<Spot> selectSpotsCommentedByMeExceptBlockedAuthorsPrefix(Long userId) {// 마이페이지 댓글 중심 리스트 조회
-        return queryFactory.selectFrom(spot)
-                .join(spot.user, user).fetchJoin()
-                .join(spot.location, location).fetchJoin()
-                .join(spot.spotCategory, spotCategory).fetchJoin()
-                .leftJoin(spot.spotBookmarkList, spotBookmark)
-                .join(spot.commentList, comment).fetchJoin()
                 .leftJoin(spot.spotImageList, spotImage)
                 .where(spot.user.id.notIn(JPAExpressions.select(userBlockUser.blockedUser.id)  // 차단한 유저 제외
                         .from(userBlockUser)
