@@ -56,6 +56,7 @@ public class LocationRepositoryImpl implements LocationRepositoryCustom {
     @Override
     public Page<Location> getLocations(Pageable pageable, Long cursorId) {
         JPAQuery<Location> query = queryFactory.selectFrom(location)
+                .join(location.locationCategory, locationCategory).fetchJoin()
                 .where(gtCursorId(cursorId))
                 .orderBy(location.id.asc())// location_id 오름차순
                 .limit(pageable.getPageSize());
