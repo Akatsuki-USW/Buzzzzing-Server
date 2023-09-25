@@ -37,7 +37,7 @@ public class LocationRepositoryImpl implements LocationRepositoryCustom {
             SortOrder congestionLevelSortOrder,
             CongestionLevel cursorCongestionLevel
     ) {
-        JPAQuery<Location> query = selectLocationsPrefix()
+        JPAQuery<Location> query = selectFromSimpleLocationPrefix()
                 .where(containsKeyword(keyword))
                 .where(congestionLevelSortOrder == null || cursorCongestionLevel == null // 정렬 여부에 따라 페이징 방식 다르게처리
                         ? gtCursorId(cursorId)
@@ -69,9 +69,7 @@ public class LocationRepositoryImpl implements LocationRepositoryCustom {
 
     @Override
     public Optional<Location> getLocation(Long locationId) {
-        JPAQuery<Location> query = queryFactory.selectFrom(location)
-                .leftJoin(location.locationCategory, locationCategory).fetchJoin()
-                .leftJoin(location.locationBookmarkList, locationBookmark).fetchJoin()
+        JPAQuery<Location> query = selectFromSimpleLocationWithBookmarkListFetchJoinedPrefix()
                 .where(location.id.eq(locationId));
 
         return Optional.ofNullable(query.fetchOne());
@@ -79,7 +77,7 @@ public class LocationRepositoryImpl implements LocationRepositoryCustom {
 
     @Override
     public Page<Location> getTopOfWeeklyAverageCongestion(Pageable pageable, LocalDateTime start, LocalDateTime end) {
-        JPAQuery<Location> query = selectLocationsPrefix()
+        JPAQuery<Location> query = selectFromSimpleLocationPrefix()
                 .leftJoin(location.weeklyCongestionStatisticList, weeklyCongestionStatistic)
                 .where(weeklyCongestionStatistic.createdAt.between(start, end))
                 .orderBy(weeklyCongestionStatistic.averageCongestionLevel.asc(), location.id.asc()) // 평균 혼잡도 오름차순, location_id 오름차순
@@ -94,7 +92,7 @@ public class LocationRepositoryImpl implements LocationRepositoryCustom {
 
     @Override
     public Page<Location> getBookmarked(Pageable pageable, Long cursorId, Long userId) {
-        JPAQuery<Location> query = selectLocationsPrefix()
+        JPAQuery<Location> query = selectFromSimpleLocationPrefix()
                 .where(locationBookmark.user.id.eq(userId))// 특정 user의 Bookmark와 JOIN
                 .where(gtCursorId(cursorId))
                 .orderBy(location.id.asc()) // location_id 오름차순
@@ -108,7 +106,13 @@ public class LocationRepositoryImpl implements LocationRepositoryCustom {
     }
 
     /* JPAQuery */
-    public JPAQuery<Location> selectLocationsPrefix() {// 로케이션 조회
+    public JPAQuery<Location> selectFromSimpleLocationPrefix() {// 로케이션 페이지네이션 조회
+        return queryFactory.selectFrom(location)
+                .leftJoin(location.locationCategory, locationCategory).fetchJoin()
+                .leftJoin(location.locationBookmarkList, locationBookmark);
+    }
+
+    public JPAQuery<Location> selectFromSimpleLocationWithBookmarkListFetchJoinedPrefix() {// 로케이션 페이지네이션 없이 조회
         return queryFactory.selectFrom(location)
                 .leftJoin(location.locationCategory, locationCategory).fetchJoin()
                 .leftJoin(location.locationBookmarkList, locationBookmark).fetchJoin();
