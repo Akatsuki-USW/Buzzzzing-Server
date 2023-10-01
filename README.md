@@ -34,4 +34,5 @@
 ![buzzing_erd](https://github.com/Akatsuki-USW/Buzzzzing-Server/assets/72124326/2248f961-ade7-4a59-a716-be7422c8edf7)
 
 ### System Architecture
-![Web App Reference Architecture(1)](https://github.com/Akatsuki-USW/Buzzzzing-Server/assets/72124326/104981fc-29e0-48ee-b0d8-edd4965350d8)
+
+![buzzing_system_architecture12](https://github.com/Akatsuki-USW/Buzzzzing-Server/assets/72124326/71111ae1-ca19-43c3-af3f-a49407859e89)
