@@ -9,16 +9,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.CacheControl;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.ServletWebRequest;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
@@ -32,17 +28,17 @@ public class CategoryController {
     @GetMapping
     @Operation(summary = SwaggerConstants.CATEGORY_GET_ALL, description = SwaggerConstants.CATEGORY_GET_ALL_DESCRIPTION)
     public ResponseEntity<ApiResponse<AllCategoryResponse>> getAllCategory(ServletWebRequest request) {
-        AllCategories allCategories = categoryService.getAllCategory();
-        LocalDateTime lastModifiedAt = allCategories.lastModifiedAt();
+        AllCategories result = categoryService.getAllCategory();
+        ZonedDateTime lastModifiedAt = ZonedDateTime.of(result.lastModifiedAt(), ZoneId.systemDefault());
 
-        // Last-Modified 검증. 같다면 304 응답
-        if (request.checkNotModified(String.valueOf(lastModifiedAt))) {
+        // Header의 If-Modified-Since와 같다면 304 응답
+        if (request.checkNotModified(lastModifiedAt.toInstant().toEpochMilli())) {
             return null;
         }
 
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.noCache())
-                .lastModified(ZonedDateTime.of(lastModifiedAt, ZoneId.systemDefault()))
-                .body(ApiResponse.success(AllCategoryResponse.fromAllCategories(allCategories)));
+                .lastModified(lastModifiedAt) // HTTP Cache: Last-Modified
+                .body(ApiResponse.success(AllCategoryResponse.fromAllCategories(result)));
     }
 }

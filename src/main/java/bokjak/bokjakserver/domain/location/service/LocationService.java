@@ -2,7 +2,9 @@ package bokjak.bokjakserver.domain.location.service;
 
 import bokjak.bokjakserver.common.constant.GlobalConstants;
 import bokjak.bokjakserver.common.dto.PageResponse;
+import bokjak.bokjakserver.common.dto.PageWithLastModified;
 import bokjak.bokjakserver.common.exception.StatusCode;
+import bokjak.bokjakserver.common.model.BaseEntity;
 import bokjak.bokjakserver.domain.bookmark.model.LocationBookmark;
 import bokjak.bokjakserver.domain.bookmark.repository.LocationBookmarkRepository;
 import bokjak.bokjakserver.domain.congestion.dto.CongestionDto.CongestionPrediction;
@@ -32,10 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static bokjak.bokjakserver.domain.congestion.model.CongestionLevel.RELAX;
 
@@ -75,12 +74,11 @@ public class LocationService {
     }
 
     // 로케이션 단순 리스트 조회
-    public PageResponse<LocationSimpleCardResponse> getLocations(Pageable pageable, Long cursorId) {
+    public PageWithLastModified<LocationSimpleCardResponse> getSimpleLocations(Pageable pageable, Long cursorId) {
         Page<Location> locations = locationRepository.getLocations(pageable, cursorId);
-
         Page<LocationSimpleCardResponse> responsePage = locations.map(LocationSimpleCardResponse::of);
 
-        return PageResponse.of(responsePage);
+        return PageWithLastModified.of(responsePage, resolveLastModifiedAt(locations));
     }
 
     // 혼잡도 낮은순 TOP N 조회 : 주간 통계 기반 정렬
@@ -161,7 +159,12 @@ public class LocationService {
         return BookmarkResponse.of(locationId, isBookmarked);
     }
 
-    /* private 함수 */
+    /* private */
+    private LocalDateTime resolveLastModifiedAt(Page<Location> locationList) {// 가장 마지막에 수정된 시각 추출
+        List<LocalDateTime> lastModifiedTimeList = locationList.stream().map(BaseEntity::getUpdatedAt).toList();
+
+        return lastModifiedTimeList.stream().max(LocalDateTime::compareTo).orElseThrow(NoSuchElementException::new);
+    }
 
     private PageResponse<LocationCardResponse> makeLocationCardPageResponse(User currentUser, Page<Location> resultPage) {
         List<Long> bookmarkedLocationIdList = locationBookmarkRepository.findAllByUser(currentUser).stream()
