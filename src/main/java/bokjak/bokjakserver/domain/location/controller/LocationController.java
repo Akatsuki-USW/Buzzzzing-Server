@@ -78,11 +78,22 @@ public class LocationController {
 
     @GetMapping("/top")
     @Operation(summary = SwaggerConstants.LOCATION_GET_TOP, description = SwaggerConstants.LOCATION_GET_TOP_DESCRIPTION)
-    public ApiResponse<PageResponse<LocationCardResponse>> getTopRelaxingLocations(
+    public ResponseEntity<ApiResponse<PageResponse<LocationCardResponse>>> getTopRelaxingLocations(
+            ServletWebRequest request,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC, size = TOP_LOCATIONS_SIZE) Pageable pageable
     ) {
-        PageResponse<LocationCardResponse> pageResponse = locationService.getTopRelaxingLocations(pageable);
-        return success(pageResponse);
+        PageWithLastModified<LocationCardResponse> result = locationService.getTopRelaxingLocations(pageable);
+        ZonedDateTime lastModifiedAt = ZonedDateTime.of(result.getLastModified(), ZoneId.systemDefault());
+
+        // Header의 If-Modified-Since와 같다면 304 응답
+        if (request.checkNotModified(lastModifiedAt.toInstant().toEpochMilli())) {
+            return null;
+        }
+
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.noCache())
+                .lastModified(lastModifiedAt)   // HTTP Cache: Last-Modified
+                .body(ApiResponse.success(result.getPageResponse()));
     }
 
     @GetMapping("/{locationId}")
