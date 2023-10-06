@@ -1,5 +1,6 @@
 package bokjak.bokjakserver.web.log;
 
+import bokjak.bokjakserver.util.client.ClientIPAddressUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -32,7 +33,14 @@ public class LoggerAspect {
             HttpServletRequest request = requestAttributes.getRequest(); // request 정보를 가져온다.
             String controllerName = proceedingJoinPoint.getSignature().getDeclaringType().getSimpleName();
             String methodName = proceedingJoinPoint.getSignature().getName();
-            log.info("{}.{}: {} {} PARAM={}", controllerName, methodName, request.getMethod(), request.getRequestURI(), extractParams(request)); // param에 담긴 정보들을 한번에 로깅한다.
+            log.info("{} {}.{}: {} {} PARAM={}",
+                    ClientIPAddressUtils.getClientIP(request),  // IP
+                    controllerName,
+                    methodName,
+                    request.getMethod(),
+                    request.getRequestURI(),
+                    extractParams(request)
+            ); // param에 담긴 정보들을 한번에 로깅한다.
         }
 
         return result;
