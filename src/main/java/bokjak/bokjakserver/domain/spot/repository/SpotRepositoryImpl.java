@@ -40,7 +40,7 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
             Long locationId,
             List<Long> categoryIds
     ) {
-        JPAQuery<Spot> query = selectSpotsExceptBlockedAuthorsPrefix(userId)
+        JPAQuery<Spot> query = selectFromSpotExceptBlockedAuthorsPrefix(userId)
                 .where(eqLocationId(locationId))// 특정 로케이션의
                 .where(inSpotCategoryId(categoryIds))
                 .where(ltCursorId(cursorId))    // 최신순
@@ -56,7 +56,7 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
 
     @Override
     public Page<Spot> findAllByCategoriesExceptBlockedAuthors(Long userId, Pageable pageable, Long cursorId, List<Long> categoryIds) {
-        JPAQuery<Spot> query = selectSpotsExceptBlockedAuthorsPrefix(userId)
+        JPAQuery<Spot> query = selectFromSpotExceptBlockedAuthorsPrefix(userId)
                 .where(inSpotCategoryId(categoryIds))   // 특정 카테고리의
                 .where(ltCursorId(cursorId))    // 최신순
                 .orderBy(spot.id.desc())
@@ -71,7 +71,7 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
 
     @Override
     public Page<Spot> findAllBookmarked(Pageable pageable, Long cursorId, Long userId) {
-        JPAQuery<Spot> query = selectSpotsExceptBlockedAuthorsPrefix(userId)
+        JPAQuery<Spot> query = selectFromSpotExceptBlockedAuthorsPrefix(userId)
                 .where(spotBookmark.user.id.eq(userId))// 현재 유저가 북마크한
                 .where(ltCursorId(cursorId))    // 최신순
                 .orderBy(spot.id.desc())
@@ -86,7 +86,7 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
 
     @Override
     public Page<Spot> findAllMy(Pageable pageable, Long cursorId, Long userId) {
-        JPAQuery<Spot> query = selectSpotsPrefix()
+        JPAQuery<Spot> query = selectFromSpotIncludingBlockedAuthorsPrefix()
                 .where(spot.user.id.eq(userId)) // 현재 유저가 작성한
                 .where(ltCursorId(cursorId))    // 최신순
                 .orderBy(spot.id.desc())
@@ -136,7 +136,7 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
 
     @Override
     public Optional<Spot> findOne(Long spotId) {
-        JPAQuery<Spot> query = selectSpotPrefix()
+        JPAQuery<Spot> query = selectFromSpotIncludingBlockedAuthorsWithBookmarkListFetchJoinedPrefix()
                 .where(spot.id.eq(spotId));
 
         return Optional.ofNullable(query.fetchOne());
@@ -145,12 +145,12 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
     /**
      * JPA Query: Prefix
      **/
-    private JPAQuery<Spot> selectSpotsExceptBlockedAuthorsPrefix(Long userId) {// 일반적인 리스트 조회
+    private JPAQuery<Spot> selectFromSpotExceptBlockedAuthorsPrefix(Long userId) {// 일반적인 리스트 조회
         return queryFactory.selectFrom(spot)
                 .join(spot.user, user).fetchJoin()
                 .join(spot.location, location).fetchJoin()
                 .join(spot.spotCategory, spotCategory).fetchJoin()
-                .leftJoin(spot.spotBookmarkList, spotBookmark).fetchJoin()
+                .leftJoin(spot.spotBookmarkList, spotBookmark)
                 .leftJoin(spot.spotImageList, spotImage)
                 .where(spot.user.id.notIn(JPAExpressions.select(userBlockUser.blockedUser.id)  // 차단한 유저 제외
                         .from(userBlockUser)
@@ -158,14 +158,14 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
                 ));
     }
 
-    private JPAQuery<Spot> selectSpotsPrefix() { // 차단한 유저를 포함한 조회: 일반 리스트 조회 쿼리문보다 간단
+    private JPAQuery<Spot> selectFromSpotIncludingBlockedAuthorsPrefix() { // 차단한 유저를 포함한 조회: 일반 리스트 조회 쿼리문보다 간단
         return queryFactory.selectFrom(spot)
                 .join(spot.user, user).fetchJoin()
-                .leftJoin(spot.spotBookmarkList, spotBookmark).fetchJoin()
+                .leftJoin(spot.spotBookmarkList, spotBookmark)
                 .leftJoin(spot.spotImageList, spotImage);
     }
 
-    private JPAQuery<Spot> selectSpotPrefix() {
+    private JPAQuery<Spot> selectFromSpotIncludingBlockedAuthorsWithBookmarkListFetchJoinedPrefix() {
         return queryFactory.selectFrom(spot)
                 .join(spot.user, user).fetchJoin()
                 .join(spot.location, location).fetchJoin()

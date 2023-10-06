@@ -1,6 +1,7 @@
 package bokjak.bokjakserver.domain.category.model;
 
 import bokjak.bokjakserver.common.constant.ConstraintConstants;
+import bokjak.bokjakserver.common.model.BaseEntity;
 import bokjak.bokjakserver.domain.location.model.Location;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -16,7 +17,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class LocationCategory {
+public class LocationCategory extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
