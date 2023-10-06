@@ -6,6 +6,7 @@ import bokjak.bokjakserver.util.enums.EnumQueryValue;
 import bokjak.bokjakserver.util.enums.EnumValue;
 import lombok.Builder;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import static bokjak.bokjakserver.util.enums.EnumQueryValue.toEnumQueryValues;
@@ -44,6 +45,25 @@ public class CategoryDto {
     }
 
     @Builder
+    public record AllCategories(
+            List<LocationCategoryResponse> locationCategories,
+            List<SpotCategoryResponse> spotCategories,
+            LocalDateTime lastModifiedAt
+    ) {
+
+        public static AllCategories of(List<LocationCategoryResponse> locationCategories,
+                                       List<SpotCategoryResponse> spotCategories,
+                                       LocalDateTime lastModifiedAt) {
+
+            return AllCategories.builder()
+                    .locationCategories(locationCategories)
+                    .spotCategories(spotCategories)
+                    .lastModifiedAt(lastModifiedAt)
+                    .build();
+        }
+    }
+
+    @Builder
     public record AllCategoryResponse(
             List<LocationCategoryResponse> locationCategories,
             List<SpotCategoryResponse> spotCategories,
@@ -57,6 +77,15 @@ public class CategoryDto {
             return AllCategoryResponse.builder()
                     .locationCategories(locationCategories)
                     .spotCategories(spotCategories)
+                    .congestionLevelChoices(toEnumValues(CongestionLevelChoice.class))
+                    .congestionHistoricalDateChoices(toEnumQueryValues(CongestionHistoricalDateChoice.class))
+                    .build();
+        }
+
+        public static AllCategoryResponse fromAllCategories(AllCategories allCategories) {
+            return AllCategoryResponse.builder()
+                    .locationCategories(allCategories.locationCategories())
+                    .spotCategories(allCategories.spotCategories())
                     .congestionLevelChoices(toEnumValues(CongestionLevelChoice.class))
                     .congestionHistoricalDateChoices(toEnumQueryValues(CongestionHistoricalDateChoice.class))
                     .build();
