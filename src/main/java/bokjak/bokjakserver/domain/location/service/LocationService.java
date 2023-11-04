@@ -2,9 +2,7 @@ package bokjak.bokjakserver.domain.location.service;
 
 import bokjak.bokjakserver.common.constant.GlobalConstants;
 import bokjak.bokjakserver.common.dto.PageResponse;
-import bokjak.bokjakserver.common.dto.PageWithLastModified;
 import bokjak.bokjakserver.common.exception.StatusCode;
-import bokjak.bokjakserver.common.model.BaseEntity;
 import bokjak.bokjakserver.domain.bookmark.model.LocationBookmark;
 import bokjak.bokjakserver.domain.bookmark.repository.LocationBookmarkRepository;
 import bokjak.bokjakserver.domain.congestion.dto.CongestionDto.CongestionPrediction;
@@ -13,7 +11,6 @@ import bokjak.bokjakserver.domain.congestion.exception.CongestionException;
 import bokjak.bokjakserver.domain.congestion.model.Congestion;
 import bokjak.bokjakserver.domain.congestion.model.CongestionLevel;
 import bokjak.bokjakserver.domain.congestion.model.DailyCongestionStatistic;
-import bokjak.bokjakserver.domain.congestion.model.WeeklyCongestionStatistic;
 import bokjak.bokjakserver.domain.congestion.repository.CongestionRepository;
 import bokjak.bokjakserver.domain.congestion.repository.DailyCongestionStatisticRepository;
 import bokjak.bokjakserver.domain.location.dto.LocationDto.BookmarkResponse;
@@ -35,7 +32,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static bokjak.bokjakserver.domain.congestion.model.CongestionLevel.RELAX;
 
@@ -75,16 +75,16 @@ public class LocationService {
     }
 
     // 로케이션 단순 리스트 조회
-    public PageWithLastModified<LocationSimpleCardResponse> getSimpleLocations(Pageable pageable, Long cursorId) {
+    public PageResponse<LocationSimpleCardResponse> getLocations(Pageable pageable, Long cursorId) {
         Page<Location> locations = locationRepository.getLocations(pageable, cursorId);
+
         Page<LocationSimpleCardResponse> responsePage = locations.map(LocationSimpleCardResponse::of);
 
-        return PageWithLastModified.of(responsePage, this.extractLocationsLastModifiedAt(locations));
+        return PageResponse.of(responsePage);
     }
 
     // 혼잡도 낮은순 TOP N 조회 : 주간 통계 기반 정렬
-    // TODO: Redis 랭킹 테이블로 저장
-    public PageWithLastModified<LocationCardResponse> getTopRelaxingLocations(Pageable pageable) {
+    public PageResponse<LocationCardResponse> getTopRelaxingLocations(Pageable pageable) {
         User currentUser = userService.getCurrentUser();
 
         LocalDateTime start = CustomDateUtils.makePastWeekDayDateTime(Calendar.MONDAY, LocalTime.MIN);// 월요일 00시 00
@@ -92,11 +92,7 @@ public class LocationService {
 
         Page<Location> resultPage = locationRepository.getTopOfWeeklyAverageCongestion(pageable, start, end);
 
-        List<LocalDateTime> createdAtList = new ArrayList<>();
-        resultPage.forEach(location -> createdAtList.addAll(location.getWeeklyCongestionStatisticList()
-                .stream().map(WeeklyCongestionStatistic::getCreatedAt).toList()));
-
-        return PageWithLastModified.of(makeLocationCardPage(currentUser, resultPage), resolveLastModifiedAt(createdAtList));
+        return makeLocationCardPageResponse(currentUser, resultPage);
     }
 
     // 내가 북마크한 로케이션 리스트 조회
@@ -165,26 +161,15 @@ public class LocationService {
         return BookmarkResponse.of(locationId, isBookmarked);
     }
 
-    /* private */
-    private LocalDateTime extractLocationsLastModifiedAt(Page<Location> locationList) {// 가장 마지막에 수정된 시각 추출
-        List<LocalDateTime> lastModifiedTimeList = locationList.stream().map(BaseEntity::getUpdatedAt).toList();
-
-        return resolveLastModifiedAt(lastModifiedTimeList);
-    }
-
-    private LocalDateTime resolveLastModifiedAt(List<LocalDateTime> localDateTimeList) {// 가장 마지막에 수정된 시각 추출
-        return localDateTimeList.stream().max(LocalDateTime::compareTo).orElseThrow(NoSuchElementException::new);
-    }
+    /* private 함수 */
 
     private PageResponse<LocationCardResponse> makeLocationCardPageResponse(User currentUser, Page<Location> resultPage) {
-        return PageResponse.of(makeLocationCardPage(currentUser, resultPage));
-    }
-
-    private Page<LocationCardResponse> makeLocationCardPage(User currentUser, Page<Location> resultPage) {
         List<Long> bookmarkedLocationIdList = locationBookmarkRepository.findAllByUser(currentUser).stream()
                 .map(it -> it.getLocation().getId()).toList();
+        Page<LocationCardResponse> responsePage = resultPage
+                .map(it -> LocationCardResponse.of(it, bookmarkedLocationIdList.contains(it.getId())));
 
-        return resultPage.map(it -> LocationCardResponse.of(it, bookmarkedLocationIdList.contains(it.getId())));
+        return PageResponse.of(responsePage);
     }
 
     // 혼잡도 예측

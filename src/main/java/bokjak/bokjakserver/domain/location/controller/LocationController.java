@@ -3,7 +3,6 @@ package bokjak.bokjakserver.domain.location.controller;
 import bokjak.bokjakserver.common.constant.SwaggerConstants;
 import bokjak.bokjakserver.common.dto.ApiResponse;
 import bokjak.bokjakserver.common.dto.PageResponse;
-import bokjak.bokjakserver.common.dto.PageWithLastModified;
 import bokjak.bokjakserver.config.security.PrincipalDetails;
 import bokjak.bokjakserver.domain.congestion.dto.CongestionDto.DailyCongestionStatisticResponse;
 import bokjak.bokjakserver.domain.location.dto.LocationDto.BookmarkResponse;
@@ -19,14 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.CacheControl;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.ServletWebRequest;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
 
 import static bokjak.bokjakserver.common.constant.GlobalConstants.TOP_LOCATIONS_SIZE;
@@ -57,43 +51,21 @@ public class LocationController {
 
     @GetMapping("/simple")
     @Operation(summary = SwaggerConstants.LOCATION_GET_ALL, description = SwaggerConstants.LOCATION_GET_ALL_DESCRIPTION)
-    public ResponseEntity<ApiResponse<PageResponse<LocationSimpleCardResponse>>> getSimpleLocations(
-            ServletWebRequest request,
+    public ApiResponse<PageResponse<LocationSimpleCardResponse>> getSimpleLocations(
             @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable,
             @RequestParam(required = false) Long cursorId
     ) {
-        PageWithLastModified<LocationSimpleCardResponse> result = locationService.getSimpleLocations(pageable, cursorId);
-        ZonedDateTime lastModifiedAt = ZonedDateTime.of(result.getLastModified(), ZoneId.systemDefault());
-
-        // Header의 If-Modified-Since와 같다면 304 응답
-        if (request.checkNotModified(lastModifiedAt.toInstant().toEpochMilli())) {
-            return null;
-        }
-
-        return ResponseEntity.ok()
-                .cacheControl(CacheControl.noCache())
-                .lastModified(lastModifiedAt)   // HTTP Cache: Last-Modified
-                .body(ApiResponse.success(result.getPageResponse()));
+        PageResponse<LocationSimpleCardResponse> pageResponse = locationService.getLocations(pageable, cursorId);
+        return success(pageResponse);
     }
 
     @GetMapping("/top")
     @Operation(summary = SwaggerConstants.LOCATION_GET_TOP, description = SwaggerConstants.LOCATION_GET_TOP_DESCRIPTION)
-    public ResponseEntity<ApiResponse<PageResponse<LocationCardResponse>>> getTopRelaxingLocations(
-            ServletWebRequest request,
+    public ApiResponse<PageResponse<LocationCardResponse>> getTopRelaxingLocations(
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC, size = TOP_LOCATIONS_SIZE) Pageable pageable
     ) {
-        PageWithLastModified<LocationCardResponse> result = locationService.getTopRelaxingLocations(pageable);
-        ZonedDateTime lastModifiedAt = ZonedDateTime.of(result.getLastModified(), ZoneId.systemDefault());
-
-        // Header의 If-Modified-Since와 같다면 304 응답
-        if (request.checkNotModified(lastModifiedAt.toInstant().toEpochMilli())) {
-            return null;
-        }
-
-        return ResponseEntity.ok()
-                .cacheControl(CacheControl.noCache())
-                .lastModified(lastModifiedAt)   // HTTP Cache: Last-Modified
-                .body(ApiResponse.success(result.getPageResponse()));
+        PageResponse<LocationCardResponse> pageResponse = locationService.getTopRelaxingLocations(pageable);
+        return success(pageResponse);
     }
 
     @GetMapping("/{locationId}")

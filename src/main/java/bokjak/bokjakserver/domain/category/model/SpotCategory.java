@@ -1,7 +1,6 @@
 package bokjak.bokjakserver.domain.category.model;
 
 import bokjak.bokjakserver.common.constant.ConstraintConstants;
-import bokjak.bokjakserver.common.model.BaseEntity;
 import bokjak.bokjakserver.domain.spot.model.Spot;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -16,7 +15,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SpotCategory extends BaseEntity {
+public class SpotCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
