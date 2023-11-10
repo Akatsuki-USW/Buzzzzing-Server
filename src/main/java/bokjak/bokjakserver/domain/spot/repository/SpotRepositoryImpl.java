@@ -146,7 +146,7 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
      * JPA Query: Prefix
      **/
     private JPAQuery<Spot> selectFromSpotExceptBlockedAuthorsPrefix(Long userId) {// 일반적인 리스트 조회
-        return queryFactory.selectFrom(spot)
+        return queryFactory.selectFrom(spot).distinct()
                 .join(spot.user, user).fetchJoin()
                 .join(spot.location, location).fetchJoin()
                 .join(spot.spotCategory, spotCategory).fetchJoin()
@@ -159,7 +159,7 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
     }
 
     private JPAQuery<Spot> selectFromSpotIncludingBlockedAuthorsPrefix() { // 차단한 유저를 포함한 조회: 일반 리스트 조회 쿼리문보다 간단
-        return queryFactory.selectFrom(spot)
+        return queryFactory.selectFrom(spot).distinct()
                 .join(spot.user, user).fetchJoin()
                 .leftJoin(spot.spotBookmarkList, spotBookmark)
                 .leftJoin(spot.spotImageList, spotImage);
