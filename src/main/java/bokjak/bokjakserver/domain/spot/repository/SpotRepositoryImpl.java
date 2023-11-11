@@ -155,14 +155,16 @@ public class SpotRepositoryImpl implements SpotRepositoryCustom {
                 .where(spot.user.id.notIn(JPAExpressions.select(userBlockUser.blockedUser.id)  // 차단한 유저 제외
                         .from(userBlockUser)
                         .where(userBlockUser.blockerUser.id.eq(userId))
-                ));
+                ))
+                .distinct();
     }
 
     private JPAQuery<Spot> selectFromSpotIncludingBlockedAuthorsPrefix() { // 차단한 유저를 포함한 조회: 일반 리스트 조회 쿼리문보다 간단
         return queryFactory.selectFrom(spot)
                 .join(spot.user, user).fetchJoin()
                 .leftJoin(spot.spotBookmarkList, spotBookmark)
-                .leftJoin(spot.spotImageList, spotImage);
+                .leftJoin(spot.spotImageList, spotImage)
+                .distinct();
     }
 
     private JPAQuery<Spot> selectFromSpotIncludingBlockedAuthorsWithBookmarkListFetchJoinedPrefix() {

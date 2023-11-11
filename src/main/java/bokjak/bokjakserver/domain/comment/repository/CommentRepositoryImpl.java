@@ -41,7 +41,8 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
                                 .from(userBlockUser)
                                 .where(userBlockUser.blockerUser.id.eq(userId))))
                         .and(gtCursorId(cursorId)))
-                .limit(CustomSliceExecutionUtils.buildSliceLimit(pageable.getPageSize()));
+                .limit(CustomSliceExecutionUtils.buildSliceLimit(pageable.getPageSize()))
+                .distinct();
 
         return CustomSliceExecutionUtils.getSlice(query.fetch(), pageable);
     }
@@ -58,7 +59,8 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
                                 .from(userBlockUser)
                                 .where(userBlockUser.blockerUser.id.eq(userId))))
                         .and(gtCursorId(cursorId)))
-                .limit(CustomSliceExecutionUtils.buildSliceLimit(pageable.getPageSize()));
+                .limit(CustomSliceExecutionUtils.buildSliceLimit(pageable.getPageSize()))
+                .distinct();
 
         return CustomSliceExecutionUtils.getSlice(query.fetch(), pageable);
     }

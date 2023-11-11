@@ -109,8 +109,9 @@ public class LocationRepositoryImpl implements LocationRepositoryCustom {
     /* JPAQuery */
     public JPAQuery<Location> selectFromSimpleLocationPrefix() {// 로케이션 페이지네이션 조회
         return queryFactory.selectFrom(location)
-                .leftJoin(location.locationCategory, locationCategory).fetchJoin()
-                .leftJoin(location.locationBookmarkList, locationBookmark);
+                .join(location.locationCategory, locationCategory).fetchJoin()
+                .leftJoin(location.locationBookmarkList, locationBookmark)
+                .distinct();
     }
 
     public JPAQuery<Location> selectFromSimpleLocationWithBookmarkListFetchJoinedPrefix() {// 로케이션 페이지네이션 없이 조회
