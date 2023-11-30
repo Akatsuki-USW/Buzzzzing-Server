@@ -44,14 +44,6 @@ public class AwsS3Service {
         return new FileListDto(uploadedFiles);
     }
 
-    public List<String> uploadFiles(S3SaveDir saveDir, List<MultipartFile> files) {
-        String currentUserSocialEmail = getCurrentUserSocialEmail();
-
-        return files.stream()
-                .map(file -> uploadSingleFile(file, saveDir, currentUserSocialEmail).fileUrl())
-                .toList();
-    }
-
     public FileDto uploadSingleFile(final MultipartFile multipartFile, final S3SaveDir saveDir, final String owner) {
         validateFileExist(multipartFile);
         String rootPath = buildRootPath(bucket, saveDir);
