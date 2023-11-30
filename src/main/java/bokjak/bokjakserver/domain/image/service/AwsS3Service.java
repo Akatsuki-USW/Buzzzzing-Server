@@ -1,12 +1,12 @@
-package bokjak.bokjakserver.util.s3.service;
+package bokjak.bokjakserver.domain.image.service;
 
 import bokjak.bokjakserver.common.exception.StatusCode;
-import bokjak.bokjakserver.util.s3.S3SaveDir;
-import bokjak.bokjakserver.util.s3.dto.AwsS3Dto.FileDto;
-import bokjak.bokjakserver.util.s3.dto.AwsS3Dto.FileListDto;
-import bokjak.bokjakserver.util.s3.dto.AwsS3Dto.UpdateFileRequest;
-import bokjak.bokjakserver.util.s3.dto.AwsS3Dto.UploadFileRequest;
-import bokjak.bokjakserver.util.s3.exception.AwsS3Exception;
+import bokjak.bokjakserver.domain.image.S3SaveDir;
+import bokjak.bokjakserver.domain.image.exception.ImageException;
+import bokjak.bokjakserver.domain.image.dto.ImageDto.FileDto;
+import bokjak.bokjakserver.domain.image.dto.ImageDto.FileListDto;
+import bokjak.bokjakserver.domain.image.dto.ImageDto.UpdateFileRequest;
+import bokjak.bokjakserver.domain.image.dto.ImageDto.UploadFileRequest;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -77,7 +76,7 @@ public class AwsS3Service {
             throw new RuntimeException(e);
         } catch (AmazonServiceException e) {
             log.warn("S3 파일 업로드 실패 = {}", e.getMessage());
-            throw new AwsS3Exception(StatusCode.AWS_S3_UPLOAD_FAIL);
+            throw new ImageException(StatusCode.AWS_S3_UPLOAD_FAIL);
         }
 
         String fileUrl = amazonS3Client.getUrl(bucketName, key).toString();
@@ -86,7 +85,7 @@ public class AwsS3Service {
 
     private void validateFileExist(MultipartFile multipartFile) {
         if (multipartFile.isEmpty())
-            throw new AwsS3Exception(StatusCode.INVALID_INPUT_VALUE);
+            throw new ImageException(StatusCode.INVALID_INPUT_VALUE);
     }
 
     private String getFileExtension(String originalFileName) {// 파일 확장자 추출
@@ -119,7 +118,7 @@ public class AwsS3Service {
             amazonS3Client.deleteObject(new DeleteObjectRequest(bucketName, key)); // TODO 삭제 응답 확인 -> 예외 처리
         } catch (AmazonServiceException e) {
             log.warn("S3 파일 삭제 실패 = {}", e.getMessage());
-            throw new AwsS3Exception(StatusCode.AWS_S3_DELETE_FAIL);
+            throw new ImageException(StatusCode.AWS_S3_DELETE_FAIL);
         }
     }
 

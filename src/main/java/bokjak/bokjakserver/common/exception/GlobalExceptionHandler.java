@@ -2,7 +2,7 @@ package bokjak.bokjakserver.common.exception;
 
 import bokjak.bokjakserver.common.dto.ApiResponse;
 import bokjak.bokjakserver.domain.user.exeption.AuthException;
-import bokjak.bokjakserver.util.s3.exception.AwsS3Exception;
+import bokjak.bokjakserver.domain.image.exception.ImageException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -48,9 +48,9 @@ public class GlobalExceptionHandler {
      * : 요청에 문제가 있는 경우
      */
     // AWS S3 버킷 정책에 맞지 않는 요청
-    @ExceptionHandler(AwsS3Exception.class)
+    @ExceptionHandler(ImageException.class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    protected ApiResponse<?> handleAwsS3Exception(final AwsS3Exception ex) {
+    protected ApiResponse<?> handleAwsS3Exception(final ImageException ex) {
         log.warn("{} - {}", ex.getClass().getSimpleName(), ex.getMessage());
         return error(ex.getAwsS3ErrorCode().getStatusCode(), ex.getMessage());
     }

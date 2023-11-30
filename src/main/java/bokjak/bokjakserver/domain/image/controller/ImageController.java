@@ -1,13 +1,12 @@
-package bokjak.bokjakserver.util.s3.controller;
+package bokjak.bokjakserver.domain.image.controller;
 
 import bokjak.bokjakserver.common.constant.SwaggerConstants;
 import bokjak.bokjakserver.common.dto.ApiResponse;
-import bokjak.bokjakserver.util.s3.S3SaveDir;
-import bokjak.bokjakserver.util.s3.dto.AwsS3Dto.DeleteFileResponse;
-import bokjak.bokjakserver.util.s3.dto.AwsS3Dto.FileListDto;
-import bokjak.bokjakserver.util.s3.dto.AwsS3Dto.UpdateFileRequest;
-import bokjak.bokjakserver.util.s3.dto.AwsS3Dto.UploadFileRequest;
-import bokjak.bokjakserver.util.s3.service.AwsS3Service;
+import bokjak.bokjakserver.domain.image.S3SaveDir;
+import bokjak.bokjakserver.domain.image.dto.ImageDto;
+import bokjak.bokjakserver.domain.image.dto.ImageDto.DeleteFileResponse;
+import bokjak.bokjakserver.domain.image.dto.ImageDto.FileListDto;
+import bokjak.bokjakserver.domain.image.service.AwsS3Service;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,19 +23,19 @@ import static bokjak.bokjakserver.common.dto.ApiResponse.success;
 @RequestMapping("/files")
 @RequiredArgsConstructor
 @Tag(name = SwaggerConstants.TAG_S3, description = SwaggerConstants.TAG_S3_DESCRIPTION)
-public class AwsS3Controller {
+public class ImageController {
     private final AwsS3Service awsS3Service;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = SwaggerConstants.S3_FILE_UPLOAD, description = SwaggerConstants.S3_FILE_UPLOAD_DESCRIPTION)
-    public ApiResponse<FileListDto> uploadFiles(@Valid @ModelAttribute UploadFileRequest uploadFileRequest) {
+    public ApiResponse<FileListDto> uploadFiles(@Valid @ModelAttribute ImageDto.UploadFileRequest uploadFileRequest) {
         return success(awsS3Service.uploadFiles(uploadFileRequest));
     }
 
     @PostMapping(value = "/change", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @SecurityRequirement(name = SwaggerConstants.SECURITY_SCHEME_NAME)
     @Operation(summary = SwaggerConstants.S3_FILE_UPDATE, description = SwaggerConstants.S3_FILE_UPDATE_DESCRIPTION)
-    public ApiResponse<FileListDto> updateFiles(@Valid @ModelAttribute UpdateFileRequest updateFileRequest) {
+    public ApiResponse<FileListDto> updateFiles(@Valid @ModelAttribute ImageDto.UpdateFileRequest updateFileRequest) {
         return success(awsS3Service.updateFiles(updateFileRequest));
     }
 

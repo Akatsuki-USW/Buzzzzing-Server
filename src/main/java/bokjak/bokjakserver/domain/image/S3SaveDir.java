@@ -1,7 +1,7 @@
-package bokjak.bokjakserver.util.s3;
+package bokjak.bokjakserver.domain.image;
 
 import bokjak.bokjakserver.common.exception.StatusCode;
-import bokjak.bokjakserver.util.s3.exception.AwsS3Exception;
+import bokjak.bokjakserver.domain.image.exception.ImageException;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -18,7 +18,7 @@ public enum S3SaveDir {
             case "spot" -> SPOT;
             case "etc" -> ETC;
 
-            default -> throw new AwsS3Exception(StatusCode.AWS_S3_FILE_TYPE_INVALID);
+            default -> throw new ImageException(StatusCode.AWS_S3_FILE_TYPE_INVALID);
         };
     }
 }

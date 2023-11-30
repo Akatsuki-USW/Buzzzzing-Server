@@ -1,4 +1,4 @@
-package bokjak.bokjakserver.util.s3.dto;
+package bokjak.bokjakserver.domain.image.dto;
 
 import bokjak.bokjakserver.common.constant.ConstraintConstants;
 import bokjak.bokjakserver.common.constant.MessageConstants;
@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class AwsS3Dto {
+public class ImageDto {
     public record UploadFileRequest(
             @NotBlank @Size(max = ConstraintConstants.S3_FILE_TYPE_MAX_LENGTH)
             String type,
