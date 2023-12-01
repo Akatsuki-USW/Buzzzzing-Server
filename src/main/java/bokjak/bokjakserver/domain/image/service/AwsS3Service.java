@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,9 +38,12 @@ public class AwsS3Service {
     public FileListDto uploadFiles(final UploadFileRequest uploadFileRequest) {
         String currentUserSocialEmail = getCurrentUserSocialEmail();
 
-        List<FileDto> uploadedFiles = uploadMultipartFileList(uploadFileRequest.files(),
-                S3SaveDir.toEnum(uploadFileRequest.type()), currentUserSocialEmail);
-        return new FileListDto(uploadedFiles);
+        List<FileDto> fileDtoList = uploadMultipartFileList(
+                uploadFileRequest.files(),
+                S3SaveDir.toEnum(uploadFileRequest.type()),
+                currentUserSocialEmail
+        );
+        return new FileListDto(fileDtoList);
     }
 
     public FileDto uploadSingleFile(final MultipartFile multipartFile, final S3SaveDir saveDir, final String owner) {
@@ -66,7 +68,7 @@ public class AwsS3Service {
         try (InputStream inputStream = multipartFile.getInputStream()) {
             amazonS3Client
                     .putObject(new PutObjectRequest(rootPath, filePath, inputStream, objectMetadata)    // 업로드
-                    .withCannedAcl(CannedAccessControlList.PublicRead));    // ACL public read로 설정
+                            .withCannedAcl(CannedAccessControlList.PublicRead));    // ACL public read로 설정
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (AmazonServiceException e) {
@@ -92,26 +94,21 @@ public class AwsS3Service {
 
     public FileListDto updateFiles(final UpdateFileRequest updateFileRequest) {
         S3SaveDir saveDir = S3SaveDir.toEnum(updateFileRequest.type());
-        String currentUserSocialEmail = getCurrentUserSocialEmail();
+        String socialEmail = getCurrentUserSocialEmail();
 
         updateFileRequest.urlsToDelete().forEach(url -> deleteSingleFile(saveDir, url));
 
-        List<FileDto> uploadedFiles = uploadMultipartFileList(
-                updateFileRequest.newFiles(),
-                saveDir,
-                currentUserSocialEmail
-        );
+        List<FileDto> uploadedFiles = uploadMultipartFileList(updateFileRequest.newFiles(), saveDir, socialEmail);
         return new FileListDto(uploadedFiles);
     }
 
-    @NotNull
     private List<FileDto> uploadMultipartFileList(
-            List<MultipartFile> updateFileRequest,
+            List<MultipartFile> multipartFileList,
             S3SaveDir saveDir,
-            String currentUserSocialEmail
+            String socialEmail
     ) {
-        return updateFileRequest.stream()
-                .map(file -> uploadSingleFile(file, saveDir, currentUserSocialEmail))
+        return multipartFileList.stream()
+                .map(file -> uploadSingleFile(file, saveDir, socialEmail))
                 .toList();
     }
 
