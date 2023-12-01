@@ -46,13 +46,26 @@ public class AwsS3Service {
 
     public FileDto uploadSingleFile(final MultipartFile multipartFile, final S3SaveDir saveDir, final String owner) {
         validateFileExist(multipartFile);
+
         String rootPath = buildRootPath(bucket, saveDir);
         String filePath = buildImageFilePath(multipartFile, owner);
-
         ObjectMetadata objectMetadata = getObjectMetadataFromMultipartFie(multipartFile);
+        String fileUrl = amazonS3Client.getUrl(rootPath, filePath).toString();
 
+        requestS3Upload(multipartFile, rootPath, filePath, objectMetadata);
+
+        return new FileDto(multipartFile.getOriginalFilename(), fileUrl);
+    }
+
+    private void requestS3Upload(
+            MultipartFile multipartFile,
+            String rootPath,
+            String filePath,
+            ObjectMetadata objectMetadata
+    ) {
         try (InputStream inputStream = multipartFile.getInputStream()) {
-            amazonS3Client.putObject(new PutObjectRequest(rootPath, filePath, inputStream, objectMetadata)    // 업로드
+            amazonS3Client
+                    .putObject(new PutObjectRequest(rootPath, filePath, inputStream, objectMetadata)    // 업로드
                     .withCannedAcl(CannedAccessControlList.PublicRead));    // ACL public read로 설정
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -60,9 +73,6 @@ public class AwsS3Service {
             log.warn("S3 파일 업로드 실패 = {}", e.getMessage());
             throw new ImageException(StatusCode.AWS_S3_UPLOAD_FAIL);
         }
-
-        String fileUrl = amazonS3Client.getUrl(rootPath, filePath).toString();
-        return new FileDto(multipartFile.getOriginalFilename(), fileUrl);
     }
 
 
@@ -101,6 +111,10 @@ public class AwsS3Service {
         String rootPath = buildRootPath(bucket, saveDir);
         String filePath = buildImageFilePath(url);
 
+        requestS3FileDelete(rootPath, filePath);
+    }
+
+    private void requestS3FileDelete(String rootPath, String filePath) {
         try {
             amazonS3Client.deleteObject(new DeleteObjectRequest(rootPath, filePath));
         } catch (AmazonServiceException e) {
