@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,9 +39,8 @@ public class AwsS3Service {
     public FileListDto uploadFiles(final UploadFileRequest uploadFileRequest) {
         String currentUserSocialEmail = getCurrentUserSocialEmail();
 
-        List<FileDto> uploadedFiles = uploadFileRequest.files().stream()
-                .map(file -> uploadSingleFile(file, S3SaveDir.toEnum(uploadFileRequest.type()), currentUserSocialEmail))
-                .toList();
+        List<FileDto> uploadedFiles = uploadMultipartFileList(uploadFileRequest.files(),
+                S3SaveDir.toEnum(uploadFileRequest.type()), currentUserSocialEmail);
         return new FileListDto(uploadedFiles);
     }
 
@@ -94,14 +94,27 @@ public class AwsS3Service {
         S3SaveDir saveDir = S3SaveDir.toEnum(updateFileRequest.type());
         String currentUserSocialEmail = getCurrentUserSocialEmail();
 
-        updateFileRequest.urlsToDelete()
-                .forEach(url -> deleteSingleFile(saveDir, url));
+        updateFileRequest.urlsToDelete().forEach(url -> deleteSingleFile(saveDir, url));
 
-        List<FileDto> uploadedFiles = updateFileRequest.newFiles().stream()
-                .map(file -> uploadSingleFile(file, saveDir, currentUserSocialEmail))
-                .toList();
+        List<FileDto> uploadedFiles = uploadMultipartFileList(
+                updateFileRequest.newFiles(),
+                saveDir,
+                currentUserSocialEmail
+        );
         return new FileListDto(uploadedFiles);
     }
+
+    @NotNull
+    private List<FileDto> uploadMultipartFileList(
+            List<MultipartFile> updateFileRequest,
+            S3SaveDir saveDir,
+            String currentUserSocialEmail
+    ) {
+        return updateFileRequest.stream()
+                .map(file -> uploadSingleFile(file, saveDir, currentUserSocialEmail))
+                .toList();
+    }
+
 
     public void deleteMultipleFile(S3SaveDir saveDir, List<String> imageUrls) {
         imageUrls.forEach(url -> deleteSingleFile(saveDir, url));
