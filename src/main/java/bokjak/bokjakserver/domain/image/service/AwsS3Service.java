@@ -7,9 +7,10 @@ import static bokjak.bokjakserver.domain.image.service.ImageFilePathUtils.buildR
 import bokjak.bokjakserver.common.exception.StatusCode;
 import bokjak.bokjakserver.domain.image.S3SaveDir;
 import bokjak.bokjakserver.domain.image.dto.ImageDto.FileDto;
-import bokjak.bokjakserver.domain.image.dto.ImageDto.FileListDto;
 import bokjak.bokjakserver.domain.image.dto.ImageDto.UpdateFileRequest;
+import bokjak.bokjakserver.domain.image.dto.ImageDto.UpdateFilesResponse;
 import bokjak.bokjakserver.domain.image.dto.ImageDto.UploadFileRequest;
+import bokjak.bokjakserver.domain.image.dto.ImageDto.UploadFilesResponse;
 import bokjak.bokjakserver.domain.image.exception.ImageException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3Client;
@@ -35,7 +36,7 @@ public class AwsS3Service {
     private String bucket;
 
 
-    public FileListDto uploadFiles(final UploadFileRequest uploadFileRequest) {
+    public UploadFilesResponse uploadFiles(final UploadFileRequest uploadFileRequest) {
         String currentUserSocialEmail = getCurrentUserSocialEmail();
 
         List<FileDto> fileDtoList = uploadMultipartFileList(
@@ -43,7 +44,7 @@ public class AwsS3Service {
                 S3SaveDir.toEnum(uploadFileRequest.type()),
                 currentUserSocialEmail
         );
-        return new FileListDto(fileDtoList);
+        return new UploadFilesResponse(fileDtoList);
     }
 
     public FileDto uploadSingleFile(final MultipartFile multipartFile, final S3SaveDir saveDir, final String owner) {
@@ -92,14 +93,14 @@ public class AwsS3Service {
     }
 
 
-    public FileListDto updateFiles(final UpdateFileRequest updateFileRequest) {
+    public UpdateFilesResponse updateFiles(final UpdateFileRequest updateFileRequest) {
         S3SaveDir saveDir = S3SaveDir.toEnum(updateFileRequest.type());
         String socialEmail = getCurrentUserSocialEmail();
 
         updateFileRequest.urlsToDelete().forEach(url -> deleteSingleFile(saveDir, url));
 
         List<FileDto> uploadedFiles = uploadMultipartFileList(updateFileRequest.newFiles(), saveDir, socialEmail);
-        return new FileListDto(uploadedFiles);
+        return new UpdateFilesResponse(uploadedFiles);
     }
 
     private List<FileDto> uploadMultipartFileList(

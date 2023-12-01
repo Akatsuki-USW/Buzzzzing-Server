@@ -1,23 +1,29 @@
 package bokjak.bokjakserver.domain.image.controller;
 
+import static bokjak.bokjakserver.common.dto.ApiResponse.success;
+
 import bokjak.bokjakserver.common.constant.SwaggerConstants;
 import bokjak.bokjakserver.common.dto.ApiResponse;
 import bokjak.bokjakserver.domain.image.S3SaveDir;
 import bokjak.bokjakserver.domain.image.dto.ImageDto;
 import bokjak.bokjakserver.domain.image.dto.ImageDto.DeleteFileResponse;
-import bokjak.bokjakserver.domain.image.dto.ImageDto.FileListDto;
+import bokjak.bokjakserver.domain.image.dto.ImageDto.UpdateFilesResponse;
+import bokjak.bokjakserver.domain.image.dto.ImageDto.UploadFilesResponse;
 import bokjak.bokjakserver.domain.image.service.AwsS3Service;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-import static bokjak.bokjakserver.common.dto.ApiResponse.success;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/files")
@@ -28,14 +34,16 @@ public class ImageController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = SwaggerConstants.S3_FILE_UPLOAD, description = SwaggerConstants.S3_FILE_UPLOAD_DESCRIPTION)
-    public ApiResponse<FileListDto> uploadFiles(@Valid @ModelAttribute ImageDto.UploadFileRequest uploadFileRequest) {
+    public ApiResponse<UploadFilesResponse> uploadFiles(
+            @Valid @ModelAttribute ImageDto.UploadFileRequest uploadFileRequest) {
         return success(awsS3Service.uploadFiles(uploadFileRequest));
     }
 
     @PostMapping(value = "/change", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @SecurityRequirement(name = SwaggerConstants.SECURITY_SCHEME_NAME)
     @Operation(summary = SwaggerConstants.S3_FILE_UPDATE, description = SwaggerConstants.S3_FILE_UPDATE_DESCRIPTION)
-    public ApiResponse<FileListDto> updateFiles(@Valid @ModelAttribute ImageDto.UpdateFileRequest updateFileRequest) {
+    public ApiResponse<UpdateFilesResponse> updateFiles(
+            @Valid @ModelAttribute ImageDto.UpdateFileRequest updateFileRequest) {
         return success(awsS3Service.updateFiles(updateFileRequest));
     }
 

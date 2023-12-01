@@ -43,7 +43,12 @@ public class ImageDto {
     ) {
     }
 
-    public record FileListDto(
+    public record UploadFilesResponse(
+            List<FileDto> files
+    ) {
+    }
+
+    public record UpdateFilesResponse(
             List<FileDto> files
     ) {
     }
