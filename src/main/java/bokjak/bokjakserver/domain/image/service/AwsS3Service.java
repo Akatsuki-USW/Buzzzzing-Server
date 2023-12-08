@@ -1,8 +1,8 @@
 package bokjak.bokjakserver.domain.image.service;
 
 import static bokjak.bokjakserver.config.security.SecurityUtils.getCurrentUserSocialEmail;
-import static bokjak.bokjakserver.domain.image.service.ImageFilePathUtils.buildImageFilePath;
-import static bokjak.bokjakserver.domain.image.service.ImageFilePathUtils.buildRootPath;
+import static bokjak.bokjakserver.util.image.ImageFilePathUtils.buildImageFilePath;
+import static bokjak.bokjakserver.util.image.ImageFilePathUtils.buildRootPath;
 
 import bokjak.bokjakserver.common.exception.StatusCode;
 import bokjak.bokjakserver.domain.image.S3SaveDir;
