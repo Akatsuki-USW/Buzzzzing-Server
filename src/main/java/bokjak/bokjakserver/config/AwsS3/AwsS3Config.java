@@ -1,4 +1,4 @@
-package bokjak.bokjakserver.util.s3;
+package bokjak.bokjakserver.config.AwsS3;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
