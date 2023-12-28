@@ -7,7 +7,6 @@ import bokjak.bokjakserver.domain.user.dto.AuthDto.SigningUser;
 import bokjak.bokjakserver.domain.user.exeption.AuthException;
 import bokjak.bokjakserver.domain.user.model.Role;
 import bokjak.bokjakserver.domain.user.model.User;
-import bokjak.bokjakserver.domain.user.service.UserService;
 import bokjak.bokjakserver.util.CustomEncryptUtil;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -31,39 +30,35 @@ import java.util.concurrent.TimeUnit;
 public class JwtProvider {
 
     private final PrincipalDetailService principalDetailService;
-    private final Key privatekey;
+    private final Key privateKey;
     private final CustomEncryptUtil customEncryptUtil;
     private final RedisService redisService;
-    private final UserService userService;
+    @Value("${jwt.access-duration}")
+    public long accessDuration;
+    @Value("${jwt.refresh-duration}")
+    public long refreshDuration;
 
     public JwtProvider(@Value("${jwt.secret-key}") String secretKey,
                        PrincipalDetailService principalDetailService,
                        CustomEncryptUtil customEncryptUtil,
-                       RedisService redisService, UserService userService){
-        this.privatekey= Keys.hmacShaKeyFor(secretKey.getBytes());      //인코딩된 byte array
+                       RedisService redisService) {
+        this.privateKey = Keys.hmacShaKeyFor(secretKey.getBytes());      //인코딩된 byte array
         this.principalDetailService = principalDetailService;
         this.customEncryptUtil = customEncryptUtil;
         this.redisService = redisService;
-        this.userService = userService;
     }
-
-    @Value("${jwt.access-duration}")
-    public long accessDuration;
-
-    @Value("${jwt.refresh-duration}")
-    public long refreshDuration;
 
     //Request 헤더에서 토큰 추출
     public String resolveToken(HttpServletRequest request) {
         String rawToken = request.getHeader("Authorization");
         if (rawToken != null && rawToken.startsWith("Bearer "))
-            return rawToken.replace("Bearer ","");
+            return rawToken.replace("Bearer ", "");
         else return null;
     }
 
     public String resolveSignToken(String rawToken) {
         if (rawToken != null && rawToken.startsWith("Bearer "))
-            return rawToken.replace("Bearer ","");
+            return rawToken.replace("Bearer ", "");
         else throw new AuthException(StatusCode.SIGNUP_TOKEN_ERROR);
     }
 
@@ -75,7 +70,7 @@ public class JwtProvider {
                 .claim("sign", Role.ROLE_USER)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + accessDuration))
-                .signWith(privatekey)
+                .signWith(privateKey)
                 .compact();
     }
 
@@ -86,8 +81,19 @@ public class JwtProvider {
                 .setSubject(customEncryptUtil.encrypt(user.getSocialEmail()))
                 .claim("role", user.getRole())
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime()+accessDuration))
-                .signWith(privatekey)
+                .setExpiration(new Date(now.getTime() + accessDuration))
+                .signWith(privateKey)
+                .compact();
+    }
+
+    private String createAccessToken(String socialEmail, Role role) {
+        Date now = new Date(System.currentTimeMillis());
+        return Jwts.builder()
+                .setSubject(customEncryptUtil.encrypt(socialEmail))
+                .claim("role", role)
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + accessDuration))
+                .signWith(privateKey)
                 .compact();
     }
 
@@ -97,17 +103,30 @@ public class JwtProvider {
         return Jwts.builder()
                 .setSubject(customEncryptUtil.encrypt(user.getSocialEmail()))
                 .setIssuedAt(now)
+                .claim("role", user.getRole())
                 .claim("tokenType", "refresh")
-                .setExpiration(new Date(now.getTime()+refreshDuration))
-                .signWith(privatekey)
+                .setExpiration(new Date(now.getTime() + refreshDuration))
+                .signWith(privateKey)
+                .compact();
+    }
+
+    private String createRefreshToken(String socialEmail, Role role) {
+        Date now = new Date(System.currentTimeMillis());
+        return Jwts.builder()
+                .setSubject(customEncryptUtil.encrypt(socialEmail))
+                .setIssuedAt(now)
+                .claim("role", role)
+                .claim("tokenType", "refresh")
+                .setExpiration(new Date(now.getTime() + refreshDuration))
+                .signWith(privateKey)
                 .compact();
     }
 
     //Access, Refresh Token 검증 (만료 여부 검사)
-    public boolean validate(String token){
+    public boolean validate(String token) {
         try {
             Jwts.parserBuilder()
-                    .setSigningKey(privatekey)  //검증키 지정
+                    .setSigningKey(privateKey)  //검증키 지정
                     .build()
                     .parseClaimsJws(token); //토큰의 유효 기간을 확인하기 위해 exp claim을 가져와 현재와 비교
             return true;
@@ -126,24 +145,24 @@ public class JwtProvider {
     //Authentication 객체 가져오기
     public Authentication getAuthentication(String accessToken) {
         Claims body = Jwts.parserBuilder()
-                .setSigningKey(privatekey)
+                .setSigningKey(privateKey)
                 .build()
                 .parseClaimsJws(accessToken)
                 .getBody();
         String socialEmail = customEncryptUtil.decrypt(body.getSubject());
         UserDetails userDetails = principalDetailService.loadUserByUsername(socialEmail);
-        return new UsernamePasswordAuthenticationToken(userDetails,"",userDetails.getAuthorities());
+        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
     public SigningUser getSignKey(String signToken) {
         Claims body = Jwts.parserBuilder()
-                .setSigningKey(privatekey)
+                .setSigningKey(privateKey)
                 .build()
                 .parseClaimsJws(signToken)
                 .getBody();
         String socialEmail = customEncryptUtil.decrypt(body.getSubject());
         String[] split = socialEmail.split("@");
-        return new SigningUser(socialEmail, split[0],split[1]);
+        return new SigningUser(socialEmail, split[0], split[1]);
     }
 
 
@@ -155,19 +174,19 @@ public class JwtProvider {
         String refresh = createRefreshToken(user);
 
         redisService.setValues(user.getSocialEmail(), refresh, refreshDuration, TimeUnit.MILLISECONDS);
-        return new JwtDto(access,refresh);
+        return new JwtDto(access, refresh);
     }
 
     public JwtDto adminIssue(User user) {
         String accessToken = createAccessToken(user);
-        return new JwtDto(accessToken,"");
+        return new JwtDto(accessToken, "");
     }
 
     public JwtDto reissue(String refreshToken) {
 
         try {
             Claims body = Jwts.parserBuilder()
-                    .setSigningKey(privatekey)
+                    .setSigningKey(privateKey)
                     .build()
                     .parseClaimsJws(refreshToken)
                     .getBody();
@@ -175,18 +194,23 @@ public class JwtProvider {
                 throw new AuthException(StatusCode.IS_NOT_REFRESH);
             String socialEmail = customEncryptUtil.decrypt(body.getSubject());
             String valueToken = redisService.getValues(socialEmail);
-            if (!valueToken.equals(refreshToken)) throw new AuthException(StatusCode.IS_NOT_CORRECT_REFRESH);
+            if (valueToken == null || !valueToken.equals(refreshToken))
+                throw new AuthException(StatusCode.IS_NOT_CORRECT_REFRESH);
 
-            User user = userService.getUserBySocialEmail(socialEmail);
-            String newAccessToken = createAccessToken(user);
-            String newRefreshToken = createRefreshToken(user);
+            Role role = changeObjectToRole(body.get("role"));
+            String newAccessToken = createAccessToken(socialEmail, role);
+            String newRefreshToken = createRefreshToken(socialEmail, role);
 
             redisService.setValues(socialEmail, newRefreshToken, refreshDuration, TimeUnit.MILLISECONDS);
-            return new JwtDto(newAccessToken,newRefreshToken);
+            return new JwtDto(newAccessToken, newRefreshToken);
         } catch (ExpiredJwtException e) {
             throw new AuthException(StatusCode.EXPIRED_REFRESH);
         }
+    }
 
-
+    private Role changeObjectToRole(Object role) {
+        if (role.equals("ROLE_USER")) {
+            return Role.ROLE_USER;
+        } else throw new AuthException(StatusCode.FILTER_ROLE_FORBIDDEN);
     }
 }
