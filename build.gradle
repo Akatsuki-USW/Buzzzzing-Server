@@ -46,7 +46,7 @@ dependencies {
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
 	// JSON 컬럼 호환성
-	implementation 'com.vladmihalcea:hibernate-types-60:2.20.0'
+	implementation 'com.vladmihalcea:hibernate-types-60:2.21.1'
 
 
 	// mail 추가
