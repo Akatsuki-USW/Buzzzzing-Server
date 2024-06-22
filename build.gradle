@@ -37,7 +37,7 @@ dependencies {
 	//jjwt 추가
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.2'
 	implementation 'io.jsonwebtoken:jjwt-impl:0.11.2'
-	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.2'
+	implementation 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 
 	// queryDSL
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
