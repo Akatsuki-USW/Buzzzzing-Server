@@ -60,7 +60,7 @@ dependencies {
 
 	// fcm 추가
 	implementation("com.google.firebase:firebase-admin:6.8.1")
-	implementation("com.squareup.okhttp3:okhttp:4.9.1")
+	implementation("com.squareup.okhttp3:okhttp:4.12.0")
 
 	// json simple
 	implementation("com.googlecode.json-simple:json-simple:1.1.1")
